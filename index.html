@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rhood Stone — Eligibility Checker</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#050706;color:#f1f5f2;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{max-width:760px;margin:auto;padding:22px 16px 50px}.cover{width:100%;height:220px;object-fit:cover;border-radius:18px;border:1px solid #1d2922;display:block}.brand{text-align:center;margin-top:-32px;position:relative}.logo{width:72px;height:72px;border-radius:50%;border:4px solid #050706;object-fit:cover}.title{font-size:38px;margin:8px 0 4px;font-weight:800;letter-spacing:-1px}.tag{color:#9ba79f;margin:0 0 28px}.card{background:#0b100d;border:1px solid #1d2922;border-radius:18px;padding:24px}.label{font-size:14px;color:#aab4ae;margin-bottom:8px;display:block}.input{width:100%;padding:15px 16px;border-radius:12px;border:1px solid #2b392f;background:#070a08;color:#fff;font-size:16px;outline:none}.input:focus{border-color:#63d28a}.btn{width:100%;margin-top:12px;padding:15px;border:0;border-radius:12px;background:#8be28d;color:#071008;font-weight:800;font-size:16px;cursor:pointer}.btn:disabled{opacity:.6;cursor:wait}.submit{background:#c8f7cf;margin-top:10px}.result{display:none;margin-top:16px;padding:18px;border-radius:12px;border:1px solid #2b392f;background:#070a08}.result.show{display:block}.result h2{margin:0 0 5px}.result p{margin:0;color:#aab4ae}.ok h2{color:#8be28d}.no h2{color:#f0a7a7}.note{text-align:center;color:#657169;font-size:12px;margin-top:18px}.small{font-size:12px;color:#68746d;margin-top:9px}.error{color:#f0a7a7}.spinner{display:inline-block;width:14px;height:14px;border:2px solid #234329;border-top-color:#071008;border-radius:50%;vertical-align:-2px;margin-right:6px;animation:s .7s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <img class="cover" src="assets/cover.png" alt="Rhood Stone cover">
+  <div class="brand"><img class="logo" src="assets/logo.png" alt="Rhood Stone logo"></div>
+  <h1 class="title" style="text-align:center">Rhood Stone</h1>
+  <p class="tag" style="text-align:center">The chain moves forward. The stone remembers.</p>
+
+  <section class="card">
+    <label class="label" for="wallet">Wallet address</label>
+    <input id="wallet" class="input" autocomplete="off" spellcheck="false" placeholder="0x...">
+    <button id="check" class="btn">Check Eligibility</button>
+    <button id="submit" class="btn submit" style="display:none">Submit Address</button>
+    <div id="result" class="result"></div>
+    <div class="small">Only the eligibility result is shown. The transaction threshold is not displayed.</div>
+  </section>
+  <p class="note">Rhood Stone • An on-chain monument to Robinhood OGs.</p>
+</main>
+<script>
+const SUPABASE_FUNCTION_URL = "YOUR_SUPABASE_FUNCTION_URL";
+const walletEl=document.getElementById('wallet');
+const btn=document.getElementById('check');
+const submitBtn=document.getElementById('submit');
+const result=document.getElementById('result');
+
+let eligibleWallet = null;
+
+function show(type,title,text){
+  result.className='result show '+type;
+  result.innerHTML=`<h2>${title}</h2><p>${text}</p>`;
+}
+
+function validAddress(address){
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+async function api(payload){
+  const r=await fetch(SUPABASE_FUNCTION_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  const data=await r.json();
+  if(!r.ok) throw new Error(data.error||'Request failed');
+  return data;
+}
+
+async function check(){
+  const wallet=walletEl.value.trim();
+  submitBtn.style.display='none';
+  eligibleWallet=null;
+
+  if(!validAddress(wallet)){
+    show('no','Invalid address','Please enter a valid EVM wallet address.');
+    return;
+  }
+
+  if(SUPABASE_FUNCTION_URL.includes('YOUR_')){
+    show('no','Backend URL not configured','The Supabase Edge Function URL has not been added yet.');
+    return;
+  }
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Checking...';
+  result.className='result';
+
+  try{
+    const data=await api({action:'check',address:wallet});
+
+    if(data.eligible){
+      eligibleWallet=wallet;
+      show('ok','Eligible ✓','This wallet qualifies for Rhood Stone.');
+      submitBtn.style.display='block';
+    }else{
+      show('no','Not Eligible','This wallet does not currently qualify.');
+    }
+  }catch(e){
+    show('no','Something went wrong',e.message||'Please try again later.');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Check Eligibility';
+  }
+}
+
+async function submitAddress(){
+  const wallet=eligibleWallet;
+  if(!wallet || !validAddress(wallet)) return;
+
+  submitBtn.disabled=true;
+  submitBtn.innerHTML='<span class="spinner"></span>Submitting...';
+
+  try{
+    const data=await api({action:'submit',address:wallet});
+
+    if(data.submitted){
+      submitBtn.style.display='none';
+      show('ok','Address Submitted ✓','Your wallet address has been submitted successfully.');
+    }else{
+      show('no','Not Eligible','This wallet no longer qualifies.');
+      submitBtn.style.display='none';
+      eligibleWallet=null;
+    }
+  }catch(e){
+    show('no','Submission failed',e.message||'Please try again later.');
+  }finally{
+    submitBtn.disabled=false;
+    submitBtn.textContent='Submit Address';
+  }
+}
+
+btn.addEventListener('click',check);
+submitBtn.addEventListener('click',submitAddress);
+
+walletEl.addEventListener('keydown',e=>{
+  if(e.key==='Enter') check();
+});
+</script>
+</body>
+</html>
