@@ -54,27 +54,25 @@ body:after{
 
 /* Actual stone-text: the letters use a grayscale texture made from the supplied stone artwork */
 .stone-text,.stone-title{
-  background-image:url("./assets/stone-texture.jpg");
-  background-size:260px 260px;
-  background-position:center;
-  -webkit-background-clip:text;
-  background-clip:text;
-
-  color:#f4efe3;
-  -webkit-text-fill-color:#f4efe3;
-
-  font-weight:900;
-
-  -webkit-text-stroke:1px rgba(255,255,255,.55);
-
-  text-shadow:
-    0 2px 0 #ffffff,
-    0 4px 0 #77756c,
-    0 7px 0 #292a25,
-    0 10px 14px rgba(0,0,0,.95);
-
-  filter:contrast(1.15);
+ background-image:url("./assets/stone-texture.jpg");
+ background-size:260px 260px;
+ background-position:center;
+ -webkit-background-clip:text;background-clip:text;
+ color:transparent;
+ -webkit-text-fill-color:transparent;
+ font-weight:900;
+ -webkit-text-stroke:1px rgba(242,236,222,.45);
+ text-shadow:0 3px 0 #171814,0 6px 8px rgba(0,0,0,.9);
+ filter:contrast(1.12);
 }
+
+/* Social tasks */
+.social-tasks{display:grid;gap:12px;margin:0 0 22px}
+.social-task{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:2px solid #4b4d44;border-radius:10px;background:linear-gradient(180deg,rgba(50,52,45,.94),rgba(16,18,15,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 16px #000}
+.social-task a{color:#f6f0e1;text-decoration:none;font-weight:900;letter-spacing:.5px;flex:1}
+.task-action{border:1px solid #77786f;border-radius:7px;padding:9px 12px;background:#2a2c27;color:#f7f1e3;font-weight:900;cursor:pointer;white-space:nowrap}
+.social-task.done{border-color:#7e9273}.social-task.done .task-action{color:#b9d9aa;border-color:#7e9273}
+@media(max-width:560px){.social-task{padding:12px;gap:8px}.social-task a{font-size:13px}.task-action{padding:8px;font-size:11px}}
 
 /* Hero */
 .hero{text-align:center;padding:46px 10px 22px}
@@ -178,10 +176,14 @@ body:after{
 </section>
 
 <section class="stone-panel">
+ <div class="social-tasks" aria-label="Community tasks">
+  <div class="social-task" id="followTask"><a href="https://x.com/rhoodstone" target="_blank" rel="noopener">FOLLOW @RHOODSTONE</a><button class="task-action" id="followAction" type="button">OPEN X</button></div>
+  <div class="social-task" id="postTask"><a href="https://x.com/RhoodStone/status/2097333768998801839" target="_blank" rel="noopener">LIKE + REPOST THE POST</a><button class="task-action" id="postAction" type="button">OPEN POST</button></div>
+ </div>
  <h2 class="panel-title stone-text">CHECK YOUR ELIGIBILITY</h2>
  <label class="label stone-text" for="wallet">WALLET ADDRESS</label>
  <input id="wallet" class="input" autocomplete="off" spellcheck="false" placeholder="0x...">
- <button id="check" class="stone-btn">CHECK ELIGIBILITY</button>
+ <button id="check" class="stone-btn" style="display:none">CHECK ELIGIBILITY</button>
  <button id="submit" class="stone-btn submit" style="display:none">SUBMIT ADDRESS</button>
  <div id="result" class="result"></div>
  <div class="note">Only eligible wallets can submit their address.</div>
@@ -198,6 +200,17 @@ const submitBtn=document.getElementById("submit");
 const result=document.getElementById("result");
 let eligibleAddress=null;
 const valid=a=>/^0x[a-fA-F0-9]{40}$/.test(a);
+const TASKS_KEY="rhoodstone_social_tasks_v1";
+let socialTasks=JSON.parse(localStorage.getItem(TASKS_KEY)||"{}");
+function markTask(name){socialTasks[name]=true;localStorage.setItem(TASKS_KEY,JSON.stringify(socialTasks));renderTasks()}
+function renderTasks(){
+ const items=[["follow",document.getElementById("followTask"),document.getElementById("followAction")],["post",document.getElementById("postTask"),document.getElementById("postAction")]];
+ items.forEach(([name,el,btn])=>{const done=!!socialTasks[name];el.classList.toggle("done",done);btn.textContent=done?"✓ COMPLETED":(name==="follow"?"OPEN X":"OPEN POST");btn.disabled=done;});
+ checkBtn.style.display=(socialTasks.follow&&socialTasks.post)?"block":"none";
+}
+document.getElementById("followAction").onclick=()=>{window.open("https://x.com/rhoodstone","_blank","noopener");markTask("follow")};
+document.getElementById("postAction").onclick=()=>{window.open("https://x.com/RhoodStone/status/2097333768998801839","_blank","noopener");markTask("post")};
+renderTasks();
 
 function show(kind,title,msg){
  result.className="result show "+kind;
