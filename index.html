@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030503">
+<title>Rhood Stone</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#020402}
+body{
+ color:#f6f0e1;
+ font-family:Georgia,"Times New Roman",serif;
+ background:
+  linear-gradient(rgba(1,4,2,.28),rgba(1,4,2,.58)),
+  url("./assets/cover.jpg") center center/cover no-repeat;
+ background-attachment:scroll;
+}
+body:after{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+ background:radial-gradient(circle at 50% 28%,transparent 0 28%,rgba(0,0,0,.20) 62%,rgba(0,0,0,.62) 100%);
+}
+.page{position:relative;z-index:1;min-height:100vh;padding:10px 16px 35px}
+.container{width:min(1180px,100%);margin:auto}
+
+/* Header: minimal, exactly the requested elements */
+.header{
+ height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px;
+ padding:8px 12px;border:2px solid rgba(83,87,72,.9);border-radius:12px;
+ background:linear-gradient(180deg,rgba(36,39,32,.96),rgba(9,12,9,.96));
+ box-shadow:0 12px 30px #000,inset 0 2px 0 rgba(255,255,255,.16);
+ position:relative;overflow:hidden;
+}
+.header:before,.stone-panel:before,.stone-btn:before{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+ background-image:
+  repeating-linear-gradient(117deg,rgba(255,255,255,.18) 0 1px,transparent 1px 18px),
+  repeating-linear-gradient(22deg,rgba(0,0,0,.24) 0 1px,transparent 1px 14px);
+ mix-blend-mode:overlay;
+}
+.brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1;min-width:0}
+.logo{
+ width:52px;height:52px;object-fit:contain;display:block;border-radius:50%;
+ background:#020302;border:2px solid #4a4d43;box-shadow:0 0 18px rgba(104,255,67,.18),0 4px 12px #000;
+}
+.brand-name{font-size:clamp(22px,3vw,34px);letter-spacing:1.2px;white-space:nowrap}
+.xlink{
+ position:relative;z-index:1;display:flex;align-items:center;gap:9px;
+ color:#f7f1e3;text-decoration:none;padding:9px 13px;border:2px solid #4b4d44;
+ border-radius:8px;background:linear-gradient(#4a4c43,#252821);
+ box-shadow:inset 0 1px 0 #aaa79b,0 5px 12px #000;
+}
+.xicon{font-size:23px;line-height:1}.handle{font-size:15px;font-weight:900;letter-spacing:.4px}
+
+/* Actual stone-text: the letters use a grayscale texture made from the supplied stone artwork */
+.stone-text,.stone-title{
+ background-image:url("./assets/stone-texture.jpg");
+ background-size:260px 260px;
+ background-position:center;
+ -webkit-background-clip:text;background-clip:text;
+ color:transparent;
+ -webkit-text-fill-color:transparent;
+ font-weight:900;
+ -webkit-text-stroke:1px rgba(242,236,222,.45);
+ text-shadow:0 3px 0 #171814,0 6px 8px rgba(0,0,0,.9);
+ filter:contrast(1.12);
+}
+
+/* Hero */
+.hero{text-align:center;padding:46px 10px 22px}
+.hero h1{
+ margin:0;font-size:clamp(58px,10vw,116px);line-height:.86;letter-spacing:2px;
+ text-transform:uppercase;
+}
+.hero .tag{
+ margin:18px 0 0;font-size:clamp(14px,2vw,20px);letter-spacing:2px;
+}
+
+/* Main checker only — no unnecessary text/cards */
+.stone-panel{
+ position:relative;overflow:hidden;
+ width:min(760px,100%);margin:6px auto 0;padding:28px;
+ border:3px solid #4b4c43;border-radius:16px;
+ background:linear-gradient(145deg,rgba(69,70,61,.97),rgba(28,30,25,.98) 48%,rgba(10,12,9,.99));
+ box-shadow:0 24px 55px #000,inset 0 2px 0 rgba(255,255,255,.2),inset 0 -6px #11130f;
+}
+.panel-title{
+ margin:0 0 21px;text-align:center;font-size:clamp(25px,4vw,38px);
+ letter-spacing:1.3px;text-transform:uppercase;
+}
+.label{
+ display:block;margin:0 0 9px;font-size:14px;letter-spacing:1.5px;
+}
+.input{
+ width:100%;height:60px;padding:0 16px;border:3px solid #3a3d35;border-radius:10px;
+ background:linear-gradient(#11140f,#070907);color:#fffdf4;
+ font:900 17px Georgia,serif;outline:none;box-shadow:inset 0 5px 12px #000;
+}
+.input::placeholder{color:#aaa79b}
+.input:focus{border-color:#79926c;box-shadow:0 0 0 2px rgba(121,255,69,.15),inset 0 5px 12px #000}
+.stone-btn{
+ position:relative;overflow:hidden;width:100%;height:62px;margin-top:15px;
+ border:3px solid #4a4c43;border-radius:10px;cursor:pointer;
+ background:linear-gradient(#a8a59a,#77756c 50%,#464741);
+ color:#fff8e8;font:900 18px Georgia,serif;letter-spacing:1px;text-transform:uppercase;
+ -webkit-text-stroke:.45px #282923;
+ text-shadow:0 1px 0 #fff,0 3px 0 #77746b,0 5px 0 #2a2b26,0 7px 8px #000;
+ box-shadow:inset 0 2px 0 #e9e4d8,inset 0 -5px #2b2c27,0 8px 18px #000;
+}
+.stone-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.stone-btn:disabled{opacity:.62;cursor:wait}
+.submit{background:linear-gradient(#a8c69b,#718864 50%,#465342);border-color:#56664f}
+.result{
+ display:none;position:relative;margin-top:16px;padding:17px;
+ border:3px solid #3c3e36;border-radius:10px;background:linear-gradient(#20231d,#090b08);
+ text-align:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.1),0 8px 15px #000;
+}
+.result.show{display:block}
+.result h3{margin:0 0 6px;font-size:26px}
+.result p{margin:0;color:#eee8da;font-size:15px;text-shadow:0 2px #1d1f1a}
+.result.ok h3{color:#baff9a;text-shadow:0 1px #f0ffe5,0 3px #62865b,0 5px #192017,0 0 12px rgba(121,255,69,.3)}
+.note{text-align:center;margin:13px 0 0;color:#ded7c8;font-size:12px;text-shadow:0 2px #151713}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid #4a4c43;border-top-color:#111;border-radius:50%;vertical-align:-2px;margin-right:7px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:700px){
+ body{
+  background:
+   linear-gradient(rgba(1,4,2,.34),rgba(1,4,2,.70)),
+   url("./assets/cover.jpg") center center/auto 100% no-repeat;
+ }
+ .page{padding:7px 8px 26px}
+ .header{height:64px;padding:6px 8px;border-radius:9px;gap:8px}
+ .logo{width:42px;height:42px}
+ .brand-name{font-size:20px;letter-spacing:.8px}
+ .xlink{padding:7px 8px}.xicon{font-size:19px}.handle{font-size:12px}
+ .hero{padding:35px 5px 18px}
+ .hero h1{font-size:47px;letter-spacing:1px}
+ .hero .tag{font-size:11px;letter-spacing:.8px;margin-top:12px}
+ .stone-panel{padding:20px 13px;border-radius:12px;margin-top:3px}
+ .panel-title{font-size:25px;margin-bottom:18px}
+ .input{height:56px;font-size:15px}
+ .stone-btn{height:58px;font-size:15px}
+}
+@media(max-width:390px){
+ .brand-name{font-size:18px}.handle{font-size:11px}.xicon{font-size:18px}
+ .hero h1{font-size:40px}.hero .tag{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="container">
+
+<header class="header">
+ <div class="brand">
+  <img class="logo" src="./assets/logo.png" alt="Rhood Stone">
+  <div class="brand-name stone-text">RHOOD STONE</div>
+ </div>
+ <a class="xlink" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
+  <span class="xicon">𝕏</span><span class="handle">@rhoodstone</span>
+ </a>
+</header>
+
+<section class="hero">
+ <h1 class="stone-title">RHOOD STONE</h1>
+ <div class="tag stone-text">THE CHAIN MOVES FORWARD. THE STONE REMEMBERS.</div>
+</section>
+
+<section class="stone-panel">
+ <h2 class="panel-title stone-text">CHECK YOUR ELIGIBILITY</h2>
+ <label class="label stone-text" for="wallet">WALLET ADDRESS</label>
+ <input id="wallet" class="input" autocomplete="off" spellcheck="false" placeholder="0x...">
+ <button id="check" class="stone-btn">CHECK ELIGIBILITY</button>
+ <button id="submit" class="stone-btn submit" style="display:none">SUBMIT ADDRESS</button>
+ <div id="result" class="result"></div>
+ <div class="note">Only eligible wallets can submit their address.</div>
+</section>
+
+</div>
+</div>
+
+<script>
+const SUPABASE_FUNCTION_URL="YOUR_SUPABASE_FUNCTION_URL";
+const wallet=document.getElementById("wallet");
+const checkBtn=document.getElementById("check");
+const submitBtn=document.getElementById("submit");
+const result=document.getElementById("result");
+let eligibleAddress=null;
+const valid=a=>/^0x[a-fA-F0-9]{40}$/.test(a);
+
+function show(kind,title,msg){
+ result.className="result show "+kind;
+ result.innerHTML="<h3>"+title+"</h3><p>"+msg+"</p>";
+}
+async function request(action,address){
+ const r=await fetch(SUPABASE_FUNCTION_URL,{
+  method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({action,address})
+ });
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(data.error||"Request failed");
+ return data;
+}
+async function checkEligibility(){
+ const address=wallet.value.trim();
+ submitBtn.style.display="none";eligibleAddress=null;result.className="result";
+ if(!valid(address)){show("bad","INVALID ADDRESS","Please enter a valid EVM wallet address.");return}
+ if(SUPABASE_FUNCTION_URL.includes("YOUR_")){
+  show("bad","BACKEND NOT CONFIGURED","Add your Supabase Edge Function URL in index.html first.");return
+ }
+ checkBtn.disabled=true;checkBtn.innerHTML='<span class="spinner"></span>CHECKING...';
+ try{
+  const data=await request("check",address);
+  if(data.eligible){
+   eligibleAddress=address;
+   show("ok","ELIGIBLE ✓","This wallet qualifies for Rhood Stone.");
+   submitBtn.style.display="block";
+  }else show("bad","NOT ELIGIBLE","This wallet does not currently qualify.");
+ }catch(e){show("bad","CHECK FAILED",e.message)}
+ finally{checkBtn.disabled=false;checkBtn.textContent="CHECK ELIGIBILITY"}
+}
+async function submitAddress(){
+ if(!eligibleAddress)return;
+ submitBtn.disabled=true;submitBtn.innerHTML='<span class="spinner"></span>SUBMITTING...';
+ try{
+  const data=await request("submit",eligibleAddress);
+  if(data.submitted){
+   submitBtn.style.display="none";
+   show("ok","ADDRESS SUBMITTED ✓","Your wallet address has been submitted successfully.");
+  }else{
+   eligibleAddress=null;submitBtn.style.display="none";
+   show("bad","NOT ELIGIBLE","This wallet no longer qualifies.");
+  }
+ }catch(e){show("bad","SUBMISSION FAILED",e.message)}
+ finally{submitBtn.disabled=false;submitBtn.textContent="SUBMIT ADDRESS"}
+}
+checkBtn.onclick=checkEligibility;
+submitBtn.onclick=submitAddress;
+wallet.addEventListener("keydown",e=>{if(e.key==="Enter")checkEligibility()});
+</script>
+</body>
+</html>
