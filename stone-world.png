@@ -51,3 +51,7 @@ This does NOT automatically discover wallets that never visit the checker. To bu
 
 VISUAL
 The site now uses assets/stone-world.png as the full-page stone/ancient-world background and a carved-stone UI treatment for all text and controls.
+
+
+LOGO FIX
+The stone logo is embedded directly inside index.html as a data URI. This prevents the logo from breaking on GitHub Pages when the assets folder/path is missing or misconfigured.

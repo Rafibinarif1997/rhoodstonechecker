@@ -25,7 +25,7 @@ body:before{
 .wrap{width:min(920px,94vw);margin:auto;padding:32px 14px 54px;position:relative;z-index:1}
 .hero{text-align:center;margin-bottom:24px}
 .logo-wrap{display:inline-flex;padding:7px;border-radius:50%;background:linear-gradient(145deg,#aaa69a,#33342d);box-shadow:0 8px 25px #000, inset 0 1px 2px #d6d0c1}
-.logo{width:78px;height:78px;border-radius:50%;display:block;object-fit:cover;background:#000}
+.logo{width:70px;height:70px;border-radius:50%;display:block;object-fit:cover}
 .title{
   margin:13px 0 3px;font-size:clamp(42px,8vw,76px);line-height:.95;
   letter-spacing:2px;font-weight:900;color:#9a968a;
@@ -97,7 +97,7 @@ body:before{
 <body>
 <main class="wrap">
   <header class="hero">
-    <div class="logo-wrap"><img class="logo" src="./assets/logo.jpg" alt="Rhood Stone logo"></div>
+    <div class="logo-wrap"><img class="logo" src="./assets/logo.png" alt="" aria-hidden="true"></div>
     <h1 class="title">Rhood Stone</h1>
     <p class="tag">The chain moves forward. The stone remembers.</p>
     <div class="stone-line"></div>
