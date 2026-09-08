@@ -1,42 +1,53 @@
-RHOOD STONE — SUPABASE CHECKER
+RHOOD STONE — SUPABASE VERSION
 
-FLOW
-1. User enters a wallet address.
-2. Clicks "Check Eligibility".
-3. If eligible, "Submit Address" appears.
-4. Only after the user clicks "Submit Address" is the wallet saved to Supabase.
-5. If not eligible, the Submit Address button never appears.
+RULE
+10+ successful OUTGOING transactions on Robinhood Chain = Eligible.
+Failed/reverted transactions do not count.
 
-SECURITY
-- Never put BLOCKSCOUT_API_KEY in index.html.
-- Add BLOCKSCOUT_API_KEY as a Supabase Edge Function secret.
-- SUPABASE_SERVICE_ROLE_KEY is used only by the Edge Function to write to the database.
-- The submit action re-checks eligibility server-side, so users cannot submit arbitrary ineligible addresses by bypassing the frontend.
+ARCHITECTURE
+GitHub Pages/frontend -> Supabase Edge Function -> Blockscout API
+The Blockscout API key stays server-side in Supabase.
 
-SETUP
-1. In Supabase SQL Editor, run schema.sql.
-2. Deploy the Edge Function:
-   supabase functions deploy check-eligibility
-3. Add the Blockscout API key as an Edge Function secret:
-   supabase secrets set BLOCKSCOUT_API_KEY=YOUR_KEY
-   Do NOT paste the key into the website.
-4. Your function URL will be:
+1) Create a Supabase project.
+2) Open SQL Editor and run schema.sql.
+3) Deploy the Edge Function folder:
+   supabase/functions/check-eligibility/index.ts
+   and supabase/config.toml
+
+CLI (recommended):
+   supabase login
+   supabase link --project-ref YOUR_PROJECT_REF
+   supabase functions deploy check-eligibility --no-verify-jwt
+
+4) Add this Supabase Edge Function secret:
+   BLOCKSCOUT_API_KEY = YOUR_NEW_BLOCKSCOUT_KEY
+
+   Do NOT put the Blockscout key in index.html or GitHub.
+
+5) Your function URL will be:
    https://YOUR_PROJECT_REF.supabase.co/functions/v1/check-eligibility
-5. In index.html replace:
+
+6) Open index.html and replace:
    YOUR_SUPABASE_FUNCTION_URL
-   with your real function URL.
-6. Upload index.html + assets to GitHub Pages or your hosting.
+   with that function URL.
 
-ELIGIBLE LIST
-Submitted addresses are stored in:
-public.eligibility_checks
+7) Upload index.html + assets/ to GitHub Pages.
 
-In Supabase:
-Table Editor → eligibility_checks
+ELIGIBLE ADDRESS LIST
+Every wallet that checks successfully is automatically saved in:
+   Table Editor -> eligibility_checks
 
-You can export the table as CSV.
+The table contains:
+- address
+- eligible
+- successful_transactions
+- checked_at
+
+You can export the table as CSV from Supabase. This gives you the addresses of eligible users who actually used the checker.
 
 IMPORTANT
-Only wallets whose owners click "Submit Address" are saved.
-Failed/reverted transactions do not count.
-The checker counts successful outgoing transactions from the wallet.
+This does NOT automatically discover wallets that never visit the checker. To build a complete chain-wide eligible list, a separate Blockscout transaction scan is needed. I can make that scanner too.
+
+
+VISUAL
+The site now uses assets/stone-world.png as the full-page stone/ancient-world background and a carved-stone UI treatment for all text and controls.

@@ -5,124 +5,136 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Rhood Stone — Eligibility Checker</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#050706;color:#f1f5f2;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{max-width:760px;margin:auto;padding:22px 16px 50px}.cover{width:100%;height:220px;object-fit:cover;border-radius:18px;border:1px solid #1d2922;display:block}.brand{text-align:center;margin-top:-32px;position:relative}.logo{width:72px;height:72px;border-radius:50%;border:4px solid #050706;object-fit:cover}.title{font-size:38px;margin:8px 0 4px;font-weight:800;letter-spacing:-1px}.tag{color:#9ba79f;margin:0 0 28px}.card{background:#0b100d;border:1px solid #1d2922;border-radius:18px;padding:24px}.label{font-size:14px;color:#aab4ae;margin-bottom:8px;display:block}.input{width:100%;padding:15px 16px;border-radius:12px;border:1px solid #2b392f;background:#070a08;color:#fff;font-size:16px;outline:none}.input:focus{border-color:#63d28a}.btn{width:100%;margin-top:12px;padding:15px;border:0;border-radius:12px;background:#8be28d;color:#071008;font-weight:800;font-size:16px;cursor:pointer}.btn:disabled{opacity:.6;cursor:wait}.submit{background:#c8f7cf;margin-top:10px}.result{display:none;margin-top:16px;padding:18px;border-radius:12px;border:1px solid #2b392f;background:#070a08}.result.show{display:block}.result h2{margin:0 0 5px}.result p{margin:0;color:#aab4ae}.ok h2{color:#8be28d}.no h2{color:#f0a7a7}.note{text-align:center;color:#657169;font-size:12px;margin-top:18px}.small{font-size:12px;color:#68746d;margin-top:9px}.error{color:#f0a7a7}.spinner{display:inline-block;width:14px;height:14px;border:2px solid #234329;border-top-color:#071008;border-radius:50%;vertical-align:-2px;margin-right:6px;animation:s .7s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+*{box-sizing:border-box}
+:root{
+  --stone:#7e7b72;--stone-dark:#272821;--stone-deep:#11130f;
+  --moss:#59644b;--green:#8cff62;--text:#d2cec2;
+}
+html,body{margin:0;min-height:100%;background:#050605;color:var(--text)}
+body{
+  font-family:Georgia,"Times New Roman",serif;
+  background:
+    linear-gradient(rgba(3,5,3,.60),rgba(3,5,3,.78)),
+    url("./assets/stone-world.png") center top/cover fixed no-repeat;
+  text-shadow:1px 2px 0 #111,0 -1px 0 rgba(255,255,255,.10);
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 28%,transparent 0,rgba(0,0,0,.08) 42%,rgba(0,0,0,.62) 100%);
+}
+.wrap{width:min(920px,94vw);margin:auto;padding:32px 14px 54px;position:relative;z-index:1}
+.hero{text-align:center;margin-bottom:24px}
+.logo-wrap{display:inline-flex;padding:7px;border-radius:50%;background:linear-gradient(145deg,#aaa69a,#33342d);box-shadow:0 8px 25px #000, inset 0 1px 2px #d6d0c1}
+.logo{width:70px;height:70px;border-radius:50%;display:block;object-fit:cover}
+.title{
+  margin:13px 0 3px;font-size:clamp(42px,8vw,76px);line-height:.95;
+  letter-spacing:2px;font-weight:900;color:#9a968a;
+  background:linear-gradient(#d2cec0 0%,#858176 45%,#403f38 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px #171814;
+  filter:drop-shadow(3px 5px 0 #171814) drop-shadow(0 0 12px rgba(140,255,98,.10));
+}
+.tag{margin:10px 0 0;font-size:clamp(15px,2.2vw,20px);letter-spacing:2px;color:#b4b0a4;font-weight:700}
+.slab{
+  position:relative;margin:22px auto 0;max-width:760px;padding:30px 28px 27px;
+  border:3px solid #34362f;border-radius:22px;
+  background:
+    linear-gradient(145deg,rgba(139,135,123,.90),rgba(52,53,46,.94) 42%,rgba(22,24,20,.97));
+  box-shadow:0 18px 45px #000, inset 0 2px 0 rgba(255,255,255,.22), inset 0 -5px 0 rgba(0,0,0,.45);
+}
+.slab:after{
+  content:"";position:absolute;inset:7px;border-radius:15px;border:1px solid rgba(202,199,185,.18);pointer-events:none;
+}
+.heading{
+  margin:0 0 18px;text-align:center;font-size:clamp(22px,4vw,34px);letter-spacing:2px;
+  color:#c9c4b6;font-weight:900;text-transform:uppercase;
+  -webkit-text-stroke:.5px #292a25;
+  text-shadow:2px 3px 0 #252620,0 -1px 0 #e1ddd0;
+}
+.label{display:block;margin:0 0 9px;color:#c2bdae;font-size:15px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}
+.input{
+  width:100%;height:58px;padding:0 17px;border-radius:12px;border:3px solid #36382f;
+  background:linear-gradient(#242620,#11130f);color:#d8d3c6;font:700 16px Georgia,serif;
+  outline:none;box-shadow:inset 0 4px 10px #000,0 2px 0 rgba(255,255,255,.08);
+}
+.input::placeholder{color:#77776f}
+.input:focus{border-color:#718060;box-shadow:0 0 0 2px rgba(140,255,98,.12),inset 0 4px 10px #000}
+.btn{
+  width:100%;min-height:58px;margin-top:14px;border:3px solid #36382f;border-radius:13px;
+  cursor:pointer;font:900 17px Georgia,serif;letter-spacing:1.2px;text-transform:uppercase;
+  color:#262820;background:linear-gradient(#b9b5a8,#77746a 52%,#4b4b45);
+  box-shadow:inset 0 2px 0 #e3dfd2,inset 0 -4px 0 #292a25,0 7px 16px #000;
+  text-shadow:0 1px 0 #ddd8ca;
+}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.62;cursor:wait}
+.submit{
+  background:linear-gradient(#b4d2a2,#718663 50%,#485542);
+  border-color:#53614c;color:#182017;text-shadow:0 1px 0 #d7e1cf;
+}
+.result{
+  display:none;margin-top:17px;padding:18px 20px;border-radius:13px;
+  border:3px solid #35372f;background:linear-gradient(145deg,#20231d,#0c0e0b);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.09),inset 0 -3px 0 #000;
+}
+.result.show{display:block}
+.result h2{margin:0 0 5px;text-align:center;font-size:25px;letter-spacing:1px;color:#c7c2b5}
+.result p{margin:0;text-align:center;color:#a9a59a;font-size:15px}
+.ok h2{color:#b8dc9e}
+.note{margin:20px auto 0;text-align:center;color:#aaa69a;font-size:14px;letter-spacing:1px}
+.small{margin-top:10px;text-align:center;color:#85837a;font-size:12px}
+.footer{margin-top:24px;text-align:center;color:#8c897f;letter-spacing:2px;font-weight:700}
+.stone-line{height:10px;margin:22px auto 0;max-width:650px;border-radius:999px;background:linear-gradient(#77736a,#282a25);box-shadow:0 4px 10px #000,inset 0 1px 0 #aaa69a}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid #4a4c43;border-top-color:#10120f;border-radius:50%;vertical-align:-2px;margin-right:7px;animation:s .7s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+@media(max-width:600px){
+  .wrap{padding-top:20px}.slab{padding:24px 17px 22px;border-radius:17px}
+  .title{font-size:46px}.tag{letter-spacing:1px}
+}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <img class="cover" src="assets/cover.png" alt="Rhood Stone cover">
-  <div class="brand"><img class="logo" src="assets/logo.png" alt="Rhood Stone logo"></div>
-  <h1 class="title" style="text-align:center">Rhood Stone</h1>
-  <p class="tag" style="text-align:center">The chain moves forward. The stone remembers.</p>
+  <header class="hero">
+    <div class="logo-wrap"><img class="logo" src="./assets/logo.png" alt="Rhood Stone logo"></div>
+    <h1 class="title">Rhood Stone</h1>
+    <p class="tag">The chain moves forward. The stone remembers.</p>
+    <div class="stone-line"></div>
+  </header>
 
-  <section class="card">
-    <label class="label" for="wallet">Wallet address</label>
+  <section class="slab">
+    <h2 class="heading">Check Your Eligibility</h2>
+    <label class="label" for="wallet">Wallet Address</label>
     <input id="wallet" class="input" autocomplete="off" spellcheck="false" placeholder="0x...">
     <button id="check" class="btn">Check Eligibility</button>
     <button id="submit" class="btn submit" style="display:none">Submit Address</button>
     <div id="result" class="result"></div>
-    <div class="small">Only the eligibility result is shown. The transaction threshold is not displayed.</div>
+    <div class="small">Only the eligibility result is shown.</div>
   </section>
-  <p class="note">Rhood Stone • An on-chain monument to Robinhood OGs.</p>
+
+  <p class="note">An on-chain monument to Robinhood OGs.</p>
+  <div class="footer">FORGED FOR THE EARLY • PRESERVED ON-CHAIN</div>
 </main>
 <script>
 const SUPABASE_FUNCTION_URL = "YOUR_SUPABASE_FUNCTION_URL";
-const walletEl=document.getElementById('wallet');
-const btn=document.getElementById('check');
-const submitBtn=document.getElementById('submit');
-const result=document.getElementById('result');
-
-let eligibleWallet = null;
-
-function show(type,title,text){
-  result.className='result show '+type;
-  result.innerHTML=`<h2>${title}</h2><p>${text}</p>`;
-}
-
-function validAddress(address){
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
-
-async function api(payload){
-  const r=await fetch(SUPABASE_FUNCTION_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  });
-  const data=await r.json();
-  if(!r.ok) throw new Error(data.error||'Request failed');
-  return data;
-}
-
+const walletEl=document.getElementById('wallet'), btn=document.getElementById('check'), result=document.getElementById('result');
+function show(type,title,text){result.className='result show '+type;result.innerHTML=`<h2>${title}</h2><p>${text}</p>`}
 async function check(){
-  const wallet=walletEl.value.trim();
-  submitBtn.style.display='none';
-  eligibleWallet=null;
-
-  if(!validAddress(wallet)){
-    show('no','Invalid address','Please enter a valid EVM wallet address.');
-    return;
-  }
-
-  if(SUPABASE_FUNCTION_URL.includes('YOUR_')){
-    show('no','Backend URL not configured','The Supabase Edge Function URL has not been added yet.');
-    return;
-  }
-
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span>Checking...';
-  result.className='result';
-
-  try{
-    const data=await api({action:'check',address:wallet});
-
-    if(data.eligible){
-      eligibleWallet=wallet;
-      show('ok','Eligible ✓','This wallet qualifies for Rhood Stone.');
-      submitBtn.style.display='block';
-    }else{
-      show('no','Not Eligible','This wallet does not currently qualify.');
-    }
-  }catch(e){
-    show('no','Something went wrong',e.message||'Please try again later.');
-  }finally{
-    btn.disabled=false;
-    btn.textContent='Check Eligibility';
-  }
+ const wallet=walletEl.value.trim();
+ if(!/^0x[a-fA-F0-9]{40}$/.test(wallet)){show('no','Invalid address','Please enter a valid EVM wallet address.');return}
+ if(SUPABASE_FUNCTION_URL.includes('YOUR_')){show('no','Backend URL not configured','The Supabase Edge Function URL has not been added yet.');return}
+ btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Checking...';result.className='result';
+ try{
+   const r=await fetch(SUPABASE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address:wallet})});
+   const data=await r.json();
+   if(!r.ok) throw new Error(data.error||'Request failed');
+   if(data.eligible) show('ok','Eligible ✓','This wallet qualifies for Rhood Stone.');
+   else show('no','Not Eligible','This wallet does not currently qualify.');
+ }catch(e){show('no','Something went wrong',e.message||'Please try again later.');}
+ finally{btn.disabled=false;btn.textContent='Check Eligibility'}
 }
-
-async function submitAddress(){
-  const wallet=eligibleWallet;
-  if(!wallet || !validAddress(wallet)) return;
-
-  submitBtn.disabled=true;
-  submitBtn.innerHTML='<span class="spinner"></span>Submitting...';
-
-  try{
-    const data=await api({action:'submit',address:wallet});
-
-    if(data.submitted){
-      submitBtn.style.display='none';
-      show('ok','Address Submitted ✓','Your wallet address has been submitted successfully.');
-    }else{
-      show('no','Not Eligible','This wallet no longer qualifies.');
-      submitBtn.style.display='none';
-      eligibleWallet=null;
-    }
-  }catch(e){
-    show('no','Submission failed',e.message||'Please try again later.');
-  }finally{
-    submitBtn.disabled=false;
-    submitBtn.textContent='Submit Address';
-  }
-}
-
-btn.addEventListener('click',check);
-submitBtn.addEventListener('click',submitAddress);
-
-walletEl.addEventListener('keydown',e=>{
-  if(e.key==='Enter') check();
-});
+btn.addEventListener('click',check);walletEl.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
 </script>
 </body>
 </html>
