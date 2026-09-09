@@ -1,1178 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080b08">
-<meta name="description" content="Rhood Stone — The chain moves forward. The stone remembers.">
-<title>Rhood Stone</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050706">
+<title>Rhood Stone — The Chain Moves Forward. The Stone Remembers.</title>
+<meta name="description" content="Rhood Stone — a commemorative project for the early Robinhood Chain community.">
 <style>
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-html,body{margin:0;padding:0;background:#050705}
-body{
- color:#eee9dc;
- font-family:Georgia,"Times New Roman",serif;
- overflow-x:hidden;
- background:
-   radial-gradient(circle at 50% 0%,rgba(92,113,76,.13),transparent 34%),
-   #050705;
-}
-body:before{
- content:"";
- position:fixed;
- inset:0;
- pointer-events:none;
- z-index:20;
- opacity:.055;
- background-image:
-   repeating-linear-gradient(115deg,rgba(255,255,255,.5) 0 1px,transparent 1px 22px),
-   repeating-linear-gradient(25deg,rgba(0,0,0,.8) 0 1px,transparent 1px 18px);
- mix-blend-mode:overlay;
-}
-a{text-decoration:none;color:inherit}
-button{font-family:inherit}
-.page{position:relative;z-index:1}
-.container{width:min(1160px,calc(100% - 30px));margin:auto}
-
-/* =========================
-   HEADER
-========================= */
-.header-wrap{
- position:sticky;
- top:10px;
- z-index:10;
- padding-top:10px;
-}
-.header{
- height:70px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:20px;
- padding:8px 12px;
- border:1px solid rgba(130,139,112,.38);
- border-radius:15px;
- background:rgba(10,14,10,.82);
- backdrop-filter:blur(16px);
- box-shadow:
-   0 15px 40px rgba(0,0,0,.55),
-   inset 0 1px 0 rgba(255,255,255,.08);
-}
-.brand{
- display:flex;
- align-items:center;
- gap:11px;
- min-width:0;
-}
-.logo{
- width:48px;
- height:48px;
- object-fit:contain;
- border-radius:50%;
- border:1px solid rgba(180,188,157,.35);
- background:#020302;
- box-shadow:0 0 25px rgba(124,168,99,.15);
-}
-.brand-name{
- font-size:clamp(19px,3vw,27px);
- letter-spacing:2px;
- white-space:nowrap;
- font-weight:900;
-}
-.nav{
- display:flex;
- align-items:center;
- gap:4px;
-}
-.nav a{
- padding:9px 11px;
- color:#bcbcaf;
- font-size:12px;
- letter-spacing:1px;
- text-transform:uppercase;
- border-radius:8px;
- transition:.25s;
-}
-.nav a:hover{
- color:#f1ecde;
- background:rgba(130,150,105,.12);
-}
-.xlink{
- display:flex;
- align-items:center;
- gap:8px;
- padding:9px 12px;
- border:1px solid rgba(164,168,145,.4);
- border-radius:9px;
- background:linear-gradient(180deg,#272c25,#151914);
- color:#f2eee3;
- font-weight:900;
- font-size:13px;
- box-shadow:inset 0 1px rgba(255,255,255,.1);
-}
-.xicon{font-size:18px}
-@media(max-width:800px){
- .nav{display:none}
-}
-@media(max-width:450px){
- .header{height:62px;padding:6px 8px}
- .logo{width:42px;height:42px}
- .brand-name{font-size:17px;letter-spacing:1.3px}
- .xlink{padding:8px 9px;font-size:11px}
- .xicon{font-size:16px}
-}
-
-/* =========================
-   TEXTURE TEXT
-========================= */
-.stone-text,
-.stone-title{
- background-image:url("./assets/stone-texture.jpg");
- background-size:280px 280px;
- background-position:center;
- -webkit-background-clip:text;
- background-clip:text;
- color:transparent;
- -webkit-text-fill-color:transparent;
- font-weight:900;
- -webkit-text-stroke:1px rgba(238,235,219,.32);
- filter:contrast(1.15);
-}
-
-/* =========================
-   HERO
-========================= */
-.hero{
- min-height:calc(100vh - 90px);
- display:flex;
- align-items:center;
- justify-content:center;
- text-align:center;
- padding:70px 10px 80px;
- position:relative;
- overflow:hidden;
-}
-.hero:before{
- content:"";
- position:absolute;
- width:650px;
- height:650px;
- left:50%;
- top:42%;
- transform:translate(-50%,-50%);
- background:radial-gradient(circle,rgba(101,139,79,.17),transparent 68%);
- filter:blur(10px);
- pointer-events:none;
-}
-.hero-bg{
- position:absolute;
- inset:0;
- background:
-   linear-gradient(180deg,rgba(5,8,5,.25),#050705 94%),
-   url("./assets/cover.jpg") center/cover no-repeat;
- opacity:.36;
- z-index:-2;
-}
-.hero-content{position:relative;max-width:920px}
-.eyebrow{
- display:inline-flex;
- align-items:center;
- gap:10px;
- margin-bottom:25px;
- color:#aeb89c;
- font-size:11px;
- letter-spacing:4px;
- text-transform:uppercase;
-}
-.eyebrow:before,.eyebrow:after{
- content:"";
- width:35px;
- height:1px;
- background:rgba(161,176,138,.55);
-}
-.hero h1{
- margin:0;
- font-size:clamp(58px,12vw,142px);
- line-height:.82;
- letter-spacing:4px;
- text-transform:uppercase;
- animation:rise .9s ease both;
-}
-.hero-sub{
- margin:30px auto 0;
- max-width:650px;
- color:#c7c4b8;
- font-size:clamp(14px,2vw,18px);
- line-height:1.8;
- letter-spacing:1.8px;
-}
-.hero-actions{
- display:flex;
- justify-content:center;
- gap:12px;
- flex-wrap:wrap;
- margin-top:34px;
-}
-.btn{
- display:inline-flex;
- align-items:center;
- justify-content:center;
- min-width:145px;
- padding:13px 20px;
- border-radius:9px;
- border:1px solid rgba(170,179,148,.4);
- text-transform:uppercase;
- letter-spacing:1.5px;
- font-size:11px;
- font-weight:900;
- transition:.25s;
-}
-.btn-primary{
- background:linear-gradient(180deg,#83966f,#59674d);
- color:#f6f3e8;
- box-shadow:0 10px 25px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.2);
-}
-.btn-secondary{
- background:rgba(20,24,19,.75);
- color:#d7d4c8;
-}
-.btn:hover{
- transform:translateY(-2px);
- filter:brightness(1.1);
-}
-.scroll-hint{
- position:absolute;
- bottom:28px;
- left:50%;
- transform:translateX(-50%);
- color:#747b6e;
- font-size:9px;
- letter-spacing:3px;
- text-transform:uppercase;
-}
-.scroll-hint span{
- display:block;
- width:1px;
- height:32px;
- margin:8px auto 0;
- background:linear-gradient(#79826e,transparent);
-}
-@keyframes rise{
- from{opacity:0;transform:translateY(25px)}
- to{opacity:1;transform:none}
-}
-
-/* =========================
-   SECTIONS
-========================= */
-.section{
- padding:105px 0;
- position:relative;
-}
-.section-head{
- display:flex;
- align-items:end;
- justify-content:space-between;
- gap:30px;
- margin-bottom:38px;
-}
-.section-kicker{
- color:#82916f;
- font-size:10px;
- letter-spacing:4px;
- text-transform:uppercase;
- margin-bottom:10px;
-}
-.section-title{
- margin:0;
- font-size:clamp(32px,6vw,58px);
- line-height:1;
- letter-spacing:1px;
- text-transform:uppercase;
-}
-.section-desc{
- max-width:470px;
- color:#96998e;
- line-height:1.75;
- font-size:14px;
-}
-.divider{
- width:100%;
- height:1px;
- background:linear-gradient(90deg,rgba(135,150,113,.35),transparent);
- margin:0 0 40px;
-}
-
-/* =========================
-   LORE
-========================= */
-.lore{
- border-top:1px solid rgba(128,143,108,.12);
-}
-.lore-grid{
- display:grid;
- grid-template-columns:1fr 1.3fr;
- gap:65px;
- align-items:center;
-}
-.lore-mark{
- width:min(280px,70vw);
- aspect-ratio:1;
- margin:auto;
- border-radius:50%;
- border:1px solid rgba(146,159,127,.28);
- background:
-   radial-gradient(circle at 35% 30%,rgba(170,181,151,.13),transparent 26%),
-   radial-gradient(circle,rgba(87,106,71,.18),transparent 65%),
-   #0a0d0a;
- box-shadow:
-   0 0 0 15px rgba(115,135,94,.025),
-   0 0 80px rgba(105,138,83,.08),
-   inset 0 0 50px rgba(0,0,0,.9);
- display:flex;
- align-items:center;
- justify-content:center;
- position:relative;
-}
-.lore-mark:before{
- content:"";
- position:absolute;
- inset:20px;
- border:1px dashed rgba(148,161,128,.18);
- border-radius:50%;
- animation:rotate 35s linear infinite;
-}
-.lore-mark img{
- width:55%;
- height:55%;
- object-fit:contain;
- filter:drop-shadow(0 15px 20px #000);
-}
-@keyframes rotate{to{transform:rotate(360deg)}}
-.lore-copy{
- color:#b9b7ac;
- font-size:16px;
- line-height:2;
-}
-.lore-copy p{margin:0 0 20px}
-.lore-quote{
- margin-top:30px;
- padding:20px 0 20px 20px;
- border-left:2px solid #657557;
- color:#ddd8ca;
- font-size:20px;
- line-height:1.55;
- font-style:italic;
-}
-
-/* =========================
-   ETHOS / STATEMENT
-========================= */
-.statement{
- padding:50px 0;
-}
-.statement-box{
- padding:50px;
- border:1px solid rgba(135,149,114,.22);
- border-radius:18px;
- background:
-   radial-gradient(circle at 80% 20%,rgba(116,143,91,.1),transparent 30%),
-   linear-gradient(135deg,rgba(35,42,33,.68),rgba(9,12,9,.88));
- box-shadow:inset 0 1px rgba(255,255,255,.05),0 25px 60px rgba(0,0,0,.3);
- text-align:center;
-}
-.statement-box h3{
- margin:0 auto 18px;
- max-width:850px;
- font-size:clamp(27px,5vw,48px);
- line-height:1.1;
- letter-spacing:1px;
-}
-.statement-box p{
- margin:auto;
- max-width:650px;
- color:#8f9589;
- line-height:1.8;
- font-size:14px;
-}
-
-/* =========================
-   ECOSYSTEM
-========================= */
-.ecosystem-grid{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:14px;
-}
-.eco-card{
- position:relative;
- min-height:220px;
- padding:24px;
- border:1px solid rgba(128,141,112,.2);
- border-radius:14px;
- background:linear-gradient(145deg,rgba(27,33,26,.9),rgba(9,12,9,.94));
- overflow:hidden;
- transition:.3s;
-}
-.eco-card:before{
- content:"";
- position:absolute;
- width:120px;
- height:120px;
- right:-45px;
- top:-45px;
- border-radius:50%;
- background:rgba(119,148,91,.07);
-}
-.eco-card:hover{
- transform:translateY(-5px);
- border-color:rgba(145,163,121,.45);
- box-shadow:0 20px 40px rgba(0,0,0,.3);
-}
-.eco-number{
- color:#68775d;
- font-size:11px;
- letter-spacing:2px;
-}
-.eco-icon{
- font-size:30px;
- margin:28px 0 18px;
- filter:grayscale(.4);
-}
-.eco-card h3{
- margin:0 0 10px;
- font-size:19px;
- text-transform:uppercase;
- letter-spacing:1px;
-}
-.eco-card p{
- margin:0;
- color:#858b81;
- font-size:12px;
- line-height:1.7;
-}
-
-/* =========================
-   ROADMAP
-========================= */
-.roadmap{
- background:linear-gradient(180deg,transparent,rgba(47,58,43,.08),transparent);
-}
-.timeline{
- position:relative;
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:0;
-}
-.timeline:before{
- content:"";
- position:absolute;
- top:17px;
- left:6%;
- right:6%;
- height:1px;
- background:linear-gradient(90deg,rgba(116,139,97,.15),rgba(116,139,97,.5),rgba(116,139,97,.15));
-}
-.phase{
- position:relative;
- padding:0 18px;
-}
-.phase-dot{
- width:34px;
- height:34px;
- margin:0 auto 24px;
- border-radius:50%;
- border:1px solid #65735b;
- background:#090c08;
- box-shadow:0 0 0 7px #080b08;
- display:flex;
- align-items:center;
- justify-content:center;
- color:#8d9b7d;
- font-size:10px;
- position:relative;
- z-index:2;
-}
-.phase.active .phase-dot{
- background:#637657;
- color:#f0eddf;
- box-shadow:0 0 0 7px #080b08,0 0 22px rgba(123,157,98,.22);
-}
-.phase h3{
- text-align:center;
- margin:0 0 10px;
- font-size:16px;
- text-transform:uppercase;
- letter-spacing:1px;
-}
-.phase p{
- margin:0 auto;
- max-width:190px;
- text-align:center;
- color:#7e857b;
- font-size:12px;
- line-height:1.65;
-}
-.phase small{
- display:block;
- text-align:center;
- color:#596352;
- font-size:9px;
- letter-spacing:2px;
- text-transform:uppercase;
- margin-top:14px;
-}
-
-/* =========================
-   CHECKER COMING SOON
-========================= */
-.checker-section{
- padding-top:100px;
-}
-.checker-box{
- position:relative;
- overflow:hidden;
- max-width:820px;
- margin:auto;
- padding:65px 30px;
- text-align:center;
- border:1px solid rgba(139,154,119,.32);
- border-radius:20px;
- background:
-   radial-gradient(circle at 50% 0%,rgba(120,151,91,.13),transparent 42%),
-   linear-gradient(145deg,#1b2119,#080b08 70%);
- box-shadow:
-   0 30px 80px rgba(0,0,0,.45),
-   inset 0 1px rgba(255,255,255,.06);
-}
-.checker-box:before{
- content:"";
- position:absolute;
- width:300px;
- height:300px;
- left:50%;
- top:50%;
- transform:translate(-50%,-50%);
- border:1px solid rgba(139,156,119,.08);
- border-radius:50%;
- box-shadow:0 0 0 35px rgba(139,156,119,.025),0 0 0 70px rgba(139,156,119,.018);
-}
-.lock{
- width:62px;
- height:62px;
- margin:0 auto 25px;
- border:1px solid rgba(151,166,130,.38);
- border-radius:50%;
- display:flex;
- align-items:center;
- justify-content:center;
- background:#0b0f0a;
- font-size:24px;
- position:relative;
- z-index:1;
- box-shadow:0 0 30px rgba(116,151,91,.1);
-}
-.checker-box h2{
- margin:0;
- font-size:clamp(32px,6vw,56px);
- letter-spacing:2px;
- text-transform:uppercase;
- position:relative;
- z-index:1;
-}
-.coming{
- display:inline-block;
- margin-top:18px;
- padding:8px 14px;
- border:1px solid rgba(143,160,119,.35);
- border-radius:100px;
- color:#9aaa8a;
- background:rgba(108,132,87,.08);
- font-size:10px;
- font-weight:900;
- letter-spacing:3px;
- position:relative;
- z-index:1;
-}
-.checker-box p{
- max-width:500px;
- margin:22px auto 0;
- color:#838a80;
- line-height:1.8;
- font-size:13px;
- position:relative;
- z-index:1;
-}
-.checker-box .btn{
- margin-top:25px;
- position:relative;
- z-index:1;
-}
-
-/* =========================
-   FAQ
-========================= */
-.faq-list{
- max-width:850px;
- margin:auto;
-}
-.faq{
- border-top:1px solid rgba(129,142,113,.2);
-}
-.faq:last-child{border-bottom:1px solid rgba(129,142,113,.2)}
-.faq summary{
- cursor:pointer;
- list-style:none;
- padding:22px 4px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:20px;
- color:#d4d1c5;
- font-size:14px;
- font-weight:900;
- letter-spacing:.4px;
-}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary:after{
- content:"+";
- color:#718065;
- font-size:22px;
- font-weight:400;
-}
-.faq[open] summary:after{content:"−"}
-.faq p{
- margin:0;
- padding:0 45px 23px 4px;
- color:#81877e;
- line-height:1.8;
- font-size:13px;
-}
-
-/* =========================
-   COMMUNITY
-========================= */
-.community{
- padding:80px 0 100px;
-}
-.community-box{
- text-align:center;
- padding:65px 25px;
- border-top:1px solid rgba(135,149,113,.2);
- border-bottom:1px solid rgba(135,149,113,.2);
-}
-.community-box h2{
- margin:0;
- font-size:clamp(30px,6vw,58px);
- text-transform:uppercase;
- letter-spacing:1px;
-}
-.community-box p{
- margin:18px auto 25px;
- max-width:520px;
- color:#858c81;
- line-height:1.8;
- font-size:13px;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer{
- padding:25px 0 35px;
- border-top:1px solid rgba(128,141,112,.12);
- color:#5e655b;
- font-size:10px;
- letter-spacing:1.5px;
- text-transform:uppercase;
-}
-.footer-inner{
- display:flex;
- justify-content:space-between;
- gap:15px;
-}
-.footer a:hover{color:#9aa68c}
-
-/* =========================
-   MOBILE
-========================= */
-@media(max-width:900px){
- .ecosystem-grid{grid-template-columns:repeat(2,1fr)}
- .lore-grid{grid-template-columns:1fr;gap:45px}
- .lore-mark{width:220px}
-}
-@media(max-width:650px){
- .container{width:min(100% - 20px,1160px)}
- .section{padding:75px 0}
- .section-head{display:block}
- .section-desc{margin-top:18px}
- .hero{min-height:calc(100vh - 75px);padding:60px 5px 80px}
- .hero h1{letter-spacing:1px}
- .hero-sub{line-height:1.7;letter-spacing:1px}
- .statement-box{padding:35px 22px}
- .ecosystem-grid{grid-template-columns:1fr 1fr;gap:9px}
- .eco-card{min-height:190px;padding:18px}
- .eco-icon{margin:22px 0 13px;font-size:25px}
- .eco-card h3{font-size:14px}
- .eco-card p{font-size:11px}
- .timeline{
-   grid-template-columns:1fr;
-   gap:35px;
- }
- .timeline:before{
-   left:17px;
-   right:auto;
-   top:17px;
-   bottom:17px;
-   width:1px;
-   height:auto;
- }
- .phase{
-   display:grid;
-   grid-template-columns:34px 1fr;
-   column-gap:20px;
-   padding:0;
- }
- .phase-dot{
-   grid-row:1 / span 3;
-   margin:0;
- }
- .phase h3{text-align:left;margin:0 0 7px}
- .phase p{text-align:left;max-width:none}
- .phase small{text-align:left;margin-top:8px}
- .checker-box{padding:50px 20px}
- .faq summary{font-size:13px}
- .footer-inner{display:block;line-height:2}
-}
-@media(max-width:390px){
- .ecosystem-grid{grid-template-columns:1fr}
- .hero h1{font-size:48px}
- .brand-name{font-size:15px}
-}
-
-/* subtle reveal */
-.reveal{
- opacity:0;
- transform:translateY(18px);
- animation:reveal .8s ease forwards;
-}
-@keyframes reveal{
- to{opacity:1;transform:none}
-}
+:root{--bg:#050706;--stone:#151817;--stone2:#242825;--stone3:#303631;--text:#f0f3f1;--muted:#aeb7b2;--green:#20ff9a;--green2:#0bc878;--line:rgba(220,230,225,.13);--shadow:rgba(0,0,0,.55)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;background:var(--bg)}body{background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}a{text-decoration:none;color:inherit}button{font:inherit;color:inherit}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(circle at 50% 15%,transparent 35%,rgba(0,0,0,.5) 100%)}
+.container{width:min(1180px,90%);margin:auto}
+/* stone typography */
+.stone-text{font-family:Georgia,"Times New Roman",serif;font-weight:900;letter-spacing:.035em;text-transform:uppercase;color:#cfd4d0;text-shadow:1px 1px 0 #090a09,2px 2px 0 #0b0d0c,0 0 22px rgba(32,255,154,.08);-webkit-text-stroke:.35px rgba(255,255,255,.18)}
+.stone-text.green{color:#dce8e1;text-shadow:0 1px 0 #050706,0 0 18px rgba(32,255,154,.25)}
+/* header */
+header{position:fixed;top:0;left:0;right:0;height:76px;z-index:40;background:linear-gradient(180deg,rgba(4,7,6,.96),rgba(4,7,6,.78));border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)}
+.nav{height:100%;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:900;letter-spacing:2px}.brand img{width:34px;height:34px;object-fit:cover;border-radius:9px;filter:drop-shadow(0 0 8px rgba(32,255,154,.3))}.brand span{font-family:Georgia,serif;letter-spacing:1.5px;color:#d8ddd9;text-shadow:1px 1px 0 #000}.desktop-nav{display:flex;align-items:center;gap:25px;margin-left:auto;margin-right:12px}.desktop-nav a{font-size:10px;font-weight:900;letter-spacing:1.8px;color:#9fa8a3;transition:.2s}.desktop-nav a:hover{color:var(--green)}
+.nav-actions{display:flex;align-items:center;gap:9px}.wallet-btn,.menu-btn{border:1px solid rgba(255,255,255,.16);background:linear-gradient(145deg,#303631,#101311);box-shadow:inset 0 1px rgba(255,255,255,.13),0 7px 25px rgba(0,0,0,.35);cursor:pointer}.wallet-btn{height:42px;padding:0 17px;border-radius:7px;font-size:10px;font-weight:900;letter-spacing:1.3px}.wallet-btn:after{content:"COMING SOON";display:block;font-size:7px;color:var(--green);letter-spacing:1.1px;margin-top:2px}.menu-btn{display:none;width:42px;height:42px;border-radius:8px;font-size:23px;line-height:1}
+/* menu */
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.56);opacity:0;pointer-events:none;transition:.25s;z-index:60}.menu-panel{position:fixed;top:0;right:0;width:min(370px,88vw);height:100dvh;z-index:61;padding:88px 24px 24px;background:linear-gradient(145deg,#252a27 0%,#0d100f 55%,#070908 100%);border-left:1px solid rgba(255,255,255,.14);box-shadow:-30px 0 90px rgba(0,0,0,.6);transform:translateX(105%);transition:.35s cubic-bezier(.2,.8,.2,1);overflow:auto}.menu-panel.open{transform:none}.menu-overlay.open{opacity:1;pointer-events:auto}.menu-close{position:absolute;right:20px;top:20px;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;background:#111513;cursor:pointer;font-size:22px}.menu-kicker{font-size:9px;letter-spacing:3px;color:var(--green);font-weight:900;margin-bottom:10px}.menu-title{font:900 30px Georgia,serif;letter-spacing:1px;margin-bottom:25px;text-transform:uppercase;color:#d9dfdb}.menu-item{display:flex;align-items:center;justify-content:space-between;padding:17px 14px;margin:8px 0;border:1px solid rgba(255,255,255,.09);border-radius:7px;background:linear-gradient(145deg,rgba(55,61,57,.65),rgba(12,15,13,.9));box-shadow:inset 0 1px rgba(255,255,255,.08)}.menu-item span:first-child{font:900 14px Georgia,serif;letter-spacing:1.2px}.soon{font-size:8px;font-weight:900;letter-spacing:1.3px;color:var(--green);padding:5px 7px;border:1px solid rgba(32,255,154,.25);border-radius:4px}.menu-item.about{border-color:rgba(32,255,154,.2)}
+/* hero */
+.hero{min-height:100svh;position:relative;display:grid;place-items:center;overflow:hidden;padding:120px 0 70px;background:radial-gradient(circle at 50% 42%,rgba(19,105,70,.18),transparent 28%),radial-gradient(circle at 50% 85%,rgba(32,255,154,.06),transparent 30%),#050706}.hero:before{content:"";position:absolute;inset:-10%;background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.4) 65%,rgba(0,0,0,.9) 100%);z-index:2}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 70%,#050706 100%);z-index:3}.rock-bg{position:absolute;width:min(850px,88vw);height:850px;left:50%;top:46%;transform:translate(-50%,-50%);background:url("logo.jpg") center/contain no-repeat;opacity:.16;filter:blur(1px) saturate(.8) brightness(.7) drop-shadow(0 0 50px rgba(32,255,154,.18));z-index:1}.rock-shard{position:absolute;width:12px;height:20px;background:#555d57;clip-path:polygon(50% 0,100% 34%,77% 100%,16% 78%,0 35%);opacity:.6;z-index:2;animation:float 7s ease-in-out infinite}.s1{left:11%;top:35%}.s2{right:12%;top:28%;width:17px;height:26px;animation-delay:1.5s}.s3{left:21%;bottom:24%;width:9px;height:14px;animation-delay:3s}.s4{right:23%;bottom:31%;width:10px;height:16px;animation-delay:2s}@keyframes float{50%{transform:translateY(-16px) rotate(8deg);opacity:.85}}
+.hero-inner{position:relative;z-index:4;text-align:center;width:min(900px,90%);display:flex;flex-direction:column;align-items:center}.hero-logo{width:min(370px,62vw);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 18px rgba(32,255,154,.28)) drop-shadow(0 30px 55px rgba(0,0,0,.8));animation:heroFloat 6s ease-in-out infinite}@keyframes heroFloat{50%{transform:translateY(-10px)}}.eyebrow{margin-top:-12px;margin-bottom:16px;color:#7e8983;font-size:9px;font-weight:900;letter-spacing:4px}.hero h1{font-size:clamp(54px,10vw,116px);line-height:.82;margin-bottom:25px}.hero h1:after{content:"";display:block;width:95px;height:2px;margin:25px auto 0;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 18px rgba(32,255,154,.5)}.tagline{font:900 clamp(18px,3vw,29px)/1.25 Georgia,serif;letter-spacing:2px;text-transform:uppercase;color:#d7ded9;text-shadow:1px 2px 0 #000}.hero-copy{max-width:590px;margin:17px auto 0;color:#aeb7b2;font-size:14px;line-height:1.8}.hero-cta{margin-top:28px;display:inline-flex;align-items:center;justify-content:center;min-width:220px;min-height:54px;padding:0 26px;border:1px solid rgba(32,255,154,.7);border-radius:6px;background:linear-gradient(145deg,#303631,#0b0f0d);box-shadow:inset 0 1px rgba(255,255,255,.13),0 0 28px rgba(32,255,154,.1),0 15px 40px rgba(0,0,0,.5);font:900 12px Georgia,serif;letter-spacing:2px;color:#e2e8e4;position:relative;overflow:hidden}.hero-cta:after{content:"";position:absolute;inset:1px;background:linear-gradient(120deg,transparent,rgba(32,255,154,.16),transparent);transform:translateX(-100%);transition:.6s}.hero-cta:hover:after{transform:translateX(100%)}
+/* sections */
+.section{position:relative;padding:120px 0;overflow:hidden}.section:before{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08),transparent);opacity:.5}.section-dark{background:linear-gradient(180deg,#050706,#0b0e0c 50%,#050706)}.section-stone{background:radial-gradient(circle at 50% 50%,rgba(32,255,154,.07),transparent 36%),linear-gradient(135deg,#171b19,#080a09 55%,#111512)}.section-head{max-width:780px;margin-bottom:55px}.kicker{font-size:9px;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:13px}.section h2{font-size:clamp(42px,7vw,82px);line-height:.9;margin-bottom:22px}.lead{max-width:740px;color:#aeb7b2;font-size:15px;line-height:1.9}.mark-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:stretch}.story,.quote-block{border:1px solid var(--line);background:linear-gradient(145deg,rgba(50,56,52,.65),rgba(8,10,9,.94));box-shadow:inset 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.35);border-radius:9px}.story{padding:38px}.story p{color:#c0c7c3;line-height:1.9;font-size:15px}.quote-block{display:flex;align-items:center;justify-content:center;padding:40px;text-align:center;min-height:280px}.quote-block p{font:900 clamp(25px,4vw,43px)/1.15 Georgia,serif;color:#d9e0dc;text-transform:uppercase}.quote-block span{display:block;margin-top:20px;color:var(--green);font:900 9px Inter,sans-serif;letter-spacing:3px}
+.traits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.trait{padding:30px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(145deg,#292e2b,#0c0f0e);box-shadow:inset 0 1px rgba(255,255,255,.1),0 18px 55px rgba(0,0,0,.3)}.trait-num{font-size:9px;color:var(--green);letter-spacing:3px;font-weight:900}.trait h3{font:900 25px Georgia,serif;margin:18px 0 10px;text-transform:uppercase}.trait p{font-size:13px;color:#aeb7b2;line-height:1.8}
+/* eligibility */
+.check-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}.check-stone{min-height:330px;border:1px solid var(--line);border-radius:10px;background:radial-gradient(circle at 50% 45%,rgba(32,255,154,.15),transparent 28%),linear-gradient(145deg,#282e2a,#090c0a);display:grid;place-items:center;position:relative;overflow:hidden;box-shadow:inset 0 1px rgba(255,255,255,.1),0 30px 80px rgba(0,0,0,.4)}.check-stone:before{content:"";width:205px;height:250px;background:url("logo.jpg") center/contain no-repeat;filter:drop-shadow(0 0 20px rgba(32,255,154,.3));opacity:.9}.check-copy{padding:15px}.check-copy h3{font:900 35px Georgia,serif;text-transform:uppercase;margin-bottom:16px}.check-copy p{color:#aeb7b2;line-height:1.8;font-size:14px}.check-btn{display:inline-flex;margin-top:25px;padding:15px 21px;border:1px solid rgba(32,255,154,.55);border-radius:6px;background:#141a17;font:900 11px Georgia,serif;letter-spacing:1.7px;color:#e1e8e4}.check-btn:hover{box-shadow:0 0 25px rgba(32,255,154,.12)}
+/* roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.phase-card{min-height:230px;padding:30px;border:1px solid var(--line);border-radius:9px;background:linear-gradient(145deg,#272c29,#0a0d0b);box-shadow:inset 0 1px rgba(255,255,255,.09),0 22px 65px rgba(0,0,0,.35);position:relative;overflow:hidden}.phase-card:after{content:"";position:absolute;right:-45px;bottom:-55px;width:170px;height:170px;border-radius:50%;background:rgba(32,255,154,.06);filter:blur(20px)}.phase{font-size:9px;font-weight:900;letter-spacing:3px;color:#7e8983}.phase-card h3{font:900 26px Georgia,serif;margin:14px 0 12px;text-transform:uppercase}.phase-card p{color:#aeb7b2;font-size:13px;line-height:1.8}.tbd{display:inline-block;margin-top:18px;padding:6px 8px;border:1px solid rgba(32,255,154,.22);border-radius:4px;color:var(--green);font-size:8px;font-weight:900;letter-spacing:1.2px}.wide{grid-column:1/-1}
+/* community/footer */
+.community{text-align:center;background:radial-gradient(circle at 50% 40%,rgba(32,255,154,.09),transparent 30%),#050706}.community .section-head{margin:0 auto 30px}.community .lead{margin:auto}.social{display:inline-flex;margin-top:26px;padding:15px 22px;border:1px solid rgba(255,255,255,.17);border-radius:6px;background:linear-gradient(145deg,#282e2a,#0b0e0c);font:900 11px Georgia,serif;letter-spacing:1.6px}.social:hover{border-color:rgba(32,255,154,.5)}footer{padding:35px 0 42px;border-top:1px solid rgba(255,255,255,.08);background:#040605}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}.footer-brand{font:900 14px Georgia,serif;letter-spacing:1.8px}.footer-copy{font-size:9px;letter-spacing:1.5px;color:#69736e}.footer-x{font-size:10px;color:#aeb7b2;font-weight:900}.footer-x:hover{color:var(--green)}
+@media(max-width:820px){header{height:68px}.desktop-nav{display:none}.menu-btn{display:block}.wallet-btn{height:40px;padding:0 13px}.wallet-btn:after{font-size:6px}.brand span{font-size:13px}.section{padding:90px 0}.mark-grid,.check-wrap{grid-template-columns:1fr}.traits{grid-template-columns:1fr}.roadmap{grid-template-columns:1fr}.wide{grid-column:auto}.hero{padding-top:100px}.hero-logo{width:min(310px,68vw)}.hero h1{font-size:clamp(48px,15vw,82px)}.rock-bg{width:650px;height:650px}.footer-inner{flex-direction:column;text-align:center}}
+@media(max-width:460px){.container{width:88%}.brand img{width:31px;height:31px}.brand span{font-size:12px}.nav-actions{gap:6px}.wallet-btn{padding:0 10px;font-size:9px}.menu-btn{width:40px;height:40px}.hero-copy{font-size:13px}.section h2{font-size:45px}.story,.quote-block{padding:28px}.check-stone{min-height:270px}.menu-panel{padding-left:17px;padding-right:17px}}
 </style>
 </head>
-
 <body>
-
-<div class="page">
-
-<!-- ================= HEADER ================= -->
-<div class="header-wrap">
-<div class="container">
-<header class="header">
-
-<a class="brand" href="#">
-<img class="logo" src="./assets/logo.png" alt="Rhood Stone">
-<span class="brand-name stone-text">RHOOD STONE</span>
-</a>
-
-<nav class="nav">
-<a href="#lore">Lore</a>
-<a href="#ecosystem">Ecosystem</a>
-<a href="#roadmap">Roadmap</a>
-<a href="#checker">Checker</a>
-</nav>
-
-<a class="xlink" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
-<span class="xicon">𝕏</span>
-<span>@rhoodstone</span>
-</a>
-
+<header>
+  <div class="container nav">
+    <a href="#home" class="brand" aria-label="Rhood Stone home"><img src="logo.jpg" alt="Rhood Stone logo"><span>RHOOD STONE</span></a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a href="#about">ABOUT</a><a href="#stone">THE STONE</a><a href="#roadmap">ROADMAP</a><a href="#community">COMMUNITY</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="wallet-btn" type="button" onclick="comingSoon('Connect Wallet')">CONNECT WALLET</button>
+      <button class="menu-btn" type="button" aria-label="Open menu" onclick="openMenu()">⋮</button>
+    </div>
+  </div>
 </header>
-</div>
-</div>
+<div class="menu-overlay" id="overlay" onclick="closeMenu()"></div>
+<aside class="menu-panel" id="menuPanel" aria-label="Menu">
+  <button class="menu-close" onclick="closeMenu()" aria-label="Close menu">×</button>
+  <div class="menu-kicker">RHOOD STONE / MENU</div>
+  <div class="menu-title stone-text">THE NEXT CHAPTER</div>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>PORTFOLIO</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>STAKE</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>EARN</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>POINTS</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>REFERRAL</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item" href="#home" onclick="closeMenu()"><span>LEADERBOARD</span><span class="soon">COMING SOON</span></a>
+  <a class="menu-item about" href="#about" onclick="closeMenu()"><span>ABOUT</span><span class="soon">VIEW</span></a>
+</aside>
 
-
-<!-- ================= HERO ================= -->
-<section class="hero">
-
-<div class="hero-bg"></div>
-
-<div class="hero-content">
-
-<div class="eyebrow">
-<span>THE STONE HAS ARRIVED</span>
-</div>
-
-<h1 class="stone-title">RHOOD<br>STONE</h1>
-
-<p class="hero-sub">
-The chain moves forward.<br>
-The stone remembers.
-</p>
-
-<div class="hero-actions">
-<a class="btn btn-primary" href="#lore">Explore the Lore</a>
-<a class="btn btn-secondary" href="#checker">Checker</a>
-</div>
-
-</div>
-
-<div class="scroll-hint">
-Scroll to discover
-<span></span>
-</div>
-
+<main>
+<section class="hero" id="home">
+  <div class="rock-bg"></div><i class="rock-shard s1"></i><i class="rock-shard s2"></i><i class="rock-shard s3"></i><i class="rock-shard s4"></i>
+  <div class="hero-inner">
+    <img class="hero-logo" src="logo.jpg" alt="Rhood Stone">
+    <div class="eyebrow">A COMMEMORATIVE PROJECT FOR THE EARLY COMMUNITY</div>
+    <h1 class="stone-text">RHOOD STONE</h1>
+    <div class="tagline">THE CHAIN MOVES FORWARD.<br>THE STONE REMEMBERS.</div>
+    <p class="hero-copy">A commemorative project built for the early Robinhood Chain community. Remember the early moves. Build what comes next.</p>
+    <a class="hero-cta" href="https://checker.rhoodstone.xyz/">CHECK ELIGIBILITY</a>
+  </div>
 </section>
 
-
-<!-- ================= LORE ================= -->
-<section class="section lore" id="lore">
-<div class="container">
-
-<div class="section-head">
-<div>
-<div class="section-kicker">01 — Origin</div>
-<h2 class="section-title stone-text">The Lore</h2>
-</div>
-
-<p class="section-desc">
-Every chain has a history. Every wallet leaves a trace.
-Somewhere between the blocks, the stone remembers.
-</p>
-</div>
-
-<div class="divider"></div>
-
-<div class="lore-grid">
-
-<div class="lore-mark">
-<img src="./assets/logo.png" alt="Rhood Stone emblem">
-</div>
-
-<div class="lore-copy">
-
-<p>
-Before the noise, there was the stone.
-Silent. Patient. Unmoved by the speed of the chain.
-</p>
-
-<p>
-Blocks were created. Wallets appeared. Communities formed and disappeared.
-But the stone remained — recording what the chain forgot.
-</p>
-
-<p>
-Rhood Stone begins there.
-Not as another passing moment, but as a story that unfolds block by block.
-</p>
-
-<div class="lore-quote">
-“The chain moves forward.<br>
-The stone remembers.”
-</div>
-
-</div>
-
-</div>
-
-</div>
+<section class="section section-dark" id="about">
+  <div class="container">
+    <div class="section-head"><div class="kicker">01 / THE MARK</div><h2 class="stone-text">EVERY CHAIN HAS A BEGINNING.</h2><p class="lead">Every chain has its early believers. The people who moved first. The ones who were there before the story was written.</p></div>
+    <div class="mark-grid"><div class="story"><p>Rhood Stone is a community-first commemorative project for the early Robinhood Chain community. The Stone is a symbol of early participation — a way to remember who was there when the chain was still writing its first chapter.</p></div><div class="quote-block"><p>Remember the early moves.<span>BUILD WHAT COMES NEXT.</span></p></div></div>
+  </div>
 </section>
 
-
-<!-- ================= STATEMENT ================= -->
-<section class="statement">
-<div class="container">
-
-<div class="statement-box">
-
-<div class="section-kicker">The Principle</div>
-
-<h3 class="stone-text">
-BUILT FOR THOSE<br>
-WHO REMEMBER.
-</h3>
-
-<p>
-Rhood Stone is a growing on-chain universe.
-The story is still being written — and the earliest chapters are being written now.
-</p>
-
-</div>
-
-</div>
+<section class="section section-stone" id="stone">
+  <div class="container">
+    <div class="section-head"><div class="kicker">02 / THE STONE</div><h2 class="stone-text">MORE THAN AN NFT.</h2><p class="lead">The Stone is built around three ideas: remember where the community started, belong to the people who were there early, and build toward whatever comes next.</p></div>
+    <div class="traits">
+      <article class="trait"><div class="trait-num">01 / REMEMBER</div><h3 class="stone-text">REMEMBER</h3><p>Early participation becomes part of the story. The Stone keeps that moment visible.</p></article>
+      <article class="trait"><div class="trait-num">02 / BELONG</div><h3 class="stone-text">BELONG</h3><p>The Stone represents the community that was there before the next chapter began.</p></article>
+      <article class="trait"><div class="trait-num">03 / BUILD</div><h3 class="stone-text">BUILD</h3><p>What starts as a commemorative Stone can grow into something bigger, built together.</p></article>
+    </div>
+  </div>
 </section>
 
-
-<!-- ================= ECOSYSTEM ================= -->
-<section class="section" id="ecosystem">
-<div class="container">
-
-<div class="section-head">
-<div>
-<div class="section-kicker">02 — The World</div>
-<h2 class="section-title stone-text">Ecosystem</h2>
-</div>
-
-<p class="section-desc">
-The stone is only the beginning.
-Different pieces of the Rhood Stone world will reveal themselves over time.
-</p>
-</div>
-
-<div class="divider"></div>
-
-<div class="ecosystem-grid">
-
-<div class="eco-card">
-<div class="eco-number">01</div>
-<div class="eco-icon">◈</div>
-<h3>Checker</h3>
-<p>
-A gateway for discovering wallet eligibility. The Checker is currently under construction.
-</p>
-</div>
-
-<div class="eco-card">
-<div class="eco-number">02</div>
-<div class="eco-icon">◉</div>
-<h3>Lore</h3>
-<p>
-The history behind the stone. New fragments of the story will appear as the project evolves.
-</p>
-</div>
-
-<div class="eco-card">
-<div class="eco-number">03</div>
-<div class="eco-icon">◇</div>
-<h3>Collection</h3>
-<p>
-Something is forming beneath the surface. Details will be revealed when the time comes.
-</p>
-</div>
-
-<div class="eco-card">
-<div class="eco-number">04</div>
-<div class="eco-icon">✦</div>
-<h3>Community</h3>
-<p>
-The people around the stone are part of the story. The next chapter is built together.
-</p>
-</div>
-
-</div>
-
-</div>
+<section class="section section-dark" id="check">
+  <div class="container check-wrap">
+    <div class="check-stone" aria-hidden="true"></div>
+    <div class="check-copy"><div class="kicker">03 / ELIGIBILITY</div><h3 class="stone-text">WERE YOU THERE EARLY?</h3><p>Connect your wallet and check whether you qualify for the Rhood Stone WL. Eligibility is handled through the dedicated checker.</p><a class="check-btn" href="https://checker.rhoodstone.xyz/">OPEN WALLET CHECKER</a></div>
+  </div>
 </section>
 
-
-<!-- ================= ROADMAP ================= -->
-<section class="section roadmap" id="roadmap">
-<div class="container">
-
-<div class="section-head">
-<div>
-<div class="section-kicker">03 — The Path</div>
-<h2 class="section-title stone-text">Roadmap</h2>
-</div>
-
-<p class="section-desc">
-No artificial promises. Just a path.
-Some destinations remain intentionally hidden.
-</p>
-</div>
-
-<div class="divider"></div>
-
-<div class="timeline">
-
-<div class="phase active">
-<div class="phase-dot">01</div>
-<h3>Genesis</h3>
-<p>
-The foundation is laid. The stone enters the chain.
-</p>
-<small>Current</small>
-</div>
-
-<div class="phase">
-<div class="phase-dot">02</div>
-<h3>Awakening</h3>
-<p>
-The world begins to expand. New pieces of the story emerge.
-</p>
-<small>Next</small>
-</div>
-
-<div class="phase">
-<div class="phase-dot">03</div>
-<h3>Verification</h3>
-<p>
-The Rhood Stone Checker opens its gates.
-</p>
-<small>Coming</small>
-</div>
-
-<div class="phase">
-<div class="phase-dot">04</div>
-<h3>Unknown</h3>
-<p>
-Not everything should be revealed before its time.
-</p>
-<small>???</small>
-</div>
-
-</div>
-
-</div>
+<section class="section section-stone" id="roadmap">
+  <div class="container"><div class="section-head"><div class="kicker">04 / THE JOURNEY</div><h2 class="stone-text">ROADMAP.</h2><p class="lead">Rhood Stone is designed in chapters. Anything not finalized is intentionally marked TBD.</p></div>
+    <div class="roadmap">
+      <article class="phase-card"><div class="phase">PHASE 01</div><h3 class="stone-text">THE MARK</h3><p>Early community recognition, eligibility and the foundation of the Rhood Stone journey.</p><span class="tbd">ELIGIBILITY / MINT DETAILS · TBD</span></article>
+      <article class="phase-card"><div class="phase">PHASE 02</div><h3 class="stone-text">THE STONE</h3><p>The Rhood Stone NFT mint, community building and holder base.</p><span class="tbd">SUPPLY / FEE / DATE · TBD</span></article>
+      <article class="phase-card"><div class="phase">PHASE 03</div><h3 class="stone-text">STAKE &amp; EARN</h3><p>Stone holders may be able to stake and earn Rhood Points through participation.</p><span class="tbd">STAKING MECHANICS · TBD</span></article>
+      <article class="phase-card"><div class="phase">PHASE 04</div><h3 class="stone-text">THE NEXT CHAPTER</h3><p>Rhood Points may contribute to future rewards or allocation possibilities.</p><span class="tbd">TOKEN / REWARD STRUCTURE · TBD</span></article>
+      <article class="phase-card wide"><div class="phase">PHASE 05</div><h3 class="stone-text">BEYOND THE STONE</h3><p>Holder utilities, community benefits and ecosystem expansion — shaped by what the community builds next.</p><span class="tbd">FUTURE UTILITIES · TBD</span></article>
+    </div>
+  </div>
 </section>
 
-
-<!-- ================= CHECKER ================= -->
-<section class="section checker-section" id="checker">
-<div class="container">
-
-<div class="section-head">
-<div>
-<div class="section-kicker">04 — Gateway</div>
-<h2 class="section-title stone-text">The Checker</h2>
-</div>
-
-<p class="section-desc">
-The gateway is being prepared.
-For now, the stone remains closed.
-</p>
-</div>
-
-<div class="divider"></div>
-
-<div class="checker-box">
-
-<div class="lock">◈</div>
-
-<h2 class="stone-text">CHECKER</h2>
-
-<div class="coming">COMING SOON</div>
-
-<p>
-Wallet verification is currently under development.
-The Checker will open when the next chapter of Rhood Stone begins.
-</p>
-
-<a class="btn btn-secondary" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
-Follow for Updates
-</a>
-
-</div>
-
-</div>
+<section class="section community" id="community">
+  <div class="container"><div class="section-head"><div class="kicker">05 / THE COMMUNITY</div><h2 class="stone-text">BUILT WITH THE RHOOD COMMUNITY.</h2><p class="lead">The Stone started with the early community. Where it goes next will be built together.</p></div><a class="social" href="https://x.com/rhoodstone" target="_blank" rel="noopener">FOLLOW @RHOODSTONE ON X</a></div>
 </section>
-
-
-<!-- ================= FAQ ================= -->
-<section class="section" id="faq">
-<div class="container">
-
-<div class="section-head">
-<div>
-<div class="section-kicker">05 — Questions</div>
-<h2 class="section-title stone-text">FAQ</h2>
-</div>
-
-<p class="section-desc">
-A few things worth knowing before entering the stone.
-</p>
-</div>
-
-<div class="divider"></div>
-
-<div class="faq-list">
-
-<details class="faq">
-<summary>What is Rhood Stone?</summary>
-<p>
-Rhood Stone is a growing Web3 project built around an evolving story, community and on-chain ecosystem.
-</p>
-</details>
-
-<details class="faq">
-<summary>What is the Checker?</summary>
-<p>
-The Checker will be used to verify wallet eligibility. It is currently under development and will be available in a future update.
-</p>
-</details>
-
-<details class="faq">
-<summary>When will the Checker launch?</summary>
-<p>
-The exact launch timing has not been announced yet. Follow the official Rhood Stone account for updates.
-</p>
-</details>
-
-<details class="faq">
-<summary>Is Rhood Stone live?</summary>
-<p>
-The project is currently being built. Some parts of the ecosystem are already taking shape, while other features remain locked.
-</p>
-</details>
-
-<details class="faq">
-<summary>Where can I follow Rhood Stone?</summary>
-<p>
-The official updates are shared through the Rhood Stone X account.
-</p>
-</details>
-
-</div>
-
-</div>
-</section>
-
-
-<!-- ================= COMMUNITY ================= -->
-<section class="community">
-<div class="container">
-
-<div class="community-box">
-
-<div class="section-kicker">The Story Continues</div>
-
-<h2 class="stone-text">Stay Close To The Stone.</h2>
-
-<p>
-The earliest chapters are being written now.
-Follow Rhood Stone and don't miss what comes next.
-</p>
-
-<a class="btn btn-primary" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
-Follow @rhoodstone
-</a>
-
-</div>
-
-</div>
-</section>
-
-
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-<div class="container">
-<div class="footer-inner">
-<div>© 2026 RHOOD STONE</div>
-<div>
-<a href="https://x.com/rhoodstone" target="_blank" rel="noopener">X / @rhoodstone</a>
-&nbsp; · &nbsp;
-<a href="#lore">Lore</a>
-&nbsp; · &nbsp;
-<a href="#checker">Checker</a>
-</div>
-</div>
-</div>
-</footer>
-
-</div>
-
+</main>
+<footer><div class="container footer-inner"><div class="footer-brand">RHOOD STONE</div><div class="footer-copy">THE CHAIN MOVES FORWARD. THE STONE REMEMBERS.</div><a class="footer-x" href="https://x.com/rhoodstone" target="_blank" rel="noopener">@RHOODSTONE</a></div></footer>
+<script>
+function comingSoon(name){alert(name+' — COMING SOON');}
+const panel=document.getElementById('menuPanel'),overlay=document.getElementById('overlay');
+function openMenu(){panel.classList.add('open');overlay.classList.add('open');document.body.style.overflow='hidden'}
+function closeMenu(){panel.classList.remove('open');overlay.classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+</script>
 </body>
 </html>
