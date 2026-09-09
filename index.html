@@ -3,264 +3,1176 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#030503">
+<meta name="theme-color" content="#080b08">
+<meta name="description" content="Rhood Stone — The chain moves forward. The stone remembers.">
 <title>Rhood Stone</title>
+
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:#020402}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;background:#050705}
 body{
- color:#f6f0e1;
+ color:#eee9dc;
  font-family:Georgia,"Times New Roman",serif;
+ overflow-x:hidden;
  background:
-  linear-gradient(rgba(1,4,2,.28),rgba(1,4,2,.58)),
-  url("./assets/cover.jpg") center center/cover no-repeat;
- background-attachment:scroll;
+   radial-gradient(circle at 50% 0%,rgba(92,113,76,.13),transparent 34%),
+   #050705;
 }
-body:after{
- content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
- background:radial-gradient(circle at 50% 28%,transparent 0 28%,rgba(0,0,0,.20) 62%,rgba(0,0,0,.62) 100%);
-}
-.page{position:relative;z-index:1;min-height:100vh;padding:10px 16px 35px}
-.container{width:min(1180px,100%);margin:auto}
-
-/* Header: minimal, exactly the requested elements */
-.header{
- height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px;
- padding:8px 12px;border:2px solid rgba(83,87,72,.9);border-radius:12px;
- background:linear-gradient(180deg,rgba(36,39,32,.96),rgba(9,12,9,.96));
- box-shadow:0 12px 30px #000,inset 0 2px 0 rgba(255,255,255,.16);
- position:relative;overflow:hidden;
-}
-.header:before,.stone-panel:before,.stone-btn:before{
- content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+body:before{
+ content:"";
+ position:fixed;
+ inset:0;
+ pointer-events:none;
+ z-index:20;
+ opacity:.055;
  background-image:
-  repeating-linear-gradient(117deg,rgba(255,255,255,.18) 0 1px,transparent 1px 18px),
-  repeating-linear-gradient(22deg,rgba(0,0,0,.24) 0 1px,transparent 1px 14px);
+   repeating-linear-gradient(115deg,rgba(255,255,255,.5) 0 1px,transparent 1px 22px),
+   repeating-linear-gradient(25deg,rgba(0,0,0,.8) 0 1px,transparent 1px 18px);
  mix-blend-mode:overlay;
 }
-.brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1;min-width:0}
-.logo{
- width:52px;height:52px;object-fit:contain;display:block;border-radius:50%;
- background:#020302;border:2px solid #4a4d43;box-shadow:0 0 18px rgba(104,255,67,.18),0 4px 12px #000;
-}
-.brand-name{font-size:clamp(22px,3vw,34px);letter-spacing:1.2px;white-space:nowrap}
-.xlink{
- position:relative;z-index:1;display:flex;align-items:center;gap:9px;
- color:#f7f1e3;text-decoration:none;padding:9px 13px;border:2px solid #4b4d44;
- border-radius:8px;background:linear-gradient(#4a4c43,#252821);
- box-shadow:inset 0 1px 0 #aaa79b,0 5px 12px #000;
-}
-.xicon{font-size:23px;line-height:1}.handle{font-size:15px;font-weight:900;letter-spacing:.4px}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+.page{position:relative;z-index:1}
+.container{width:min(1160px,calc(100% - 30px));margin:auto}
 
-/* Actual stone-text: the letters use a grayscale texture made from the supplied stone artwork */
-.stone-text,.stone-title{
+/* =========================
+   HEADER
+========================= */
+.header-wrap{
+ position:sticky;
+ top:10px;
+ z-index:10;
+ padding-top:10px;
+}
+.header{
+ height:70px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:20px;
+ padding:8px 12px;
+ border:1px solid rgba(130,139,112,.38);
+ border-radius:15px;
+ background:rgba(10,14,10,.82);
+ backdrop-filter:blur(16px);
+ box-shadow:
+   0 15px 40px rgba(0,0,0,.55),
+   inset 0 1px 0 rgba(255,255,255,.08);
+}
+.brand{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ min-width:0;
+}
+.logo{
+ width:48px;
+ height:48px;
+ object-fit:contain;
+ border-radius:50%;
+ border:1px solid rgba(180,188,157,.35);
+ background:#020302;
+ box-shadow:0 0 25px rgba(124,168,99,.15);
+}
+.brand-name{
+ font-size:clamp(19px,3vw,27px);
+ letter-spacing:2px;
+ white-space:nowrap;
+ font-weight:900;
+}
+.nav{
+ display:flex;
+ align-items:center;
+ gap:4px;
+}
+.nav a{
+ padding:9px 11px;
+ color:#bcbcaf;
+ font-size:12px;
+ letter-spacing:1px;
+ text-transform:uppercase;
+ border-radius:8px;
+ transition:.25s;
+}
+.nav a:hover{
+ color:#f1ecde;
+ background:rgba(130,150,105,.12);
+}
+.xlink{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ padding:9px 12px;
+ border:1px solid rgba(164,168,145,.4);
+ border-radius:9px;
+ background:linear-gradient(180deg,#272c25,#151914);
+ color:#f2eee3;
+ font-weight:900;
+ font-size:13px;
+ box-shadow:inset 0 1px rgba(255,255,255,.1);
+}
+.xicon{font-size:18px}
+@media(max-width:800px){
+ .nav{display:none}
+}
+@media(max-width:450px){
+ .header{height:62px;padding:6px 8px}
+ .logo{width:42px;height:42px}
+ .brand-name{font-size:17px;letter-spacing:1.3px}
+ .xlink{padding:8px 9px;font-size:11px}
+ .xicon{font-size:16px}
+}
+
+/* =========================
+   TEXTURE TEXT
+========================= */
+.stone-text,
+.stone-title{
  background-image:url("./assets/stone-texture.jpg");
- background-size:260px 260px;
+ background-size:280px 280px;
  background-position:center;
- -webkit-background-clip:text;background-clip:text;
+ -webkit-background-clip:text;
+ background-clip:text;
  color:transparent;
  -webkit-text-fill-color:transparent;
  font-weight:900;
- -webkit-text-stroke:1px rgba(242,236,222,.45);
- text-shadow:0 3px 0 #171814,0 6px 8px rgba(0,0,0,.9);
- filter:contrast(1.12);
+ -webkit-text-stroke:1px rgba(238,235,219,.32);
+ filter:contrast(1.15);
 }
 
-/* Social tasks */
-.social-tasks{display:grid;gap:12px;margin:0 0 22px}
-.social-task{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:2px solid #4b4d44;border-radius:10px;background:linear-gradient(180deg,rgba(50,52,45,.94),rgba(16,18,15,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 16px #000}
-.social-task a{color:#f6f0e1;text-decoration:none;font-weight:900;letter-spacing:.5px;flex:1}
-.task-action{border:1px solid #77786f;border-radius:7px;padding:9px 12px;background:#2a2c27;color:#f7f1e3;font-weight:900;cursor:pointer;white-space:nowrap}
-.social-task.done{border-color:#7e9273}.social-task.done .task-action{color:#b9d9aa;border-color:#7e9273}
-@media(max-width:560px){.social-task{padding:12px;gap:8px}.social-task a{font-size:13px}.task-action{padding:8px;font-size:11px}}
-
-/* Hero */
-.hero{text-align:center;padding:46px 10px 22px}
-.hero h1{
- margin:0;font-size:clamp(58px,10vw,116px);line-height:.86;letter-spacing:2px;
+/* =========================
+   HERO
+========================= */
+.hero{
+ min-height:calc(100vh - 90px);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:70px 10px 80px;
+ position:relative;
+ overflow:hidden;
+}
+.hero:before{
+ content:"";
+ position:absolute;
+ width:650px;
+ height:650px;
+ left:50%;
+ top:42%;
+ transform:translate(-50%,-50%);
+ background:radial-gradient(circle,rgba(101,139,79,.17),transparent 68%);
+ filter:blur(10px);
+ pointer-events:none;
+}
+.hero-bg{
+ position:absolute;
+ inset:0;
+ background:
+   linear-gradient(180deg,rgba(5,8,5,.25),#050705 94%),
+   url("./assets/cover.jpg") center/cover no-repeat;
+ opacity:.36;
+ z-index:-2;
+}
+.hero-content{position:relative;max-width:920px}
+.eyebrow{
+ display:inline-flex;
+ align-items:center;
+ gap:10px;
+ margin-bottom:25px;
+ color:#aeb89c;
+ font-size:11px;
+ letter-spacing:4px;
  text-transform:uppercase;
 }
-.hero .tag{
- margin:18px 0 0;font-size:clamp(14px,2vw,20px);letter-spacing:2px;
+.eyebrow:before,.eyebrow:after{
+ content:"";
+ width:35px;
+ height:1px;
+ background:rgba(161,176,138,.55);
+}
+.hero h1{
+ margin:0;
+ font-size:clamp(58px,12vw,142px);
+ line-height:.82;
+ letter-spacing:4px;
+ text-transform:uppercase;
+ animation:rise .9s ease both;
+}
+.hero-sub{
+ margin:30px auto 0;
+ max-width:650px;
+ color:#c7c4b8;
+ font-size:clamp(14px,2vw,18px);
+ line-height:1.8;
+ letter-spacing:1.8px;
+}
+.hero-actions{
+ display:flex;
+ justify-content:center;
+ gap:12px;
+ flex-wrap:wrap;
+ margin-top:34px;
+}
+.btn{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ min-width:145px;
+ padding:13px 20px;
+ border-radius:9px;
+ border:1px solid rgba(170,179,148,.4);
+ text-transform:uppercase;
+ letter-spacing:1.5px;
+ font-size:11px;
+ font-weight:900;
+ transition:.25s;
+}
+.btn-primary{
+ background:linear-gradient(180deg,#83966f,#59674d);
+ color:#f6f3e8;
+ box-shadow:0 10px 25px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.2);
+}
+.btn-secondary{
+ background:rgba(20,24,19,.75);
+ color:#d7d4c8;
+}
+.btn:hover{
+ transform:translateY(-2px);
+ filter:brightness(1.1);
+}
+.scroll-hint{
+ position:absolute;
+ bottom:28px;
+ left:50%;
+ transform:translateX(-50%);
+ color:#747b6e;
+ font-size:9px;
+ letter-spacing:3px;
+ text-transform:uppercase;
+}
+.scroll-hint span{
+ display:block;
+ width:1px;
+ height:32px;
+ margin:8px auto 0;
+ background:linear-gradient(#79826e,transparent);
+}
+@keyframes rise{
+ from{opacity:0;transform:translateY(25px)}
+ to{opacity:1;transform:none}
 }
 
-/* Main checker only — no unnecessary text/cards */
-.stone-panel{
- position:relative;overflow:hidden;
- width:min(760px,100%);margin:6px auto 0;padding:28px;
- border:3px solid #4b4c43;border-radius:16px;
- background:linear-gradient(145deg,rgba(69,70,61,.97),rgba(28,30,25,.98) 48%,rgba(10,12,9,.99));
- box-shadow:0 24px 55px #000,inset 0 2px 0 rgba(255,255,255,.2),inset 0 -6px #11130f;
+/* =========================
+   SECTIONS
+========================= */
+.section{
+ padding:105px 0;
+ position:relative;
 }
-.panel-title{
- margin:0 0 21px;text-align:center;font-size:clamp(25px,4vw,38px);
- letter-spacing:1.3px;text-transform:uppercase;
+.section-head{
+ display:flex;
+ align-items:end;
+ justify-content:space-between;
+ gap:30px;
+ margin-bottom:38px;
 }
-.label{
- display:block;margin:0 0 9px;font-size:14px;letter-spacing:1.5px;
+.section-kicker{
+ color:#82916f;
+ font-size:10px;
+ letter-spacing:4px;
+ text-transform:uppercase;
+ margin-bottom:10px;
 }
-.input{
- width:100%;height:60px;padding:0 16px;border:3px solid #3a3d35;border-radius:10px;
- background:linear-gradient(#11140f,#070907);color:#fffdf4;
- font:900 17px Georgia,serif;outline:none;box-shadow:inset 0 5px 12px #000;
+.section-title{
+ margin:0;
+ font-size:clamp(32px,6vw,58px);
+ line-height:1;
+ letter-spacing:1px;
+ text-transform:uppercase;
 }
-.input::placeholder{color:#aaa79b}
-.input:focus{border-color:#79926c;box-shadow:0 0 0 2px rgba(121,255,69,.15),inset 0 5px 12px #000}
-.stone-btn{
- position:relative;overflow:hidden;width:100%;height:62px;margin-top:15px;
- border:3px solid #4a4c43;border-radius:10px;cursor:pointer;
- background:linear-gradient(#a8a59a,#77756c 50%,#464741);
- color:#fff8e8;font:900 18px Georgia,serif;letter-spacing:1px;text-transform:uppercase;
- -webkit-text-stroke:.45px #282923;
- text-shadow:0 1px 0 #fff,0 3px 0 #77746b,0 5px 0 #2a2b26,0 7px 8px #000;
- box-shadow:inset 0 2px 0 #e9e4d8,inset 0 -5px #2b2c27,0 8px 18px #000;
+.section-desc{
+ max-width:470px;
+ color:#96998e;
+ line-height:1.75;
+ font-size:14px;
 }
-.stone-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.stone-btn:disabled{opacity:.62;cursor:wait}
-.submit{background:linear-gradient(#a8c69b,#718864 50%,#465342);border-color:#56664f}
-.result{
- display:none;position:relative;margin-top:16px;padding:17px;
- border:3px solid #3c3e36;border-radius:10px;background:linear-gradient(#20231d,#090b08);
- text-align:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.1),0 8px 15px #000;
+.divider{
+ width:100%;
+ height:1px;
+ background:linear-gradient(90deg,rgba(135,150,113,.35),transparent);
+ margin:0 0 40px;
 }
-.result.show{display:block}
-.result h3{margin:0 0 6px;font-size:26px}
-.result p{margin:0;color:#eee8da;font-size:15px;text-shadow:0 2px #1d1f1a}
-.result.ok h3{color:#baff9a;text-shadow:0 1px #f0ffe5,0 3px #62865b,0 5px #192017,0 0 12px rgba(121,255,69,.3)}
-.note{text-align:center;margin:13px 0 0;color:#ded7c8;font-size:12px;text-shadow:0 2px #151713}
-.spinner{display:inline-block;width:15px;height:15px;border:2px solid #4a4c43;border-top-color:#111;border-radius:50%;vertical-align:-2px;margin-right:7px;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 
-@media(max-width:700px){
- body{
-  background:
-   linear-gradient(rgba(1,4,2,.34),rgba(1,4,2,.70)),
-   url("./assets/cover.jpg") center center/auto 100% no-repeat;
+/* =========================
+   LORE
+========================= */
+.lore{
+ border-top:1px solid rgba(128,143,108,.12);
+}
+.lore-grid{
+ display:grid;
+ grid-template-columns:1fr 1.3fr;
+ gap:65px;
+ align-items:center;
+}
+.lore-mark{
+ width:min(280px,70vw);
+ aspect-ratio:1;
+ margin:auto;
+ border-radius:50%;
+ border:1px solid rgba(146,159,127,.28);
+ background:
+   radial-gradient(circle at 35% 30%,rgba(170,181,151,.13),transparent 26%),
+   radial-gradient(circle,rgba(87,106,71,.18),transparent 65%),
+   #0a0d0a;
+ box-shadow:
+   0 0 0 15px rgba(115,135,94,.025),
+   0 0 80px rgba(105,138,83,.08),
+   inset 0 0 50px rgba(0,0,0,.9);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ position:relative;
+}
+.lore-mark:before{
+ content:"";
+ position:absolute;
+ inset:20px;
+ border:1px dashed rgba(148,161,128,.18);
+ border-radius:50%;
+ animation:rotate 35s linear infinite;
+}
+.lore-mark img{
+ width:55%;
+ height:55%;
+ object-fit:contain;
+ filter:drop-shadow(0 15px 20px #000);
+}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.lore-copy{
+ color:#b9b7ac;
+ font-size:16px;
+ line-height:2;
+}
+.lore-copy p{margin:0 0 20px}
+.lore-quote{
+ margin-top:30px;
+ padding:20px 0 20px 20px;
+ border-left:2px solid #657557;
+ color:#ddd8ca;
+ font-size:20px;
+ line-height:1.55;
+ font-style:italic;
+}
+
+/* =========================
+   ETHOS / STATEMENT
+========================= */
+.statement{
+ padding:50px 0;
+}
+.statement-box{
+ padding:50px;
+ border:1px solid rgba(135,149,114,.22);
+ border-radius:18px;
+ background:
+   radial-gradient(circle at 80% 20%,rgba(116,143,91,.1),transparent 30%),
+   linear-gradient(135deg,rgba(35,42,33,.68),rgba(9,12,9,.88));
+ box-shadow:inset 0 1px rgba(255,255,255,.05),0 25px 60px rgba(0,0,0,.3);
+ text-align:center;
+}
+.statement-box h3{
+ margin:0 auto 18px;
+ max-width:850px;
+ font-size:clamp(27px,5vw,48px);
+ line-height:1.1;
+ letter-spacing:1px;
+}
+.statement-box p{
+ margin:auto;
+ max-width:650px;
+ color:#8f9589;
+ line-height:1.8;
+ font-size:14px;
+}
+
+/* =========================
+   ECOSYSTEM
+========================= */
+.ecosystem-grid{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:14px;
+}
+.eco-card{
+ position:relative;
+ min-height:220px;
+ padding:24px;
+ border:1px solid rgba(128,141,112,.2);
+ border-radius:14px;
+ background:linear-gradient(145deg,rgba(27,33,26,.9),rgba(9,12,9,.94));
+ overflow:hidden;
+ transition:.3s;
+}
+.eco-card:before{
+ content:"";
+ position:absolute;
+ width:120px;
+ height:120px;
+ right:-45px;
+ top:-45px;
+ border-radius:50%;
+ background:rgba(119,148,91,.07);
+}
+.eco-card:hover{
+ transform:translateY(-5px);
+ border-color:rgba(145,163,121,.45);
+ box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+.eco-number{
+ color:#68775d;
+ font-size:11px;
+ letter-spacing:2px;
+}
+.eco-icon{
+ font-size:30px;
+ margin:28px 0 18px;
+ filter:grayscale(.4);
+}
+.eco-card h3{
+ margin:0 0 10px;
+ font-size:19px;
+ text-transform:uppercase;
+ letter-spacing:1px;
+}
+.eco-card p{
+ margin:0;
+ color:#858b81;
+ font-size:12px;
+ line-height:1.7;
+}
+
+/* =========================
+   ROADMAP
+========================= */
+.roadmap{
+ background:linear-gradient(180deg,transparent,rgba(47,58,43,.08),transparent);
+}
+.timeline{
+ position:relative;
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:0;
+}
+.timeline:before{
+ content:"";
+ position:absolute;
+ top:17px;
+ left:6%;
+ right:6%;
+ height:1px;
+ background:linear-gradient(90deg,rgba(116,139,97,.15),rgba(116,139,97,.5),rgba(116,139,97,.15));
+}
+.phase{
+ position:relative;
+ padding:0 18px;
+}
+.phase-dot{
+ width:34px;
+ height:34px;
+ margin:0 auto 24px;
+ border-radius:50%;
+ border:1px solid #65735b;
+ background:#090c08;
+ box-shadow:0 0 0 7px #080b08;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#8d9b7d;
+ font-size:10px;
+ position:relative;
+ z-index:2;
+}
+.phase.active .phase-dot{
+ background:#637657;
+ color:#f0eddf;
+ box-shadow:0 0 0 7px #080b08,0 0 22px rgba(123,157,98,.22);
+}
+.phase h3{
+ text-align:center;
+ margin:0 0 10px;
+ font-size:16px;
+ text-transform:uppercase;
+ letter-spacing:1px;
+}
+.phase p{
+ margin:0 auto;
+ max-width:190px;
+ text-align:center;
+ color:#7e857b;
+ font-size:12px;
+ line-height:1.65;
+}
+.phase small{
+ display:block;
+ text-align:center;
+ color:#596352;
+ font-size:9px;
+ letter-spacing:2px;
+ text-transform:uppercase;
+ margin-top:14px;
+}
+
+/* =========================
+   CHECKER COMING SOON
+========================= */
+.checker-section{
+ padding-top:100px;
+}
+.checker-box{
+ position:relative;
+ overflow:hidden;
+ max-width:820px;
+ margin:auto;
+ padding:65px 30px;
+ text-align:center;
+ border:1px solid rgba(139,154,119,.32);
+ border-radius:20px;
+ background:
+   radial-gradient(circle at 50% 0%,rgba(120,151,91,.13),transparent 42%),
+   linear-gradient(145deg,#1b2119,#080b08 70%);
+ box-shadow:
+   0 30px 80px rgba(0,0,0,.45),
+   inset 0 1px rgba(255,255,255,.06);
+}
+.checker-box:before{
+ content:"";
+ position:absolute;
+ width:300px;
+ height:300px;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ border:1px solid rgba(139,156,119,.08);
+ border-radius:50%;
+ box-shadow:0 0 0 35px rgba(139,156,119,.025),0 0 0 70px rgba(139,156,119,.018);
+}
+.lock{
+ width:62px;
+ height:62px;
+ margin:0 auto 25px;
+ border:1px solid rgba(151,166,130,.38);
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#0b0f0a;
+ font-size:24px;
+ position:relative;
+ z-index:1;
+ box-shadow:0 0 30px rgba(116,151,91,.1);
+}
+.checker-box h2{
+ margin:0;
+ font-size:clamp(32px,6vw,56px);
+ letter-spacing:2px;
+ text-transform:uppercase;
+ position:relative;
+ z-index:1;
+}
+.coming{
+ display:inline-block;
+ margin-top:18px;
+ padding:8px 14px;
+ border:1px solid rgba(143,160,119,.35);
+ border-radius:100px;
+ color:#9aaa8a;
+ background:rgba(108,132,87,.08);
+ font-size:10px;
+ font-weight:900;
+ letter-spacing:3px;
+ position:relative;
+ z-index:1;
+}
+.checker-box p{
+ max-width:500px;
+ margin:22px auto 0;
+ color:#838a80;
+ line-height:1.8;
+ font-size:13px;
+ position:relative;
+ z-index:1;
+}
+.checker-box .btn{
+ margin-top:25px;
+ position:relative;
+ z-index:1;
+}
+
+/* =========================
+   FAQ
+========================= */
+.faq-list{
+ max-width:850px;
+ margin:auto;
+}
+.faq{
+ border-top:1px solid rgba(129,142,113,.2);
+}
+.faq:last-child{border-bottom:1px solid rgba(129,142,113,.2)}
+.faq summary{
+ cursor:pointer;
+ list-style:none;
+ padding:22px 4px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:20px;
+ color:#d4d1c5;
+ font-size:14px;
+ font-weight:900;
+ letter-spacing:.4px;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{
+ content:"+";
+ color:#718065;
+ font-size:22px;
+ font-weight:400;
+}
+.faq[open] summary:after{content:"−"}
+.faq p{
+ margin:0;
+ padding:0 45px 23px 4px;
+ color:#81877e;
+ line-height:1.8;
+ font-size:13px;
+}
+
+/* =========================
+   COMMUNITY
+========================= */
+.community{
+ padding:80px 0 100px;
+}
+.community-box{
+ text-align:center;
+ padding:65px 25px;
+ border-top:1px solid rgba(135,149,113,.2);
+ border-bottom:1px solid rgba(135,149,113,.2);
+}
+.community-box h2{
+ margin:0;
+ font-size:clamp(30px,6vw,58px);
+ text-transform:uppercase;
+ letter-spacing:1px;
+}
+.community-box p{
+ margin:18px auto 25px;
+ max-width:520px;
+ color:#858c81;
+ line-height:1.8;
+ font-size:13px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer{
+ padding:25px 0 35px;
+ border-top:1px solid rgba(128,141,112,.12);
+ color:#5e655b;
+ font-size:10px;
+ letter-spacing:1.5px;
+ text-transform:uppercase;
+}
+.footer-inner{
+ display:flex;
+ justify-content:space-between;
+ gap:15px;
+}
+.footer a:hover{color:#9aa68c}
+
+/* =========================
+   MOBILE
+========================= */
+@media(max-width:900px){
+ .ecosystem-grid{grid-template-columns:repeat(2,1fr)}
+ .lore-grid{grid-template-columns:1fr;gap:45px}
+ .lore-mark{width:220px}
+}
+@media(max-width:650px){
+ .container{width:min(100% - 20px,1160px)}
+ .section{padding:75px 0}
+ .section-head{display:block}
+ .section-desc{margin-top:18px}
+ .hero{min-height:calc(100vh - 75px);padding:60px 5px 80px}
+ .hero h1{letter-spacing:1px}
+ .hero-sub{line-height:1.7;letter-spacing:1px}
+ .statement-box{padding:35px 22px}
+ .ecosystem-grid{grid-template-columns:1fr 1fr;gap:9px}
+ .eco-card{min-height:190px;padding:18px}
+ .eco-icon{margin:22px 0 13px;font-size:25px}
+ .eco-card h3{font-size:14px}
+ .eco-card p{font-size:11px}
+ .timeline{
+   grid-template-columns:1fr;
+   gap:35px;
  }
- .page{padding:7px 8px 26px}
- .header{height:64px;padding:6px 8px;border-radius:9px;gap:8px}
- .logo{width:42px;height:42px}
- .brand-name{font-size:20px;letter-spacing:.8px}
- .xlink{padding:7px 8px}.xicon{font-size:19px}.handle{font-size:12px}
- .hero{padding:35px 5px 18px}
- .hero h1{font-size:47px;letter-spacing:1px}
- .hero .tag{font-size:11px;letter-spacing:.8px;margin-top:12px}
- .stone-panel{padding:20px 13px;border-radius:12px;margin-top:3px}
- .panel-title{font-size:25px;margin-bottom:18px}
- .input{height:56px;font-size:15px}
- .stone-btn{height:58px;font-size:15px}
+ .timeline:before{
+   left:17px;
+   right:auto;
+   top:17px;
+   bottom:17px;
+   width:1px;
+   height:auto;
+ }
+ .phase{
+   display:grid;
+   grid-template-columns:34px 1fr;
+   column-gap:20px;
+   padding:0;
+ }
+ .phase-dot{
+   grid-row:1 / span 3;
+   margin:0;
+ }
+ .phase h3{text-align:left;margin:0 0 7px}
+ .phase p{text-align:left;max-width:none}
+ .phase small{text-align:left;margin-top:8px}
+ .checker-box{padding:50px 20px}
+ .faq summary{font-size:13px}
+ .footer-inner{display:block;line-height:2}
 }
 @media(max-width:390px){
- .brand-name{font-size:18px}.handle{font-size:11px}.xicon{font-size:18px}
- .hero h1{font-size:40px}.hero .tag{font-size:10px}
+ .ecosystem-grid{grid-template-columns:1fr}
+ .hero h1{font-size:48px}
+ .brand-name{font-size:15px}
+}
+
+/* subtle reveal */
+.reveal{
+ opacity:0;
+ transform:translateY(18px);
+ animation:reveal .8s ease forwards;
+}
+@keyframes reveal{
+ to{opacity:1;transform:none}
 }
 </style>
 </head>
+
 <body>
+
 <div class="page">
+
+<!-- ================= HEADER ================= -->
+<div class="header-wrap">
+<div class="container">
+<header class="header">
+
+<a class="brand" href="#">
+<img class="logo" src="./assets/logo.png" alt="Rhood Stone">
+<span class="brand-name stone-text">RHOOD STONE</span>
+</a>
+
+<nav class="nav">
+<a href="#lore">Lore</a>
+<a href="#ecosystem">Ecosystem</a>
+<a href="#roadmap">Roadmap</a>
+<a href="#checker">Checker</a>
+</nav>
+
+<a class="xlink" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
+<span class="xicon">𝕏</span>
+<span>@rhoodstone</span>
+</a>
+
+</header>
+</div>
+</div>
+
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+
+<div class="hero-bg"></div>
+
+<div class="hero-content">
+
+<div class="eyebrow">
+<span>THE STONE HAS ARRIVED</span>
+</div>
+
+<h1 class="stone-title">RHOOD<br>STONE</h1>
+
+<p class="hero-sub">
+The chain moves forward.<br>
+The stone remembers.
+</p>
+
+<div class="hero-actions">
+<a class="btn btn-primary" href="#lore">Explore the Lore</a>
+<a class="btn btn-secondary" href="#checker">Checker</a>
+</div>
+
+</div>
+
+<div class="scroll-hint">
+Scroll to discover
+<span></span>
+</div>
+
+</section>
+
+
+<!-- ================= LORE ================= -->
+<section class="section lore" id="lore">
 <div class="container">
 
-<header class="header">
- <div class="brand">
-  <img class="logo" src="./assets/logo.png" alt="Rhood Stone">
-  <div class="brand-name stone-text">RHOOD STONE</div>
- </div>
- <a class="xlink" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
-  <span class="xicon">𝕏</span><span class="handle">@rhoodstone</span>
- </a>
-</header>
-
-<section class="hero">
- <h1 class="stone-title">RHOOD STONE</h1>
- <div class="tag stone-text">THE CHAIN MOVES FORWARD. THE STONE REMEMBERS.</div>
-</section>
-
-<section class="stone-panel">
- <div class="social-tasks" aria-label="Community tasks">
-  <div class="social-task" id="followTask"><a href="https://x.com/rhoodstone" target="_blank" rel="noopener">FOLLOW @RHOODSTONE</a><button class="task-action" id="followAction" type="button">OPEN X</button></div>
-  <div class="social-task" id="postTask"><a href="https://x.com/RhoodStone/status/2097333768998801839" target="_blank" rel="noopener">LIKE + REPOST THE POST</a><button class="task-action" id="postAction" type="button">OPEN POST</button></div>
- </div>
- <h2 class="panel-title stone-text">CHECK YOUR ELIGIBILITY</h2>
- <label class="label stone-text" for="wallet">WALLET ADDRESS</label>
- <input id="wallet" class="input" autocomplete="off" spellcheck="false" placeholder="0x...">
- <button id="check" class="stone-btn" style="display:none">CHECK ELIGIBILITY</button>
- <button id="submit" class="stone-btn submit" style="display:none">SUBMIT ADDRESS</button>
- <div id="result" class="result"></div>
- <div class="note">Only eligible wallets can submit their address.</div>
-</section>
-
-</div>
+<div class="section-head">
+<div>
+<div class="section-kicker">01 — Origin</div>
+<h2 class="section-title stone-text">The Lore</h2>
 </div>
 
-<script>
-const SUPABASE_FUNCTION_URL="https://arsriflrliftvpbtzuwt.supabase.co/functions/v1/check-eligibility";
-const wallet=document.getElementById("wallet");
-const checkBtn=document.getElementById("check");
-const submitBtn=document.getElementById("submit");
-const result=document.getElementById("result");
-let eligibleAddress=null;
-const valid=a=>/^0x[a-fA-F0-9]{40}$/.test(a);
-const TASKS_KEY="rhoodstone_social_tasks_v1";
-let socialTasks=JSON.parse(localStorage.getItem(TASKS_KEY)||"{}");
-function markTask(name){socialTasks[name]=true;localStorage.setItem(TASKS_KEY,JSON.stringify(socialTasks));renderTasks()}
-function renderTasks(){
- const items=[["follow",document.getElementById("followTask"),document.getElementById("followAction")],["post",document.getElementById("postTask"),document.getElementById("postAction")]];
- items.forEach(([name,el,btn])=>{const done=!!socialTasks[name];el.classList.toggle("done",done);btn.textContent=done?"✓ COMPLETED":(name==="follow"?"OPEN X":"OPEN POST");btn.disabled=done;});
- checkBtn.style.display=(socialTasks.follow&&socialTasks.post)?"block":"none";
-}
-document.getElementById("followAction").onclick=()=>{window.open("https://x.com/rhoodstone","_blank","noopener");markTask("follow")};
-document.getElementById("postAction").onclick=()=>{window.open("https://x.com/RhoodStone/status/2097333768998801839","_blank","noopener");markTask("post")};
-renderTasks();
+<p class="section-desc">
+Every chain has a history. Every wallet leaves a trace.
+Somewhere between the blocks, the stone remembers.
+</p>
+</div>
 
-function show(kind,title,msg){
- result.className="result show "+kind;
- result.innerHTML="<h3>"+title+"</h3><p>"+msg+"</p>";
-}
-async function request(action,address){
- const r=await fetch(SUPABASE_FUNCTION_URL,{
-  method:"POST",headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({action,address})
- });
- const data=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error(data.error||"Request failed");
- return data;
-}
-async function checkEligibility(){
- const address=wallet.value.trim();
- submitBtn.style.display="none";eligibleAddress=null;result.className="result";
- if(!valid(address)){show("bad","INVALID ADDRESS","Please enter a valid EVM wallet address.");return}
- if(SUPABASE_FUNCTION_URL.includes("YOUR_")){
-  show("bad","BACKEND NOT CONFIGURED","Add your Supabase Edge Function URL in index.html first.");return
- }
- checkBtn.disabled=true;checkBtn.innerHTML='<span class="spinner"></span>CHECKING...';
- try{
-  const data=await request("check",address);
-  if(data.eligible){
-   eligibleAddress=address;
-   show("ok","ELIGIBLE ✓","This wallet qualifies for Rhood Stone.");
-   submitBtn.style.display="block";
-  }else show("bad","NOT ELIGIBLE","This wallet does not currently qualify.");
- }catch(e){show("bad","CHECK FAILED",e.message)}
- finally{checkBtn.disabled=false;checkBtn.textContent="CHECK ELIGIBILITY"}
-}
-async function submitAddress(){
- if(!eligibleAddress)return;
- submitBtn.disabled=true;submitBtn.innerHTML='<span class="spinner"></span>SUBMITTING...';
- try{
-  const data=await request("submit",eligibleAddress);
-  if(data.submitted){
-   submitBtn.style.display="none";
-   show("ok","ADDRESS SUBMITTED ✓","Your wallet address has been submitted successfully.");
-  }else{
-   eligibleAddress=null;submitBtn.style.display="none";
-   show("bad","NOT ELIGIBLE","This wallet no longer qualifies.");
-  }
- }catch(e){show("bad","SUBMISSION FAILED",e.message)}
- finally{submitBtn.disabled=false;submitBtn.textContent="SUBMIT ADDRESS"}
-}
-checkBtn.onclick=checkEligibility;
-submitBtn.onclick=submitAddress;
-wallet.addEventListener("keydown",e=>{if(e.key==="Enter")checkEligibility()});
-</script>
+<div class="divider"></div>
+
+<div class="lore-grid">
+
+<div class="lore-mark">
+<img src="./assets/logo.png" alt="Rhood Stone emblem">
+</div>
+
+<div class="lore-copy">
+
+<p>
+Before the noise, there was the stone.
+Silent. Patient. Unmoved by the speed of the chain.
+</p>
+
+<p>
+Blocks were created. Wallets appeared. Communities formed and disappeared.
+But the stone remained — recording what the chain forgot.
+</p>
+
+<p>
+Rhood Stone begins there.
+Not as another passing moment, but as a story that unfolds block by block.
+</p>
+
+<div class="lore-quote">
+“The chain moves forward.<br>
+The stone remembers.”
+</div>
+
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= STATEMENT ================= -->
+<section class="statement">
+<div class="container">
+
+<div class="statement-box">
+
+<div class="section-kicker">The Principle</div>
+
+<h3 class="stone-text">
+BUILT FOR THOSE<br>
+WHO REMEMBER.
+</h3>
+
+<p>
+Rhood Stone is a growing on-chain universe.
+The story is still being written — and the earliest chapters are being written now.
+</p>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= ECOSYSTEM ================= -->
+<section class="section" id="ecosystem">
+<div class="container">
+
+<div class="section-head">
+<div>
+<div class="section-kicker">02 — The World</div>
+<h2 class="section-title stone-text">Ecosystem</h2>
+</div>
+
+<p class="section-desc">
+The stone is only the beginning.
+Different pieces of the Rhood Stone world will reveal themselves over time.
+</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="ecosystem-grid">
+
+<div class="eco-card">
+<div class="eco-number">01</div>
+<div class="eco-icon">◈</div>
+<h3>Checker</h3>
+<p>
+A gateway for discovering wallet eligibility. The Checker is currently under construction.
+</p>
+</div>
+
+<div class="eco-card">
+<div class="eco-number">02</div>
+<div class="eco-icon">◉</div>
+<h3>Lore</h3>
+<p>
+The history behind the stone. New fragments of the story will appear as the project evolves.
+</p>
+</div>
+
+<div class="eco-card">
+<div class="eco-number">03</div>
+<div class="eco-icon">◇</div>
+<h3>Collection</h3>
+<p>
+Something is forming beneath the surface. Details will be revealed when the time comes.
+</p>
+</div>
+
+<div class="eco-card">
+<div class="eco-number">04</div>
+<div class="eco-icon">✦</div>
+<h3>Community</h3>
+<p>
+The people around the stone are part of the story. The next chapter is built together.
+</p>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= ROADMAP ================= -->
+<section class="section roadmap" id="roadmap">
+<div class="container">
+
+<div class="section-head">
+<div>
+<div class="section-kicker">03 — The Path</div>
+<h2 class="section-title stone-text">Roadmap</h2>
+</div>
+
+<p class="section-desc">
+No artificial promises. Just a path.
+Some destinations remain intentionally hidden.
+</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="timeline">
+
+<div class="phase active">
+<div class="phase-dot">01</div>
+<h3>Genesis</h3>
+<p>
+The foundation is laid. The stone enters the chain.
+</p>
+<small>Current</small>
+</div>
+
+<div class="phase">
+<div class="phase-dot">02</div>
+<h3>Awakening</h3>
+<p>
+The world begins to expand. New pieces of the story emerge.
+</p>
+<small>Next</small>
+</div>
+
+<div class="phase">
+<div class="phase-dot">03</div>
+<h3>Verification</h3>
+<p>
+The Rhood Stone Checker opens its gates.
+</p>
+<small>Coming</small>
+</div>
+
+<div class="phase">
+<div class="phase-dot">04</div>
+<h3>Unknown</h3>
+<p>
+Not everything should be revealed before its time.
+</p>
+<small>???</small>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= CHECKER ================= -->
+<section class="section checker-section" id="checker">
+<div class="container">
+
+<div class="section-head">
+<div>
+<div class="section-kicker">04 — Gateway</div>
+<h2 class="section-title stone-text">The Checker</h2>
+</div>
+
+<p class="section-desc">
+The gateway is being prepared.
+For now, the stone remains closed.
+</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="checker-box">
+
+<div class="lock">◈</div>
+
+<h2 class="stone-text">CHECKER</h2>
+
+<div class="coming">COMING SOON</div>
+
+<p>
+Wallet verification is currently under development.
+The Checker will open when the next chapter of Rhood Stone begins.
+</p>
+
+<a class="btn btn-secondary" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
+Follow for Updates
+</a>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= FAQ ================= -->
+<section class="section" id="faq">
+<div class="container">
+
+<div class="section-head">
+<div>
+<div class="section-kicker">05 — Questions</div>
+<h2 class="section-title stone-text">FAQ</h2>
+</div>
+
+<p class="section-desc">
+A few things worth knowing before entering the stone.
+</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="faq-list">
+
+<details class="faq">
+<summary>What is Rhood Stone?</summary>
+<p>
+Rhood Stone is a growing Web3 project built around an evolving story, community and on-chain ecosystem.
+</p>
+</details>
+
+<details class="faq">
+<summary>What is the Checker?</summary>
+<p>
+The Checker will be used to verify wallet eligibility. It is currently under development and will be available in a future update.
+</p>
+</details>
+
+<details class="faq">
+<summary>When will the Checker launch?</summary>
+<p>
+The exact launch timing has not been announced yet. Follow the official Rhood Stone account for updates.
+</p>
+</details>
+
+<details class="faq">
+<summary>Is Rhood Stone live?</summary>
+<p>
+The project is currently being built. Some parts of the ecosystem are already taking shape, while other features remain locked.
+</p>
+</details>
+
+<details class="faq">
+<summary>Where can I follow Rhood Stone?</summary>
+<p>
+The official updates are shared through the Rhood Stone X account.
+</p>
+</details>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= COMMUNITY ================= -->
+<section class="community">
+<div class="container">
+
+<div class="community-box">
+
+<div class="section-kicker">The Story Continues</div>
+
+<h2 class="stone-text">Stay Close To The Stone.</h2>
+
+<p>
+The earliest chapters are being written now.
+Follow Rhood Stone and don't miss what comes next.
+</p>
+
+<a class="btn btn-primary" href="https://x.com/rhoodstone" target="_blank" rel="noopener">
+Follow @rhoodstone
+</a>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+<div class="container">
+<div class="footer-inner">
+<div>© 2026 RHOOD STONE</div>
+<div>
+<a href="https://x.com/rhoodstone" target="_blank" rel="noopener">X / @rhoodstone</a>
+&nbsp; · &nbsp;
+<a href="#lore">Lore</a>
+&nbsp; · &nbsp;
+<a href="#checker">Checker</a>
+</div>
+</div>
+</div>
+</footer>
+
+</div>
+
 </body>
 </html>
