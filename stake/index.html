@@ -380,28 +380,36 @@ return e
 }
 
 async function refreshAll(){
-if(!wallet)return;
-try{
-$("stakedCount").textContent=String(await staking.stakedBalance(wallet));
-$("ogStatus").textContent=(await staking.isOGEligible(wallet))?"ELIGIBLE":"NOT YET";
-$("ownedGrid").innerHTML='<div class="status">Loading owned Stones…</div>';
-const owned=await getOwnedTokens();
-$("ownedGrid").innerHTML="";
-if(!owned.length)$("ownedGrid").innerHTML='<div class="status">No Rhood Stones found in this wallet.</div>';
-else owned.forEach(id=>$("ownedGrid").appendChild(ownedCard(id)));
-$("stakedGrid").innerHTML='<div class="status">Loading active stakes…</div>';
-const ids=await getStakedTokens();
-$("stakedGrid").innerHTML="";
-if(!ids.length)$("stakedGrid").innerHTML='<div class="status">No active stakes found.</div>';
-for(const id of ids){
-const info=await staking.getStakeInfo(id);
-$("stakedGrid").appendChild(stakedCard(id,info))
-}
-setStatus("Staking data refreshed.","ok")
-}catch(e){
-console.error(e);
-setStatus(e?.shortMessage||e?.reason||e?.message||"Could not load staking data.","err")
-}
+ if(!wallet)return;
+ $("ownedGrid").innerHTML='<div class="status">Loading owned Stones…</div>';
+ try{
+  const owned=await getOwnedTokens();
+  $("ownedGrid").innerHTML="";
+  updateTokenSelect(owned);
+  if(!owned.length)$("ownedGrid").innerHTML='<div class="status">No Rhood Stones found in this wallet.</div>';
+  else owned.forEach(id=>$("ownedGrid").appendChild(ownedCard(id)));
+ }catch(e){
+  console.error("NFT load failed",e);
+  $("ownedGrid").innerHTML='<div class="status">Could not load your Stones. Please refresh.</div>';
+  updateTokenSelect([]);
+ }
+ try{
+  $("stakedCount").textContent=String(await staking.stakedBalance(wallet));
+  $("ogStatus").textContent=(await staking.isOGEligible(wallet))?"ELIGIBLE":"NOT YET";
+ }catch(e){
+  console.error("Staking summary read failed",e);
+  $("stakedCount").textContent="—"; $("ogStatus").textContent="—";
+ }
+ try{
+  $("stakedGrid").innerHTML='<div class="status">Loading active stakes…</div>';
+  const ids=await getStakedTokens(); $("stakedGrid").innerHTML="";
+  if(!ids.length)$("stakedGrid").innerHTML='<div class="status">No active stakes found.</div>';
+  for(const id of ids){const info=await staking.getStakeInfo(id);$("stakedGrid").appendChild(stakedCard(id,info));}
+ }catch(e){
+  console.error("Active stakes read failed",e);
+  $("stakedGrid").innerHTML='<div class="status">Could not load active stakes. Your wallet is still connected.</div>';
+ }
+ setStatus("Wallet connected. Your Stones are loaded.","ok");
 }
 
 function updateTokenSelect(ids){
