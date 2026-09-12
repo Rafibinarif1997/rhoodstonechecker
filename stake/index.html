@@ -15,7 +15,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;opa
 body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.48) 100%)}
 .container{width:min(1060px,90%);margin:auto;position:relative;z-index:2}
 .topbar{position:absolute;top:0;left:0;right:0;height:86px;z-index:10;padding:22px 4%;display:flex;justify-content:flex-end;align-items:flex-start}
-.connect{min-width:142px;height:44px;padding:0 18px;border:1px solid #68716b;border-radius:5px;background:linear-gradient(145deg,#454b47 0,#252a27 36%,#0b0e0c 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.16),inset -4px -5px 10px rgba(0,0,0,.55),0 9px 28px rgba(0,0,0,.45);color:#edf2ef;font:900 10px Georgia,serif;letter-spacing:1.6px;cursor:pointer;position:relative;overflow:hidden;clip-path:polygon(0 7%,10% 0,30% 2%,51% 0,73% 2%,100% 0,98% 31%,100% 69%,97% 100%,75% 98%,51% 100%,26% 98%,0 100%,2% 68%,0 31%)}
+.back-home{margin-right:10px;height:44px;display:flex;align-items:center;padding:0 15px;border:1px solid #58625b;border-radius:4px;color:#cfd7d2;text-decoration:none;font:900 10px Georgia,serif;letter-spacing:1.3px;background:linear-gradient(145deg,#39403b,#0c100e);box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -3px -4px 8px rgba(0,0,0,.55)}.back-home:hover{border-color:#67ffb6;color:#bfffdc}.connect{min-width:142px;height:44px;padding:0 18px;border:1px solid #68716b;border-radius:5px;background:linear-gradient(145deg,#454b47 0,#252a27 36%,#0b0e0c 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.16),inset -4px -5px 10px rgba(0,0,0,.55),0 9px 28px rgba(0,0,0,.45);color:#edf2ef;font:900 10px Georgia,serif;letter-spacing:1.6px;cursor:pointer;position:relative;overflow:hidden;clip-path:polygon(0 7%,10% 0,30% 2%,51% 0,73% 2%,100% 0,98% 31%,100% 69%,97% 100%,75% 98%,51% 100%,26% 98%,0 100%,2% 68%,0 31%)}
 .connect:before{content:"";position:absolute;inset:3px;border:1px solid rgba(255,255,255,.055);clip-path:inherit;pointer-events:none}.connect.connected{border-color:rgba(32,255,154,.55);color:#bfffdc}
 .page{padding:112px 0 90px}.hero{text-align:center;max-width:780px;margin:0 auto 42px}.kicker{font-size:9px;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:14px}.stone-title{font-family:Georgia,"Times New Roman",serif;font-weight:900;text-transform:uppercase;letter-spacing:.035em;color:#cfd4d0;text-shadow:1px 1px 0 #070807,2px 2px 0 #151816,0 -1px 0 rgba(255,255,255,.18),0 10px 25px rgba(0,0,0,.5);-webkit-text-stroke:.55px rgba(255,255,255,.12)}h1{font-size:clamp(48px,8vw,88px);line-height:.88}h1:after{content:"";display:block;width:88px;height:2px;margin:23px auto 0;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 18px rgba(32,255,154,.45)}.hero p{max-width:690px;margin:22px auto 0;color:#c4ccc7;font-size:14px;line-height:1.85}
 .rock{position:absolute;z-index:0;pointer-events:none;opacity:.28;filter:drop-shadow(0 0 30px rgba(32,255,154,.10));}.rock.r1{width:170px;height:120px;left:-40px;top:240px;background:linear-gradient(145deg,#4c554f,#171b19);clip-path:polygon(8% 18%,28% 3%,56% 10%,91% 0,100% 31%,90% 74%,65% 100%,29% 88%,0 62%)}.rock.r2{width:140px;height:170px;right:-35px;top:430px;background:linear-gradient(145deg,#3e4641,#101311);clip-path:polygon(22% 0,78% 8%,100% 34%,86% 76%,55% 100%,15% 82%,0 39%)}
@@ -24,7 +24,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 .status{margin-top:16px;padding:13px 15px;border:1px solid #414a44;background:linear-gradient(145deg,rgba(55,61,57,.5),rgba(7,10,8,.84));color:#bfc8c3;font-size:11px;line-height:1.65}.status.ok{border-color:rgba(103,255,182,.4);color:#9dffca}.status.warn{border-color:rgba(255,190,90,.3);color:#ffd49b}.status.err{border-color:rgba(255,90,90,.3);color:#ffb0b0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:18px}.nft{padding:18px;border:1px solid #414944;border-radius:5px;background:linear-gradient(145deg,#303631,#0b0e0c);box-shadow:inset 1px 1px 0 rgba(255,255,255,.08),inset -4px -6px 12px rgba(0,0,0,.55);position:relative;overflow:hidden}.nft:after{content:"";position:absolute;right:-35px;bottom:-45px;width:110px;height:110px;border-radius:50%;background:rgba(32,255,154,.045);filter:blur(18px)}.nft>*{position:relative;z-index:1}.token{font:900 24px Georgia,serif;color:#e0e5e2}.meta{font-size:9px;letter-spacing:1.2px;color:#67ffb6;margin:7px 0 12px;font-weight:900}.state{font-size:10px;color:#dbe2de;font-weight:900;margin-bottom:9px}.timer{font:11px/1.7 monospace;color:#cbd3ce;margin-bottom:11px}.nft .btn{width:100%}
 .how{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.how .nft{min-height:150px}.footer-note{text-align:center;margin-top:34px;color:#68736d;font-size:8px;letter-spacing:2px}
-@media(max-width:800px){.stats{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}.page{padding-top:105px}.topbar{padding:18px 5%}.connect{min-width:132px;height:42px}}
+@media(max-width:800px){.back-home{margin-right:7px;padding:0 10px}.stats{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}.page{padding-top:105px}.topbar{padding:18px 5%}.connect{min-width:132px;height:42px}}
 @media(max-width:480px){.container{width:88%}.how{grid-template-columns:1fr}.panel{padding:22px}.manual{align-items:stretch}.input{min-width:100%}.manual .btn{flex:1}.hero p{font-size:13px}}
 
 .wallet-modal{display:none;position:fixed;inset:0;z-index:1000}
@@ -46,7 +46,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 </style>
 </head>
 <body>
-<div class="topbar"><button class="connect" id="connectBtn">CONNECT WALLET</button></div>
+<div class="topbar"><a class="back-home" href="https://rhoodstone.xyz">← BACK TO RHOOD STONE</a><button class="connect" id="connectBtn">CONNECT WALLET</button></div>
 <div id="walletModal" class="wallet-modal" aria-hidden="true">
   <div class="wallet-backdrop" id="walletBackdrop"></div>
   <div class="wallet-dialog" role="dialog" aria-modal="true" aria-labelledby="walletTitle">
@@ -380,36 +380,28 @@ return e
 }
 
 async function refreshAll(){
- if(!wallet)return;
- $("ownedGrid").innerHTML='<div class="status">Loading owned Stones…</div>';
- try{
-  const owned=await getOwnedTokens();
-  $("ownedGrid").innerHTML="";
-  updateTokenSelect(owned);
-  if(!owned.length)$("ownedGrid").innerHTML='<div class="status">No Rhood Stones found in this wallet.</div>';
-  else owned.forEach(id=>$("ownedGrid").appendChild(ownedCard(id)));
- }catch(e){
-  console.error("NFT load failed",e);
-  $("ownedGrid").innerHTML='<div class="status">Could not load your Stones. Please refresh.</div>';
-  updateTokenSelect([]);
- }
- try{
-  $("stakedCount").textContent=String(await staking.stakedBalance(wallet));
-  $("ogStatus").textContent=(await staking.isOGEligible(wallet))?"ELIGIBLE":"NOT YET";
- }catch(e){
-  console.error("Staking summary read failed",e);
-  $("stakedCount").textContent="—"; $("ogStatus").textContent="—";
- }
- try{
-  $("stakedGrid").innerHTML='<div class="status">Loading active stakes…</div>';
-  const ids=await getStakedTokens(); $("stakedGrid").innerHTML="";
-  if(!ids.length)$("stakedGrid").innerHTML='<div class="status">No active stakes found.</div>';
-  for(const id of ids){const info=await staking.getStakeInfo(id);$("stakedGrid").appendChild(stakedCard(id,info));}
- }catch(e){
-  console.error("Active stakes read failed",e);
-  $("stakedGrid").innerHTML='<div class="status">Could not load active stakes. Your wallet is still connected.</div>';
- }
- setStatus("Wallet connected. Your Stones are loaded.","ok");
+if(!wallet)return;
+try{
+$("stakedCount").textContent=String(await staking.stakedBalance(wallet));
+$("ogStatus").textContent=(await staking.isOGEligible(wallet))?"ELIGIBLE":"NOT YET";
+$("ownedGrid").innerHTML='<div class="status">Loading owned Stones…</div>';
+const owned=await getOwnedTokens();
+$("ownedGrid").innerHTML="";
+if(!owned.length)$("ownedGrid").innerHTML='<div class="status">No Rhood Stones found in this wallet.</div>';
+else owned.forEach(id=>$("ownedGrid").appendChild(ownedCard(id)));
+$("stakedGrid").innerHTML='<div class="status">Loading active stakes…</div>';
+const ids=await getStakedTokens();
+$("stakedGrid").innerHTML="";
+if(!ids.length)$("stakedGrid").innerHTML='<div class="status">No active stakes found.</div>';
+for(const id of ids){
+const info=await staking.getStakeInfo(id);
+$("stakedGrid").appendChild(stakedCard(id,info))
+}
+setStatus("Staking data refreshed.","ok")
+}catch(e){
+console.error(e);
+setStatus(e?.shortMessage||e?.reason||e?.message||"Could not load staking data.","err")
+}
 }
 
 function updateTokenSelect(ids){
