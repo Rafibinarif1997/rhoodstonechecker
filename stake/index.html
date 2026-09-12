@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rhood Stone — Stake</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.15.0/dist/ethers.min.js"></script>
+<style>
+
+:root{--bg:#050706;--stone:#151817;--stone2:#242825;--stone3:#303631;--text:#f0f3f1;--muted:#aeb7b2;--green:#20ff9a;--green2:#0bc878;--line:rgba(220,230,225,.13);--shadow:rgba(0,0,0,.55)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;background:var(--bg)}body{background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}a{text-decoration:none;color:inherit}button{font:inherit;color:inherit}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(circle at 50% 15%,transparent 35%,rgba(0,0,0,.5) 100%)}
+.container{width:min(1180px,90%);margin:auto}
+/* stone typography */
+.stone-text{font-family:Georgia,"Times New Roman",serif;font-weight:900;letter-spacing:.035em;text-transform:uppercase;color:#cfd4d0;text-shadow:1px 1px 0 #090a09,2px 2px 0 #0b0d0c,0 0 22px rgba(32,255,154,.08);-webkit-text-stroke:.35px rgba(255,255,255,.18)}
+.stone-text.green{color:#dce8e1;text-shadow:0 1px 0 #050706,0 0 18px rgba(32,255,154,.25)}
+/* header */
+header{position:fixed;top:0;left:0;right:0;height:76px;z-index:40;background:linear-gradient(180deg,rgba(4,7,6,.96),rgba(4,7,6,.78));border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)}
+.nav{height:100%;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:900;letter-spacing:2px}.brand img{width:38px;height:38px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(32,255,154,.3))}.brand span{font-family:Georgia,serif;letter-spacing:1.5px;color:#d8ddd9;text-shadow:1px 1px 0 #000}.desktop-nav{display:flex;align-items:center;gap:25px;margin-left:auto;margin-right:12px}.desktop-nav a{font-size:10px;font-weight:900;letter-spacing:1.8px;color:#9fa8a3;transition:.2s}.desktop-nav a:hover{color:var(--green)}
+.nav-actions{display:flex;align-items:center;gap:9px}.wallet-btn,.menu-btn{border:1px solid rgba(255,255,255,.16);background:linear-gradient(145deg,#303631,#101311);box-shadow:inset 0 1px rgba(255,255,255,.13),0 7px 25px rgba(0,0,0,.35);cursor:pointer}.wallet-btn{height:42px;padding:0 17px;border-radius:7px;font-size:10px;font-weight:900;letter-spacing:1.3px}.wallet-btn:after{content:"COMING SOON";display:block;font-size:7px;color:var(--green);letter-spacing:1.1px;margin-top:2px}.menu-btn{display:none;width:42px;height:42px;border-radius:8px;font-size:23px;line-height:1}
+/* menu */
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.56);opacity:0;pointer-events:none;transition:.25s;z-index:60}.menu-panel{position:fixed;top:0;right:0;width:min(370px,88vw);height:100dvh;z-index:61;padding:88px 24px 24px;background:linear-gradient(145deg,#252a27 0%,#0d100f 55%,#070908 100%);border-left:1px solid rgba(255,255,255,.14);box-shadow:-30px 0 90px rgba(0,0,0,.6);transform:translateX(105%);transition:.35s cubic-bezier(.2,.8,.2,1);overflow:auto}.menu-panel.open{transform:none}.menu-overlay.open{opacity:1;pointer-events:auto}.menu-close{position:absolute;right:20px;top:20px;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;background:#111513;cursor:pointer;font-size:22px}.menu-kicker{font-size:9px;letter-spacing:3px;color:var(--green);font-weight:900;margin-bottom:10px}.menu-title{font:900 30px Georgia,serif;letter-spacing:1px;margin-bottom:25px;text-transform:uppercase;color:#d9dfdb}.menu-item{display:flex;align-items:center;justify-content:space-between;padding:17px 14px;margin:8px 0;border:1px solid rgba(255,255,255,.09);border-radius:7px;background:linear-gradient(145deg,rgba(55,61,57,.65),rgba(12,15,13,.9));box-shadow:inset 0 1px rgba(255,255,255,.08)}.menu-item span:first-child{font:900 14px Georgia,serif;letter-spacing:1.2px}.soon{font-size:8px;font-weight:900;letter-spacing:1.3px;color:var(--green);padding:5px 7px;border:1px solid rgba(32,255,154,.25);border-radius:4px}.menu-item.about{border-color:rgba(32,255,154,.2)}
+/* hero */
+.hero{min-height:100svh;position:relative;display:grid;place-items:center;overflow:hidden;padding:120px 0 70px;background:radial-gradient(circle at 50% 42%,rgba(19,105,70,.18),transparent 28%),radial-gradient(circle at 50% 85%,rgba(32,255,154,.06),transparent 30%),#050706}.hero:before{content:"";position:absolute;inset:-10%;background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.4) 65%,rgba(0,0,0,.9) 100%);z-index:2}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 70%,#050706 100%);z-index:3}.rock-bg{position:absolute;width:min(850px,88vw);height:850px;left:50%;top:46%;transform:translate(-50%,-50%);background:url("logo.jpg") center/contain no-repeat;opacity:.16;filter:blur(1px) saturate(.8) brightness(.7) drop-shadow(0 0 50px rgba(32,255,154,.18));z-index:1}.rock-shard{position:absolute;width:12px;height:20px;background:#555d57;clip-path:polygon(50% 0,100% 34%,77% 100%,16% 78%,0 35%);opacity:.6;z-index:2;animation:float 7s ease-in-out infinite}.s1{left:11%;top:35%}.s2{right:12%;top:28%;width:17px;height:26px;animation-delay:1.5s}.s3{left:21%;bottom:24%;width:9px;height:14px;animation-delay:3s}.s4{right:23%;bottom:31%;width:10px;height:16px;animation-delay:2s}@keyframes float{50%{transform:translateY(-16px) rotate(8deg);opacity:.85}}
+.hero-inner{position:relative;z-index:4;text-align:center;width:min(900px,90%);display:flex;flex-direction:column;align-items:center}.hero-logo{width:min(370px,62vw);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 18px rgba(32,255,154,.28)) drop-shadow(0 30px 55px rgba(0,0,0,.8));animation:heroFloat 6s ease-in-out infinite}@keyframes heroFloat{50%{transform:translateY(-10px)}}.eyebrow{margin-top:-12px;margin-bottom:16px;color:#7e8983;font-size:9px;font-weight:900;letter-spacing:4px}.hero h1{font-size:clamp(54px,10vw,116px);line-height:.82;margin-bottom:25px}.hero h1:after{content:"";display:block;width:95px;height:2px;margin:25px auto 0;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 18px rgba(32,255,154,.5)}.tagline{font:900 clamp(18px,3vw,29px)/1.25 Georgia,serif;letter-spacing:2px;text-transform:uppercase;color:#d7ded9;text-shadow:1px 2px 0 #000}.hero-copy{max-width:590px;margin:17px auto 0;color:#aeb7b2;font-size:14px;line-height:1.8}.hero-cta{margin-top:28px;display:inline-flex;align-items:center;justify-content:center;min-width:220px;min-height:54px;padding:0 26px;border:1px solid rgba(32,255,154,.7);border-radius:6px;background:linear-gradient(145deg,#303631,#0b0f0d);box-shadow:inset 0 1px rgba(255,255,255,.13),0 0 28px rgba(32,255,154,.1),0 15px 40px rgba(0,0,0,.5);font:900 12px Georgia,serif;letter-spacing:2px;color:#e2e8e4;position:relative;overflow:hidden}.hero-cta:after{content:"";position:absolute;inset:1px;background:linear-gradient(120deg,transparent,rgba(32,255,154,.16),transparent);transform:translateX(-100%);transition:.6s}.hero-cta:hover:after{transform:translateX(100%)}
+/* sections */
+.section{position:relative;padding:120px 0;overflow:hidden}.section:before{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.08),transparent);opacity:.5}.section-dark{background:linear-gradient(180deg,#050706,#0b0e0c 50%,#050706)}.section-stone{background:radial-gradient(circle at 50% 50%,rgba(32,255,154,.07),transparent 36%),linear-gradient(135deg,#171b19,#080a09 55%,#111512)}.section-head{max-width:780px;margin-bottom:55px}.kicker{font-size:9px;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:13px}.section h2{font-size:clamp(42px,7vw,82px);line-height:.9;margin-bottom:22px}.lead{max-width:740px;color:#aeb7b2;font-size:15px;line-height:1.9}.mark-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:stretch}.story,.quote-block{border:1px solid var(--line);background:linear-gradient(145deg,rgba(50,56,52,.65),rgba(8,10,9,.94));box-shadow:inset 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.35);border-radius:9px}.story{padding:38px}.story p{color:#c0c7c3;line-height:1.9;font-size:15px}.quote-block{display:flex;align-items:center;justify-content:center;padding:40px;text-align:center;min-height:280px}.quote-block p{font:900 clamp(25px,4vw,43px)/1.15 Georgia,serif;color:#d9e0dc;text-transform:uppercase}.quote-block span{display:block;margin-top:20px;color:var(--green);font:900 9px Inter,sans-serif;letter-spacing:3px}
+.traits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.trait{padding:30px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(145deg,#292e2b,#0c0f0e);box-shadow:inset 0 1px rgba(255,255,255,.1),0 18px 55px rgba(0,0,0,.3)}.trait-num{font-size:9px;color:var(--green);letter-spacing:3px;font-weight:900}.trait h3{font:900 25px Georgia,serif;margin:18px 0 10px;text-transform:uppercase}.trait p{font-size:13px;color:#aeb7b2;line-height:1.8}
+/* eligibility */
+.check-wrap{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;max-width:780px}.check-stone{min-height:330px;border:1px solid var(--line);border-radius:10px;background:radial-gradient(circle at 50% 45%,rgba(32,255,154,.15),transparent 28%),linear-gradient(145deg,#282e2a,#090c0a);display:grid;place-items:center;position:relative;overflow:hidden;box-shadow:inset 0 1px rgba(255,255,255,.1),0 30px 80px rgba(0,0,0,.4)}/* roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.phase-card{min-height:230px;padding:30px;border:1px solid var(--line);border-radius:9px;background:linear-gradient(145deg,#272c29,#0a0d0b);box-shadow:inset 0 1px rgba(255,255,255,.09),0 22px 65px rgba(0,0,0,.35);position:relative;overflow:hidden}.phase-card:after{content:"";position:absolute;right:-45px;bottom:-55px;width:170px;height:170px;border-radius:50%;background:rgba(32,255,154,.06);filter:blur(20px)}.phase{font-size:9px;font-weight:900;letter-spacing:3px;color:#7e8983}.phase-card h3{font:900 26px Georgia,serif;margin:14px 0 12px;text-transform:uppercase}.phase-card p{color:#aeb7b2;font-size:13px;line-height:1.8}.tbd{display:inline-block;margin-top:18px;padding:6px 8px;border:1px solid rgba(32,255,154,.22);border-radius:4px;color:var(--green);font-size:8px;font-weight:900;letter-spacing:1.2px}.wide{grid-column:1/-1}
+/* community/footer */
+.community{text-align:center;background:radial-gradient(circle at 50% 40%,rgba(32,255,154,.09),transparent 30%),#050706}.community .section-head{margin:0 auto 30px}.community .lead{margin:auto}.social{display:inline-flex;margin-top:26px;padding:15px 22px;border:1px solid rgba(255,255,255,.17);border-radius:6px;background:linear-gradient(145deg,#282e2a,#0b0e0c);font:900 11px Georgia,serif;letter-spacing:1.6px}.social:hover{border-color:rgba(32,255,154,.5)}footer{padding:35px 0 42px;border-top:1px solid rgba(255,255,255,.08);background:#040605}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}.footer-brand{font:900 14px Georgia,serif;letter-spacing:1.8px}.footer-copy{font-size:9px;letter-spacing:1.5px;color:#69736e}.footer-x{font-size:10px;color:#aeb7b2;font-weight:900}.footer-x:hover{color:var(--green)}
+@media(max-width:820px){header{height:68px}.desktop-nav{display:none}.menu-btn{display:block}.wallet-btn{height:40px;padding:0 13px}.wallet-btn:after{font-size:6px}.brand span{font-size:13px}.section{padding:90px 0}.mark-grid,.check-wrap{grid-template-columns:1fr}.traits{grid-template-columns:1fr}.roadmap{grid-template-columns:1fr}.wide{grid-column:auto}.hero{padding-top:100px}.hero-logo{width:min(310px,68vw)}.hero h1{font-size:clamp(48px,15vw,82px)}.rock-bg{width:650px;height:650px}.footer-inner{flex-direction:column;text-align:center}}
+@media(max-width:460px){.container{width:88%}.brand img{width:31px;height:31px}.brand span{font-size:12px}.nav-actions{gap:6px}.wallet-btn{padding:0 10px;font-size:9px}.menu-btn{width:40px;height:40px}.hero-copy{font-size:13px}.section h2{font-size:45px}.story,.quote-block{padding:28px}.check-stone{min-height:270px}.menu-panel{padding-left:17px;padding-right:17px}}
+
+/* ===== PREMIUM STONE SYSTEM ===== */
+:root{--rock:#252a27;--rock-dark:#0a0d0b;--rock-mid:#353b37;--dust:#69716c}
+body{background:#050706}
+body:before{opacity:.11;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.055' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.85'/%3E%3C/svg%3E")}
+/* compact carved header controls */
+.nav-actions{gap:8px}
+.menu-btn{display:grid;place-items:center;grid-template-columns:repeat(3,3px);gap:3px;width:42px;height:42px;padding:0;border-radius:50%;background:radial-gradient(circle at 32% 25%,#5b625e 0,#303632 28%,#151917 68%,#080a09 100%);border:1px solid #58605b;box-shadow:inset 2px 2px 4px rgba(255,255,255,.14),inset -3px -4px 7px rgba(0,0,0,.75),0 7px 22px rgba(0,0,0,.55),0 0 16px rgba(32,255,154,.06);position:relative}
+.menu-btn:before{content:"";position:absolute;inset:4px;border:1px solid rgba(255,255,255,.06);border-radius:50%;clip-path:polygon(0 16%,25% 4%,46% 8%,73% 0,100% 18%,92% 42%,100% 69%,76% 100%,48% 92%,20% 100%,0 78%,7% 48%)}
+.menu-btn span{width:3px;height:3px;border-radius:50%;background:#d7ddd9;box-shadow:0 0 5px rgba(32,255,154,.35);z-index:1}
+.wallet-btn{height:42px;min-width:126px;padding:0 13px;border-radius:5px;background:linear-gradient(145deg,#454b47 0,#252a27 36%,#0c0f0d 100%);border:1px solid #646b66;box-shadow:inset 1px 1px 0 rgba(255,255,255,.16),inset -3px -4px 8px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.45);font-family:Georgia,serif;color:#e2e7e4;position:relative;overflow:hidden}
+.wallet-btn:before{content:"";position:absolute;inset:2px;border:1px solid rgba(255,255,255,.05);clip-path:polygon(0 7%,8% 0,31% 2%,54% 0,79% 3%,100% 0,98% 30%,100% 58%,97% 100%,70% 97%,48% 100%,23% 98%,0 100%,2% 65%,0 38%);pointer-events:none}
+.wallet-btn:after{content:"COMING SOON";font-family:Inter,sans-serif;font-size:6px;color:var(--green);letter-spacing:1.1px;margin-top:2px}
+/* stone typography with carved highlight/shadow */
+.stone-text{font-family:Georgia,"Times New Roman",serif;color:#c9cecb;text-shadow:1px 1px 0 #070807,2px 2px 0 #151816,0 -1px 0 rgba(255,255,255,.18),0 10px 24px rgba(0,0,0,.35);-webkit-text-stroke:.55px rgba(255,255,255,.12);position:relative}
+.stone-text:before{content:"";position:absolute;inset:0;pointer-events:none}
+/* menu: compact stone chips, not giant cards */
+.menu-panel{width:min(320px,86vw);padding:84px 20px 24px;background:linear-gradient(145deg,#343a36 0,#181c1a 25%,#0a0d0b 75%,#171b19 100%);border-left:1px solid #59615c;box-shadow:-28px 0 90px rgba(0,0,0,.72),inset 8px 0 30px rgba(255,255,255,.025)}
+.menu-panel:before{content:"";position:absolute;inset:12px;border:1px solid rgba(255,255,255,.045);clip-path:polygon(0 2%,18% 0,38% 1%,57% 0,78% 2%,100% 0,99% 20%,100% 42%,98% 61%,100% 82%,97% 100%,77% 98%,56% 100%,37% 98%,16% 100%,0 97%,2% 77%,0 56%,2% 34%,0 15%);pointer-events:none}
+.menu-close{width:34px;height:34px;border-radius:50%;right:18px;top:18px;background:radial-gradient(circle at 30% 25%,#515852,#141816 70%);border:1px solid #5c645f;box-shadow:inset 1px 1px 3px rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.5)}
+.menu-kicker{font-size:8px;letter-spacing:3px;margin-bottom:7px}.menu-title{font-size:25px;margin-bottom:18px}
+.menu-item{position:relative;width:100%;min-height:43px;padding:8px 9px;margin:6px 0;border:1px solid #4b534e;border-radius:5px;background:linear-gradient(145deg,#3b413e 0,#232824 38%,#0d100e 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -3px -4px 8px rgba(0,0,0,.58),0 5px 14px rgba(0,0,0,.28);clip-path:polygon(0 5%,8% 0,28% 2%,52% 0,74% 2%,100% 0,98% 30%,100% 70%,97% 100%,73% 98%,50% 100%,26% 98%,0 100%,2% 69%,0 31%);transition:transform .2s,border-color .2s,filter .2s}
+.menu-item:hover{transform:translateX(-3px);border-color:rgba(32,255,154,.45);filter:brightness(1.08)}
+.menu-item span:first-child{font:900 11px Georgia,serif;letter-spacing:1.3px;color:#d4dad6}.soon{font-size:6px;letter-spacing:1px;padding:4px 5px;border:1px solid rgba(32,255,154,.25);background:rgba(0,0,0,.18)}
+/* stone slabs across every section */
+.section{isolation:isolate}.section:after{content:"";position:absolute;inset:18px 0;z-index:-1;pointer-events:none;opacity:.16;background-image:radial-gradient(ellipse at 20% 20%,#707771 0 1px,transparent 2px),radial-gradient(ellipse at 70% 65%,#858d87 0 1px,transparent 2px),radial-gradient(ellipse at 40% 85%,#4d5550 0 1px,transparent 2px);background-size:97px 113px,131px 89px,157px 127px}
+.story,.quote-block,.trait,.phase-card,.check-stone{border-color:#4a514d;background:linear-gradient(145deg,#383e3a 0,#242925 18%,#0c0f0d 72%,#1c211e 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.12),inset -7px -9px 20px rgba(0,0,0,.48),0 24px 65px rgba(0,0,0,.38);clip-path:polygon(0 2%,13% 0,29% 1%,45% 0,62% 2%,78% 0,100% 2%,98% 19%,100% 37%,98% 56%,100% 77%,97% 100%,81% 98%,64% 100%,47% 98%,29% 100%,13% 98%,0 100%,2% 80%,0 61%,2% 40%,0 20%)}
+.trait,.phase-card{position:relative}.trait:before,.phase-card:before,.story:before,.quote-block:before{content:"";position:absolute;inset:9px;border:1px solid rgba(255,255,255,.035);clip-path:polygon(0 4%,18% 0,37% 2%,57% 0,79% 2%,100% 0,98% 24%,100% 46%,98% 69%,100% 100%,77% 98%,58% 100%,38% 98%,18% 100%,0 96%,2% 73%,0 50%,2% 25%);pointer-events:none}
+/* hero is image-free; use a carved stone sigil */
+.hero{background:radial-gradient(circle at 50% 42%,rgba(19,105,70,.16),transparent 25%),radial-gradient(circle at 50% 70%,rgba(255,255,255,.025),transparent 34%),linear-gradient(180deg,#070908,#050706 70%,#030504)}
+.hero:before{background:radial-gradient(ellipse at center,transparent 18%,rgba(0,0,0,.3) 57%,rgba(0,0,0,.88) 100%)}
+.hero:after{background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 35%,transparent 67%,#050706 100%)}
+.hero h1{font-size:clamp(58px,10vw,118px);letter-spacing:.08em}.hero-logo{display:none}
+/* stone fragments */
+.rock-shard{background:linear-gradient(145deg,#737b75,#2d332f 48%,#0b0e0c);border:1px solid #5d655f;box-shadow:inset 2px 2px 3px rgba(255,255,255,.14),inset -3px -5px 6px rgba(0,0,0,.7),0 8px 18px rgba(0,0,0,.5)}
+.s5{left:33%;top:24%;width:7px;height:11px;animation-delay:1s}.s6{right:34%;bottom:19%;width:14px;height:9px;animation-delay:4s}
+/* smaller action buttons */
+.hero-cta,.check-btn,.social{min-height:0;padding:11px 16px;border-radius:4px;font-size:10px;letter-spacing:1.5px;clip-path:polygon(0 8%,9% 0,28% 2%,51% 0,74% 2%,100% 0,98% 32%,100% 70%,97% 100%,75% 98%,50% 100%,25% 98%,0 100%,2% 68%,0 30%)}
+.check-btn{margin-top:22px}.social{margin-top:22px}
+/* little stone markers before headings */
+.section-head h2:before,.check-copy h3:before{content:"◆";display:block;font-family:Georgia,serif;font-size:13px;color:#737b76;text-shadow:2px 2px 0 #080a09;margin-bottom:13px;letter-spacing:0}
+@media(max-width:820px){.nav-actions{margin-left:auto}.wallet-btn{min-width:116px}.menu-panel{width:min(305px,88vw)}@media(max-width:460px){.wallet-btn{min-width:108px;padding:0 9px}.menu-btn{width:40px;height:40px}.menu-panel{padding-left:16px;padding-right:16px}.menu-item{min-height:41px}.menu-item span:first-child{font-size:10px}.soon{font-size:5.5px}/* ===== DEEP STONE FINISH ===== */
+.stone-text{
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:900;
+  color:#c7cbc8;
+  background-image:
+    linear-gradient(165deg,#f0f1ef 0%,#aeb5b0 22%,#686f6a 48%,#d5d9d6 52%,#7a817c 72%,#b9bfbb 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.18' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)' opacity='.48'/%3E%3C/svg%3E");
+  background-blend-mode:multiply,soft-light;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:2px 2px 0 rgba(0,0,0,.72),4px 4px 0 rgba(0,0,0,.32),0 0 18px rgba(255,255,255,.05);
+  -webkit-text-stroke:.65px rgba(235,239,236,.18);
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.28));
+}
+/* Make every stone surface visibly rocky instead of flat UI */
+.story,.quote-block,.trait,.phase-card,.check-stone,.menu-panel,.wallet-btn,.menu-btn{
+  background-image:
+    linear-gradient(145deg,rgba(115,122,117,.38),rgba(25,29,27,.92) 46%,rgba(5,7,6,.98)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.045' numOctaves='5' seed='17'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23r)' opacity='.7'/%3E%3C/svg%3E");
+  background-blend-mode:normal,soft-light;
+}
+/* compact premium 3-dot stone button — stays on the far right */
+.menu-btn{
+  display:grid;
+  grid-template-rows:repeat(3,3px);
+  grid-template-columns:1fr;
+  align-content:center;
+  justify-items:center;
+  gap:3px;
+  width:42px;height:42px;padding:0;
+  border-radius:12px;
+  clip-path:polygon(8% 3%,34% 0,58% 3%,92% 0,100% 18%,97% 43%,100% 70%,94% 98%,67% 95%,43% 100%,14% 96%,0 78%,3% 52%,0 25%);
+  border:1px solid #68706b;
+  background-image:linear-gradient(145deg,#626a64 0%,#353b37 27%,#171b19 62%,#090b0a 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.1' numOctaves='3'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  background-blend-mode:normal,soft-light;
+  box-shadow:inset 2px 2px 4px rgba(255,255,255,.17),inset -4px -5px 9px rgba(0,0,0,.82),0 8px 24px rgba(0,0,0,.58);
+}
+.menu-btn:before{inset:4px;border-radius:8px;border:1px solid rgba(255,255,255,.09);clip-path:polygon(4% 8%,28% 0,55% 5%,82% 0,100% 10%,94% 37%,100% 64%,94% 100%,69% 94%,44% 100%,16% 94%,0 78%,5% 50%,0 24%)}
+.menu-btn span{width:4px;height:4px;border-radius:50%;background:#d9dedb;box-shadow:0 0 7px rgba(32,255,154,.28);z-index:1}
+.menu-btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+/* menu chips are intentionally tiny */
+.menu-item{min-height:31px;padding:5px 7px;margin:3px 0;border-radius:4px}
+.menu-item span:first-child{font-size:8.5px;letter-spacing:1.45px}
+.soon{font-size:5.5px;padding:3px 5px;letter-spacing:.9px}
+
+
+/* stone-carved lettering extends to the brand, tagline and menu labels */
+.brand span,.tagline,.menu-title,.menu-item span:first-child{
+  background-image:linear-gradient(165deg,#eef1ee 0%,#9da59f 28%,#626963 50%,#d7dbd8 56%,#737a75 78%,#b9bfbb 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:2px 2px 0 rgba(0,0,0,.55);
+}
+.menu-item span:first-child{filter:drop-shadow(0 2px 1px rgba(0,0,0,.45))}
+
+
+/* ===== READABILITY / BRIGHT STONE FINISH ===== */
+body{color:#f4f7f5}
+.lead,.hero-copy,.story p,.trait p,.check-copy p,.phase-card p{color:#d1d7d3;text-shadow:0 1px 2px rgba(0,0,0,.75)}
+.kicker,.trait-num,.phase,.tbd{color:#67ffb6}
+.eyebrow{color:#aeb8b2}
+.tagline{color:#f1f4f2}
+.story,.quote-block,.trait,.phase-card,.check-stone{color:#edf2ef}
+.menu-item span:first-child,.brand span{filter:drop-shadow(0 2px 1px rgba(0,0,0,.8)) brightness(1.08)}
+.section h2,.hero h1,.check-copy h3,.quote-block p,.trait h3,.phase-card h3{filter:brightness(1.12)}
+
+
+/* ===== FUNCTIONAL MENU / APP VIEWS ===== */
+.app-view{display:none;min-height:100svh;padding:120px 0 80px;background:radial-gradient(circle at 50% 20%,rgba(32,255,154,.07),transparent 30%),#050706}.app-view.active{display:block}.app-head{max-width:800px;margin-bottom:28px}.app-head .kicker{margin-bottom:8px}.app-head h2{font-size:clamp(42px,8vw,78px);line-height:.9;margin-bottom:16px}.app-head p{color:#c8d0cb;line-height:1.8}.app-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.app-card{padding:28px;min-height:150px}.app-card h3{font:900 22px Georgia,serif;text-transform:uppercase;margin-bottom:10px}.app-card p{color:#bfc8c2;font-size:13px;line-height:1.8}.stat{font:900 38px Georgia,serif;color:#eef3ef}.stat-label{font-size:8px;letter-spacing:2px;color:#67ffb6;font-weight:900}.app-input{width:100%;height:46px;padding:0 13px;background:#090c0a;border:1px solid #505852;border-radius:5px;outline:none;margin:10px 0;color:#eaf0ec}.app-input:focus{border-color:rgba(32,255,154,.6)}.app-btn{padding:11px 16px;border:1px solid rgba(32,255,154,.55);background:linear-gradient(145deg,#303631,#0b0f0d);border-radius:4px;cursor:pointer;font:900 10px Georgia,serif;letter-spacing:1.4px}.app-btn:disabled{opacity:.45;cursor:not-allowed}.status{margin-top:14px;padding:12px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.2);color:#aeb7b2;font-size:12px;line-height:1.6}.status.good{border-color:rgba(32,255,154,.35);color:#9fffc9}.status.warn{border-color:rgba(255,190,80,.25);color:#ffd38b}.table{width:100%;border-collapse:collapse;margin-top:10px}.table th,.table td{text-align:left;padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.08);font-size:11px}.table th{color:#67ffb6;letter-spacing:1px}.back-home{display:inline-flex;margin-bottom:24px;color:#aeb7b2;font-size:9px;font-weight:900;letter-spacing:1.5px;cursor:pointer}.back-home:hover{color:var(--green)}.wallet-address{font-family:monospace;font-size:12px;color:#dce4df;word-break:break-all}.menu-item.active{border-color:rgba(32,255,154,.7);box-shadow:inset 0 0 18px rgba(32,255,154,.06),0 0 18px rgba(32,255,154,.08)}
+@media(max-width:820px){.app-grid{grid-template-columns:1fr}}
+
+
+
+/* ===== STAKING PAGE ===== */
+.stake-wrap{padding:56px 0 100px}
+.stake-hero{max-width:820px;margin:0 auto 34px;text-align:center}
+.stake-hero .kicker{font-size:10px;letter-spacing:2.5px;font-weight:900;color:#67ffb6}
+.stake-hero h1{font-size:clamp(42px,7vw,76px);line-height:.95;margin:12px 0 18px}
+.stake-hero p{max-width:680px;margin:0 auto;color:#cbd2ce;line-height:1.8}
+.stake-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}
+.stake-stat,.stake-panel{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:22px;box-shadow:inset 0 0 28px rgba(32,255,154,.025)}
+.stake-stat .num{font-size:28px;font-weight:900;color:#f1f5f2}
+.stake-stat .label{font-size:9px;letter-spacing:2px;color:#8f9994;margin-top:7px;font-weight:900}
+.stake-panel{margin-top:14px}
+.stake-panel h2{font-size:20px;margin:0 0 7px}
+.stake-panel>p{color:#9fa9a4;font-size:13px;line-height:1.7}
+.wallet-line{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.stake-btn,.ghost-btn{border:1px solid rgba(103,255,182,.45);background:rgba(32,255,154,.08);color:#dfffee;padding:12px 18px;border-radius:10px;font-weight:900;font-size:10px;letter-spacing:1.5px;cursor:pointer}
+.stake-btn:hover,.ghost-btn:hover{background:rgba(32,255,154,.16);border-color:#67ffb6}
+.stake-btn:disabled,.ghost-btn:disabled{opacity:.45;cursor:not-allowed}
+.ghost-btn{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.14);color:#cbd2ce}
+.status-box{margin:18px 0 0;padding:13px 15px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);color:#bfc8c3;font-size:11px;line-height:1.6}
+.status-box.ok{border-color:rgba(103,255,182,.35);color:#9dffca}
+.status-box.warn{border-color:rgba(255,190,90,.3);color:#ffd49b}
+.status-box.err{border-color:rgba(255,90,90,.3);color:#ffb0b0}
+.nft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}
+.nft-card{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:14px;padding:15px}
+.nft-card .token{font-size:18px;font-weight:900}
+.nft-card .meta{font-size:9px;letter-spacing:1.2px;color:#89938e;margin:7px 0 13px}
+.nft-card .state{font-size:10px;color:#67ffb6;font-weight:900;margin-bottom:10px}
+.nft-card .timer{font-family:monospace;font-size:11px;color:#d8dfdb;line-height:1.7;margin-bottom:11px}
+.manual-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.app-input{flex:1;min-width:220px;background:#080b09;border:1px solid rgba(255,255,255,.12);color:#eaf0ed;border-radius:9px;padding:12px;font:inherit}
+a.explorer{color:#67ffb6;text-decoration:none}
+@media(max-width:820px){.stake-grid{grid-template-columns:1fr}.stake-wrap{padding-top:35px}}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="../index.html" class="brand" aria-label="Rhood Stone home"><img src="../logo.jpg" alt="Rhood Stone logo"><span>RHOOD STONE</span></a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a href="../index.html#about">ABOUT</a><a href="../index.html#stone">THE STONE</a><a href="../index.html#roadmap">ROADMAP</a><a href="../index.html#community">COMMUNITY</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="wallet-btn" id="connectBtn" type="button">CONNECT WALLET</button>
+      <button class="menu-btn" type="button" aria-label="Open menu" onclick="openMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<div class="menu-overlay" id="overlay" onclick="closeMenu()"></div>
+<aside class="menu-panel" id="menuPanel" aria-label="Menu">
+  <button class="menu-close" onclick="closeMenu()" aria-label="Close menu">×</button>
+  <div class="menu-kicker">RHOOD STONE / MENU</div>
+  <div class="menu-title stone-text">THE NEXT CHAPTER</div>
+  <a class="menu-item" href="../index.html#portfolio"><span>PORTFOLIO</span><span class="soon">OPEN</span></a>
+  <a class="menu-item active" href="./"><span>STAKE</span><span class="soon">OPEN</span></a>
+  <a class="menu-item" href="../index.html#earn"><span>EARN</span><span class="soon">OPEN</span></a>
+  <a class="menu-item" href="../index.html#points"><span>POINTS</span><span class="soon">OPEN</span></a>
+  <a class="menu-item" href="../index.html#referral"><span>REFERRAL</span><span class="soon">OPEN</span></a>
+  <a class="menu-item" href="../index.html#leaderboard"><span>LEADERBOARD</span><span class="soon">OPEN</span></a>
+  <a class="menu-item about" href="../index.html#about"><span>ABOUT</span><span class="soon">VIEW</span></a>
+</aside>
+<main class="stake-wrap">
+<div class="container">
+<section class="stake-hero">
+  <div class="kicker">THE STONE / STAKING</div>
+  <h1 class="stone-text">STAKE YOUR STONE.</h1>
+  <p>Lock your Rhood Stone on Robinhood Chain. One staked Stone makes your wallet OG eligible. Minimum stake is 7 days, followed by a 7-day unstake cooldown.</p>
+  <div class="wallet-line">
+    <button class="stake-btn" id="connectMain">CONNECT WALLET</button>
+    <a class="ghost-btn explorer" href="https://robinhoodchain.blockscout.com/address/0xA1Cf1e04c74984F7aF8CCd79Fb17E4fee54302E7" target="_blank" rel="noopener">VIEW CONTRACT</a>
+  </div>
+  <div class="status-box" id="status">Connect your wallet to begin.</div>
+</section>
+<section class="stake-grid">
+  <div class="stake-stat"><div class="num" id="walletShort">—</div><div class="label">WALLET</div></div>
+  <div class="stake-stat"><div class="num" id="stakedCount">—</div><div class="label">STAKED STONES</div></div>
+  <div class="stake-stat"><div class="num" id="ogStatus">—</div><div class="label">OG STATUS</div></div>
+</section>
+<section class="stake-panel">
+  <h2>YOUR STONES</h2>
+  <p>Select a Stone you own and approve the staking contract. Approval is a one-time NFT permission; staking itself is a separate transaction.</p>
+  <div class="manual-row">
+    <input class="app-input" id="tokenInput" inputmode="numeric" placeholder="Enter token ID if your NFT is not listed">
+    <button class="ghost-btn" id="checkTokenBtn">CHECK OWNERSHIP</button>
+    <button class="ghost-btn" id="refreshBtn">REFRESH</button>
+  </div>
+  <div class="nft-grid" id="ownedGrid"><div class="status-box">Connect wallet to load your Stones.</div></div>
+</section>
+<section class="stake-panel">
+  <h2>STAKED STONES</h2>
+  <p>Your active stakes are read from the staking contract. During the 7-day cooldown, the Stone remains staked and OG status remains active.</p>
+  <div class="nft-grid" id="stakedGrid"><div class="status-box">Connect wallet to load your stakes.</div></div>
+</section>
+<section class="stake-panel">
+  <h2>HOW IT WORKS</h2>
+  <div class="nft-grid">
+    <div class="nft-card"><div class="token">01</div><div class="meta">APPROVE</div><div class="timer">Allow the staking contract to transfer the selected Stone.</div></div>
+    <div class="nft-card"><div class="token">02</div><div class="meta">STAKE</div><div class="timer">Stake your Stone. The 7-day minimum starts immediately.</div></div>
+    <div class="nft-card"><div class="token">03</div><div class="meta">UNSTAKE REQUEST</div><div class="timer">After 7 days, request unstake. A 7-day cooldown begins.</div></div>
+    <div class="nft-card"><div class="token">04</div><div class="meta">COMPLETE</div><div class="timer">After cooldown, complete unstake and receive your Stone back.</div></div>
+  </div>
+</section>
+</div>
+</main>
+<script>
+
+const CHAIN_ID = 4663;
+const RPC_URL = "https://rpc.mainnet.chain.robinhood.com";
+const NFT_ADDRESS = "0x6be906e10351B4a970521c386E89D9e4e34c47C9";
+const STAKING_ADDRESS = "0xA1Cf1e04c74984F7aF8CCd79Fb17E4fee54302E7";
+
+const NFT_ABI = [
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function tokenOfOwnerByIndex(address owner,uint256 index) view returns (uint256)",
+  "function getApproved(uint256 tokenId) view returns (address)",
+  "function isApprovedForAll(address owner,address operator) view returns (bool)",
+  "function approve(address to,uint256 tokenId)",
+  "function setApprovalForAll(address operator,bool approved)"
+];
+
+const STAKE_ABI = [
+  "function stake(uint256 tokenId)",
+  "function requestUnstake(uint256 tokenId)",
+  "function completeUnstake(uint256 tokenId)",
+  "function stakedBalance(address user) view returns (uint256)",
+  "function isOGEligible(address user) view returns (bool)",
+  "function getStakeInfo(uint256 tokenId) view returns (address staker,uint256 stakedAt,uint256 unstakeRequestedAt,bool exists)",
+  "event Staked(address indexed user,uint256 indexed tokenId,uint256 timestamp)",
+  "event Unstaked(address indexed user,uint256 indexed tokenId,uint256 timestamp)"
+];
+
+let provider=null, signer=null, wallet=null, nft=null, staking=null;
+
+const $ = id => document.getElementById(id);
+function setStatus(msg,type=""){ $("status").className="status-box "+type; $("status").textContent=msg; }
+function short(a){return a?a.slice(0,6)+"…"+a.slice(-4):"—";}
+
+async function ensureChain(){
+  const net=await provider.getNetwork();
+  if(Number(net.chainId)!==CHAIN_ID){
+    await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x1237"}]});
+    provider=new ethers.BrowserProvider(window.ethereum);
+  }
+  signer=await provider.getSigner();
+  wallet=await signer.getAddress();
+  nft=new ethers.Contract(NFT_ADDRESS,NFT_ABI,signer);
+  staking=new ethers.Contract(STAKING_ADDRESS,STAKE_ABI,signer);
+}
+
+async function connect(){
+  try{
+    if(!window.ethereum){setStatus("No compatible EVM wallet detected.","err");return;}
+    await window.ethereum.request({method:"eth_requestAccounts"});
+    provider=new ethers.BrowserProvider(window.ethereum);
+    await ensureChain();
+    $("walletShort").textContent=short(wallet);
+    setStatus("Wallet connected. Loading your Stones…","ok");
+    await refreshAll();
+  }catch(e){console.error(e);setStatus(e.shortMessage||e.message||"Wallet connection failed.","err");}
+}
+
+async function getOwnedTokens(){
+  const result=[];
+  try{
+    const balance=Number(await nft.balanceOf(wallet));
+    for(let i=0;i<balance;i++){
+      try{result.push(Number(await nft.tokenOfOwnerByIndex(wallet,i)));}catch{break;}
+    }
+    if(result.length===balance)return result.sort((a,b)=>a-b);
+  }catch{}
+  // Fallback for ERC-721 contracts without ERC721Enumerable.
+  for(let start=1;start<=555;start+=25){
+    const ids=Array.from({length:Math.min(25,556-start)},(_,i)=>start+i);
+    const owners=await Promise.all(ids.map(async id=>{
+      try{return [id,(await nft.ownerOf(id)).toLowerCase()];}catch{return [id,null];}
+    }));
+    for(const [id,o] of owners)if(o===wallet.toLowerCase())result.push(id);
+  }
+  return [...new Set(result)].sort((a,b)=>a-b);
+}
+
+async function getStakedTokens(){
+  const active=new Set();
+  try{
+    const [stakes,unstakes]=await Promise.all([
+      staking.queryFilter(staking.filters.Staked(wallet),0,"latest"),
+      staking.queryFilter(staking.filters.Unstaked(wallet),0,"latest")
+    ]);
+    const events=[
+      ...stakes.map(x=>({b:x.blockNumber,l:x.index,t:"s",id:Number(x.args.tokenId)})),
+      ...unstakes.map(x=>({b:x.blockNumber,l:x.index,t:"u",id:Number(x.args.tokenId)}))
+    ].sort((a,b)=>a.b-b.b||a.l-b.l);
+    for(const x of events)x.t==="s"?active.add(x.id):active.delete(x.id);
+  }catch(e){console.warn(e);}
+  return [...active].sort((a,b)=>a-b);
+}
+
+function ownedCard(id){
+  const el=document.createElement("div");el.className="nft-card";
+  el.innerHTML=`<div class="token">#${String(id).padStart(3,"0")}</div><div class="meta">RHOOD STONE</div><div class="state">OWNED</div><button class="stake-btn" data-action="stake" data-id="${id}">STAKE</button>`;
+  return el;
+}
+function fmt(ts){return new Date(Number(ts)*1000).toLocaleString();}
+function stakedCard(id,info){
+  const el=document.createElement("div");el.className="nft-card";
+  const s=Number(info.stakedAt),r=Number(info.unstakeRequestedAt);
+  let body="";
+  if(!r){
+    const ready=Date.now()/1000>=s+604800;
+    body=`<div class="state">${ready?"READY TO UNSTAKE":"STAKED"}</div><div class="timer">Staked: ${fmt(s)}<br>Minimum until: ${fmt(s+604800)}</div><button class="${ready?"stake-btn":"ghost-btn"}" data-action="request" data-id="${id}" ${ready?"":"disabled"}>${ready?"REQUEST UNSTAKE":"7-DAY LOCK"}</button>`;
+  }else{
+    const ready=Date.now()/1000>=r+604800;
+    body=`<div class="state">${ready?"READY TO COMPLETE":"COOLDOWN"}</div><div class="timer">Requested: ${fmt(r)}<br>Available: ${fmt(r+604800)}</div><button class="${ready?"stake-btn":"ghost-btn"}" data-action="complete" data-id="${id}" ${ready?"":"disabled"}>${ready?"COMPLETE UNSTAKE":"7-DAY COOLDOWN"}</button>`;
+  }
+  el.innerHTML=`<div class="token">#${String(id).padStart(3,"0")}</div><div class="meta">RHOOD STONE</div>${body}`;
+  return el;
+}
+
+async function refreshAll(){
+  if(!wallet)return;
+  const count=await staking.stakedBalance(wallet);
+  $("stakedCount").textContent=String(count);
+  $("ogStatus").textContent=(await staking.isOGEligible(wallet))?"ELIGIBLE":"NOT YET";
+
+  $("ownedGrid").innerHTML='<div class="status-box">Loading owned Stones…</div>';
+  const owned=await getOwnedTokens();
+  $("ownedGrid").innerHTML="";
+  if(!owned.length)$("ownedGrid").innerHTML='<div class="status-box">No Rhood Stones found in this wallet.</div>';
+  else owned.forEach(id=>$("ownedGrid").appendChild(ownedCard(id)));
+
+  $("stakedGrid").innerHTML='<div class="status-box">Loading active stakes…</div>';
+  const ids=await getStakedTokens();
+  $("stakedGrid").innerHTML="";
+  if(!ids.length)$("stakedGrid").innerHTML='<div class="status-box">No active stakes found.</div>';
+  for(const id of ids){
+    const info=await staking.getStakeInfo(id);
+    $("stakedGrid").appendChild(stakedCard(id,info));
+  }
+  setStatus("Staking data refreshed.","ok");
+}
+
+async function checkOwnership(){
+  if(!wallet)return connect();
+  const id=Number($("tokenInput").value);
+  if(!Number.isInteger(id)||id<1||id>555){setStatus("Enter a valid token ID from 1 to 555.","warn");return;}
+  try{
+    const o=await nft.ownerOf(id);
+    setStatus(o.toLowerCase()===wallet.toLowerCase()?`You own Rhood Stone #${id}. It is ready to stake.`:`This wallet does not own token #${id}.`,o.toLowerCase()===wallet.toLowerCase()?"ok":"warn");
+  }catch{setStatus(`Token #${id} could not be read.`,"err");}
+}
+
+async function action(type,id){
+  try{
+    if(type==="stake"){
+      const approved=await nft.isApprovedForAll(wallet,STAKING_ADDRESS);
+      if(!approved){
+        setStatus("Approval transaction required. Confirm it in your wallet…","warn");
+        const tx=await nft.setApprovalForAll(STAKING_ADDRESS,true); await tx.wait();
+      }
+      setStatus("Confirming stake transaction…","warn");
+      const tx=await staking.stake(id); await tx.wait();
+      setStatus(`Stone #${id} is now staked. You are OG eligible.`,"ok");
+    }else if(type==="request"){
+      setStatus("Submitting unstake request…","warn");
+      const tx=await staking.requestUnstake(id); await tx.wait();
+      setStatus(`7-day cooldown started for #${id}. OG remains active during cooldown.`,"ok");
+    }else{
+      setStatus("Completing unstake…","warn");
+      const tx=await staking.completeUnstake(id); await tx.wait();
+      setStatus(`Stone #${id} returned to your wallet.`,"ok");
+    }
+    await refreshAll();
+  }catch(e){console.error(e);setStatus(e.shortMessage||e.reason||e.message||"Transaction failed.","err");}
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-action]");
+  if(b)action(b.dataset.action,Number(b.dataset.id));
+});
+$("connectBtn").onclick=connect;
+$("connectMain").onclick=connect;
+$("refreshBtn").onclick=refreshAll;
+$("checkTokenBtn").onclick=checkOwnership;
+function openMenu(){$("menuPanel").classList.add("open");$("overlay").classList.add("open");}
+function closeMenu(){$("menuPanel").classList.remove("open");$("overlay").classList.remove("open");}
+if(window.ethereum){
+  window.ethereum.on("accountsChanged",()=>location.reload());
+  window.ethereum.on("chainChanged",()=>location.reload());
+}
+
+</script>
+</body>
+</html>
