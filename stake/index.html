@@ -14,17 +14,17 @@ radial-gradient(circle at 88% 75%,rgba(32,255,154,.035),transparent 22%),#050706
 body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.055' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.85'/%3E%3C/svg%3E")}
 body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.48) 100%)}
 .container{width:min(1060px,90%);margin:auto;position:relative;z-index:2}
-.topbar{position:absolute;top:0;left:0;right:0;height:86px;z-index:10;padding:22px 4%;display:flex;justify-content:flex-end;align-items:flex-start}
-.back-home{margin-right:10px;height:44px;display:flex;align-items:center;padding:0 15px;border:1px solid #58625b;border-radius:4px;color:#cfd7d2;text-decoration:none;font:900 10px Georgia,serif;letter-spacing:1.3px;background:linear-gradient(145deg,#39403b,#0c100e);box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -3px -4px 8px rgba(0,0,0,.55)}.back-home:hover{border-color:#67ffb6;color:#bfffdc}.connect{min-width:142px;height:44px;padding:0 18px;border:1px solid #68716b;border-radius:5px;background:linear-gradient(145deg,#454b47 0,#252a27 36%,#0b0e0c 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.16),inset -4px -5px 10px rgba(0,0,0,.55),0 9px 28px rgba(0,0,0,.45);color:#edf2ef;font:900 10px Georgia,serif;letter-spacing:1.6px;cursor:pointer;position:relative;overflow:hidden;clip-path:polygon(0 7%,10% 0,30% 2%,51% 0,73% 2%,100% 0,98% 31%,100% 69%,97% 100%,75% 98%,51% 100%,26% 98%,0 100%,2% 68%,0 31%)}
-.connect:before{content:"";position:absolute;inset:3px;border:1px solid rgba(255,255,255,.055);clip-path:inherit;pointer-events:none}.connect.connected{border-color:rgba(32,255,154,.55);color:#bfffdc}.back-home{position:absolute;left:4%;top:22px;height:44px;padding:0 16px;border:1px solid #58625b;background:linear-gradient(145deg,#39403b,#0c100e);box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -3px -4px 8px rgba(0,0,0,.55);color:#e5ebe8;border-radius:4px;cursor:pointer;font:900 10px Georgia,serif;letter-spacing:1.4px;text-decoration:none;display:inline-flex;align-items:center}.back-home:hover{border-color:#67ffb6;box-shadow:0 0 18px rgba(32,255,154,.09),inset 1px 1px 0 rgba(255,255,255,.1)}
-.page{padding:112px 0 90px}.hero{text-align:center;max-width:780px;margin:0 auto 42px}.kicker{font-size:9px;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:14px}.stone-title{font-family:Georgia,"Times New Roman",serif;font-weight:900;text-transform:uppercase;letter-spacing:.035em;color:#cfd4d0;text-shadow:1px 1px 0 #070807,2px 2px 0 #151816,0 -1px 0 rgba(255,255,255,.18),0 10px 25px rgba(0,0,0,.5);-webkit-text-stroke:.55px rgba(255,255,255,.12)}h1{font-size:clamp(48px,8vw,88px);line-height:.88}h1:after{content:"";display:block;width:88px;height:2px;margin:23px auto 0;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 18px rgba(32,255,154,.45)}.hero p{max-width:690px;margin:22px auto 0;color:#c4ccc7;font-size:14px;line-height:1.85}
+.back{position:relative;height:34px;padding:0 10px;display:inline-flex;align-items:center;text-decoration:none;font:900 9px Georgia,serif;letter-spacing:1.1px;color:#e5ebe8;border:1px solid #58625b;background:linear-gradient(145deg,#39403b,#0c100e);border-radius:4px}.topbar{position:sticky;top:0;left:0;right:0;height:74px;z-index:100;padding:16px 4%;display:flex;justify-content:space-between;align-items:center;background:rgba(5,7,6,.96);border-bottom:1px solid rgba(74,82,76,.35);backdrop-filter:blur(8px)}
+.connect{min-width:142px;height:44px;padding:0 18px;border:1px solid #68716b;border-radius:5px;background:linear-gradient(145deg,#454b47 0,#252a27 36%,#0b0e0c 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.16),inset -4px -5px 10px rgba(0,0,0,.55),0 9px 28px rgba(0,0,0,.45);color:#edf2ef;font:900 10px Georgia,serif;letter-spacing:1.6px;cursor:pointer;position:relative;overflow:hidden;clip-path:polygon(0 7%,10% 0,30% 2%,51% 0,73% 2%,100% 0,98% 31%,100% 69%,97% 100%,75% 98%,51% 100%,26% 98%,0 100%,2% 68%,0 31%)}
+.connect:before{content:"";position:absolute;inset:3px;border:1px solid rgba(255,255,255,.055);clip-path:inherit;pointer-events:none}.connect.connected{border-color:rgba(32,255,154,.55);color:#bfffdc}
+.page{padding:38px 0 90px}.hero{text-align:center;max-width:780px;margin:0 auto 42px}.kicker{font-size:9px;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:14px}.stone-title{font-family:Georgia,"Times New Roman",serif;font-weight:900;text-transform:uppercase;letter-spacing:.035em;color:#cfd4d0;text-shadow:1px 1px 0 #070807,2px 2px 0 #151816,0 -1px 0 rgba(255,255,255,.18),0 10px 25px rgba(0,0,0,.5);-webkit-text-stroke:.55px rgba(255,255,255,.12)}h1{font-size:clamp(48px,8vw,88px);line-height:.88}h1:after{content:"";display:block;width:88px;height:2px;margin:23px auto 0;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 18px rgba(32,255,154,.45)}.hero p{max-width:690px;margin:22px auto 0;color:#c4ccc7;font-size:14px;line-height:1.85}
 .rock{position:absolute;z-index:0;pointer-events:none;opacity:.28;filter:drop-shadow(0 0 30px rgba(32,255,154,.10));}.rock.r1{width:170px;height:120px;left:-40px;top:240px;background:linear-gradient(145deg,#4c554f,#171b19);clip-path:polygon(8% 18%,28% 3%,56% 10%,91% 0,100% 31%,90% 74%,65% 100%,29% 88%,0 62%)}.rock.r2{width:140px;height:170px;right:-35px;top:430px;background:linear-gradient(145deg,#3e4641,#101311);clip-path:polygon(22% 0,78% 8%,100% 34%,86% 76%,55% 100%,15% 82%,0 39%)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:18px}.stone-surface{position:relative;overflow:hidden;border:1px solid var(--line);background:linear-gradient(145deg,#3b423e 0,#292e2b 18%,#0c0f0d 72%,#1b201d 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,.12),inset -7px -9px 20px rgba(0,0,0,.50),0 24px 65px rgba(0,0,0,.36);clip-path:polygon(0 2%,13% 0,29% 1%,45% 0,62% 2%,78% 0,100% 2%,98% 19%,100% 37%,98% 56%,100% 77%,97% 100%,81% 98%,64% 100%,47% 98%,29% 100%,13% 98%,0 100%,2% 80%,0 61%,2% 40%,0 20%)}.stone-surface:before{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.035);pointer-events:none;clip-path:polygon(0 4%,18% 0,38% 2%,58% 0,80% 2%,100% 0,98% 25%,100% 50%,98% 75%,100% 100%,78% 98%,58% 100%,38% 98%,18% 100%,0 96%,2% 72%,0 50%,2% 25%)}.stone-surface>*{position:relative;z-index:1}.stat{padding:22px}.stat .num{font:900 29px Georgia,serif;color:#eef3f0;text-shadow:2px 2px 0 #050706}.stat .label{margin-top:7px;font-size:8px;letter-spacing:2.5px;color:#67ffb6;font-weight:900}
 .panel{padding:28px;margin-top:16px}.panel h2{font:900 clamp(25px,4vw,34px) Georgia,serif;text-transform:uppercase;color:#d8dedb;text-shadow:2px 2px 0 #080a09;letter-spacing:.5px;margin-bottom:8px}.panel>p{color:#bfc8c3;font-size:13px;line-height:1.75;max-width:860px}.manual{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}.input{height:44px;flex:1;min-width:230px;padding:0 13px;background:#070a08;border:1px solid #48514b;border-radius:5px;color:#eaf0ed;outline:none;font:12px Inter,sans-serif}.input:focus{border-color:rgba(32,255,154,.65)}select.input{appearance:auto;cursor:pointer}select.input option{background:#0b0e0c;color:#eaf0ed}.btn{min-height:44px;padding:0 16px;border:1px solid #58625b;background:linear-gradient(145deg,#39403b,#0c100e);box-shadow:inset 1px 1px 0 rgba(255,255,255,.10),inset -3px -4px 8px rgba(0,0,0,.55);color:#e5ebe8;border-radius:4px;cursor:pointer;font:900 10px Georgia,serif;letter-spacing:1.4px}.btn:hover{border-color:#67ffb6;box-shadow:0 0 18px rgba(32,255,154,.09),inset 1px 1px 0 rgba(255,255,255,.1)}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{border-color:rgba(103,255,182,.55)}
 .status{margin-top:16px;padding:13px 15px;border:1px solid #414a44;background:linear-gradient(145deg,rgba(55,61,57,.5),rgba(7,10,8,.84));color:#bfc8c3;font-size:11px;line-height:1.65}.status.ok{border-color:rgba(103,255,182,.4);color:#9dffca}.status.warn{border-color:rgba(255,190,90,.3);color:#ffd49b}.status.err{border-color:rgba(255,90,90,.3);color:#ffb0b0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:18px}.nft{padding:18px;border:1px solid #414944;border-radius:5px;background:linear-gradient(145deg,#303631,#0b0e0c);box-shadow:inset 1px 1px 0 rgba(255,255,255,.08),inset -4px -6px 12px rgba(0,0,0,.55);position:relative;overflow:hidden}.nft:after{content:"";position:absolute;right:-35px;bottom:-45px;width:110px;height:110px;border-radius:50%;background:rgba(32,255,154,.045);filter:blur(18px)}.nft>*{position:relative;z-index:1}.token{font:900 24px Georgia,serif;color:#e0e5e2}.meta{font-size:9px;letter-spacing:1.2px;color:#67ffb6;margin:7px 0 12px;font-weight:900}.state{font-size:10px;color:#dbe2de;font-weight:900;margin-bottom:9px}.timer{font:11px/1.7 monospace;color:#cbd3ce;margin-bottom:11px}.nft .btn{width:100%}
 .how{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.how .nft{min-height:150px}.footer-note{text-align:center;margin-top:34px;color:#68736d;font-size:8px;letter-spacing:2px}
-@media(max-width:800px){.back-home{margin-right:7px;padding:0 10px}.stats{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}.page{padding-top:105px}.topbar{padding:18px 5%}.connect{min-width:132px;height:42px}}
+@media(max-width:800px){.stats{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}.topbar{padding:15px 5%;height:68px}.connect{min-width:132px;height:42px}}
 @media(max-width:480px){.container{width:88%}.how{grid-template-columns:1fr}.panel{padding:22px}.manual{align-items:stretch}.input{min-width:100%}.manual .btn{flex:1}.hero p{font-size:13px}}
 
 .wallet-modal{display:none;position:fixed;inset:0;z-index:1000}
@@ -46,7 +46,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 </style>
 </head>
 <body>
-<div class="topbar"><a class="back-home" href="https://rhoodstone.xyz">← BACK TO RHOOD STONE</a><button class="connect" id="connectBtn">CONNECT WALLET</button></div>
+<div class="topbar"><a class="back" href="https://rhoodstone.xyz">← BACK</a><button class="connect" id="connectBtn">CONNECT WALLET</button></div>
 <div id="walletModal" class="wallet-modal" aria-hidden="true">
   <div class="wallet-backdrop" id="walletBackdrop"></div>
   <div class="wallet-dialog" role="dialog" aria-modal="true" aria-labelledby="walletTitle">
@@ -73,7 +73,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 </section>
 <section class="stone-surface panel">
 <h2>YOUR STONES</h2><p>Select a Stone you own and approve the staking contract. Approval is a one-time NFT permission; staking itself is a separate transaction.</p>
-<div class="manual"><select class="input" id="tokenSelect"><option value="">CONNECT WALLET TO LOAD YOUR STONES</option></select><button class="btn primary" id="stakeSelectedBtn" disabled>STAKE SELECTED</button><button class="btn" id="refreshBtn">REFRESH</button></div>
+<div class="manual"><div style="flex:1;min-width:230px;color:#8f9993;font-size:10px;letter-spacing:.7px">YOUR OWNED STONES APPEAR BELOW — CHOOSE ANY STONE TO STAKE.</div><button class="btn" id="refreshBtn">REFRESH</button></div>
 <div class="grid" id="ownedGrid"><div class="status">Connect wallet to load your Stones.</div></div>
 </section>
 <section class="stone-surface panel">
@@ -100,15 +100,24 @@ const $=id=>document.getElementById(id);function short(a){return a?a.slice(0,6)+
 
 let walletProviders=[];
 let selectedProvider=null;
-let walletSource=null;
+let connectionBusy=false;
 
 const walletModal=$("walletModal");
 const walletList=$("walletList");
 const walletModalStatus=$("walletModalStatus");
 
+function setConnectedUI(){
+  $("walletShort").textContent=short(wallet);
+  $("connectBtn").textContent=short(wallet);
+  $("connectBtn").classList.add("connected");
+}
+
 function openWalletModal(){
-  if(!window.ethereum && !walletProviders.length){
-    setStatus("No compatible EVM wallet detected. Open this page in a browser with MetaMask, Bitget, Zerion or another EVM wallet.","err");
+  if(!walletProviders.length && window.ethereum){
+    walletProviders.push({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
+  }
+  if(!walletProviders.length){
+    setStatus("No compatible EVM wallet detected. Open this page inside your wallet browser or an EVM wallet extension.","err");
     return;
   }
   walletModal.classList.add("open");
@@ -122,38 +131,32 @@ function closeWalletModal(){
   walletModal.setAttribute("aria-hidden","true");
 }
 
-function walletLabel(info){
-  const name=(info?.info?.name||"EVM Wallet").trim();
-  const rdns=(info?.info?.rdns||"").toLowerCase();
+function walletLabel(item){
+  const info=item?.info||{};
+  const name=(info.name||"EVM Wallet").trim();
+  const rdns=(info.rdns||"").toLowerCase();
   if(rdns.includes("metamask")||name.toLowerCase().includes("metamask"))return "MetaMask";
   if(rdns.includes("bitget")||name.toLowerCase().includes("bitget"))return "Bitget";
   if(rdns.includes("zerion")||name.toLowerCase().includes("zerion"))return "Zerion";
   if(rdns.includes("rabby")||name.toLowerCase().includes("rabby"))return "Rabby";
+  if(rdns.includes("coinbase")||name.toLowerCase().includes("coinbase"))return "Coinbase Wallet";
   return name;
 }
 
-function walletIcon(info){
-  const svg=info?.info?.icon;
+function walletIcon(item){
+  const svg=item?.info?.icon;
   if(svg)return `<img src="${svg}" alt="" style="width:30px;height:30px;border-radius:8px">`;
-  const n=walletLabel(info);
-  return n.slice(0,1).toUpperCase();
+  return walletLabel(item).slice(0,1).toUpperCase();
 }
 
 function renderWalletOptions(){
   walletList.innerHTML="";
-  const items=[...walletProviders];
-
-  if(!items.length && window.ethereum){
-    items.push({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
-  }
-
   const seen=new Set();
-  for(const item of items){
-    const name=walletLabel(item);
-    const key=name.toLowerCase();
+  for(const item of walletProviders){
+    if(!item?.provider)continue;
+    const name=walletLabel(item),key=(item.info?.rdns||name).toLowerCase();
     if(seen.has(key))continue;
     seen.add(key);
-
     const b=document.createElement("button");
     b.type="button";
     b.className="wallet-option";
@@ -164,93 +167,92 @@ function renderWalletOptions(){
 }
 
 async function ensureChain(){
+  if(!provider||!selectedProvider)throw new Error("Wallet provider is unavailable.");
   let net=await provider.getNetwork();
   if(Number(net.chainId)!==CHAIN_ID){
     try{
       await selectedProvider.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
     }catch(e){
-      if(e.code===4902){
-        await selectedProvider.request({
-          method:"wallet_addEthereumChain",
-          params:[{
-            chainId:CHAIN_HEX,
-            chainName:"Robinhood Chain",
-            rpcUrls:[RPC_URL],
-            nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
-            blockExplorerUrls:[EXPLORER]
-          }]
-        });
+      if(e?.code===4902 || e?.code===-32603){
+        await selectedProvider.request({method:"wallet_addEthereumChain",params:[{chainId:CHAIN_HEX,chainName:"Robinhood Chain",rpcUrls:[RPC_URL],nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},blockExplorerUrls:[EXPLORER]}]});
       }else throw e;
     }
     provider=new ethers.BrowserProvider(selectedProvider);
+    net=await provider.getNetwork();
   }
+  if(Number(net.chainId)!==CHAIN_ID)throw new Error("Please switch your wallet to Robinhood Chain.");
   signer=await provider.getSigner();
   wallet=await signer.getAddress();
   nft=new ethers.Contract(NFT_ADDRESS,NFT_ABI,signer);
   staking=new ethers.Contract(STAKING_ADDRESS,STAKE_ABI,signer);
 }
 
-function itemRdnsForProvider(p){
-  const item=walletProviders.find(x=>x.provider===p);
-  return item?.info?.rdns||"";
+function providerForSavedRdns(saved){
+  if(!saved)return null;
+  return walletProviders.find(x=>(x.info?.rdns||"")===saved)?.provider||null;
 }
 
 async function restoreConnection(){
   if(typeof ethers==="undefined")return;
-  const savedRdns=(()=>{try{return localStorage.getItem("rhoodstone_wallet_rdns")||""}catch{return""}})();
-  let item=walletProviders.find(x=>savedRdns && x.info?.rdns===savedRdns);
-  if(!item && window.ethereum && walletProviders.length===0){
-    item={provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}};
-    walletProviders.push(item);
-  }
-  if(!item)return;
-  try{
-    const accounts=await item.provider.request({method:"eth_accounts"});
-    if(!accounts?.length)return;
-    selectedProvider=item.provider;
-    provider=new ethers.BrowserProvider(selectedProvider);
-    await ensureChain();
-    $("walletShort").textContent=short(wallet);
-    $("connectBtn").textContent=short(wallet);
-    $("connectBtn").classList.add("connected");
-    setStatus("Wallet connected. Loading your Stones…","ok");
-    await refreshAll();
-  }catch(e){
-    console.warn("Wallet restore failed:",e);
+  const candidates=[];
+  const saved=(()=>{try{return localStorage.getItem("rhoodstone_wallet_rdns")||""}catch{return""}})();
+  const savedProvider=providerForSavedRdns(saved);
+  if(savedProvider)candidates.push(savedProvider);
+  for(const item of walletProviders)if(item.provider&&!candidates.includes(item.provider))candidates.push(item.provider);
+  if(window.ethereum&&!candidates.includes(window.ethereum))candidates.push(window.ethereum);
+
+  for(const p of candidates){
+    try{
+      const accounts=await p.request({method:"eth_accounts"});
+      if(!accounts?.length)continue;
+      selectedProvider=p;
+      provider=new ethers.BrowserProvider(p);
+      await ensureChain();
+      setConnectedUI();
+      bindProviderEvents(p);
+      setStatus("Wallet connected. Loading your Stones…","ok");
+      await refreshAll();
+      return;
+    }catch(e){
+      console.warn("Wallet restore failed:",e);
+    }
   }
 }
 
 async function connectWithProvider(p,name){
-  if(!p)return;
+  if(!p||connectionBusy)return;
   if(typeof ethers==="undefined"){
-    walletModalStatus.textContent="Wallet library failed to load. Please refresh the page.";
+    setStatus("Wallet library failed to load. Please refresh the page.","err");
     return;
   }
+  connectionBusy=true;
   try{
     walletModalStatus.textContent=`Connecting to ${name}…`;
     selectedProvider=p;
-    try{localStorage.setItem("rhoodstone_wallet_rdns", itemRdnsForProvider(p));}catch{}
-    await p.request({method:"eth_requestAccounts"});
     provider=new ethers.BrowserProvider(p);
+    await p.request({method:"eth_requestAccounts"});
     await ensureChain();
-
-    $("walletShort").textContent=short(wallet);
-    $("connectBtn").textContent=short(wallet);
-    $("connectBtn").classList.add("connected");
-    setStatus("Wallet connected. Loading your Stones…","ok");
-
+    try{localStorage.setItem("rhoodstone_wallet_rdns",itemRdnsForProvider(p));}catch{}
+    setConnectedUI();
+    bindProviderEvents(p);
     closeWalletModal();
+    setStatus("Wallet connected. Loading your Stones…","ok");
     await refreshAll();
   }catch(e){
     console.error(e);
-    walletModalStatus.textContent=e?.shortMessage||e?.reason||e?.message||"Wallet connection failed.";
-    setStatus(walletModalStatus.textContent,"err");
-  }
+    const msg=e?.shortMessage||e?.reason||e?.message||"Wallet connection failed.";
+    walletModalStatus.textContent=msg;
+    setStatus(msg,"err");
+  }finally{connectionBusy=false}
+}
+
+function itemRdnsForProvider(p){
+  return walletProviders.find(x=>x.provider===p)?.info?.rdns||"";
 }
 
 async function connect(){
   if(typeof ethers==="undefined"){
-    setStatus("Wallet library failed to load. Please refresh the page and try again.","err");
+    setStatus("Wallet library failed to load. Please refresh the page.","err");
     return;
   }
   if(wallet){
@@ -258,7 +260,13 @@ async function connect(){
     walletList.innerHTML="";
     walletModal.classList.add("open");
     walletModal.setAttribute("aria-hidden","false");
-    document.getElementById("disconnectBtn").addEventListener("click",disconnect);
+    $("disconnectBtn").addEventListener("click",disconnect);
+    return;
+  }
+
+  // Normal dapp behavior: inside a wallet browser use the injected wallet directly.
+  if(window.ethereum){
+    await connectWithProvider(window.ethereum,"Browser Wallet");
     return;
   }
   openWalletModal();
@@ -266,13 +274,7 @@ async function connect(){
 
 function disconnect(){
   try{localStorage.removeItem("rhoodstone_wallet_rdns")}catch{}
-  wallet=null;
-  signer=null;
-  provider=null;
-  nft=null;
-  staking=null;
-  selectedProvider=null;
-  walletSource=null;
+  wallet=null;signer=null;provider=null;nft=null;staking=null;selectedProvider=null;connectionBusy=false;
   $("walletShort").textContent="—";
   $("stakedCount").textContent="—";
   $("ogStatus").textContent="—";
@@ -280,46 +282,32 @@ function disconnect(){
   $("connectBtn").classList.remove("connected");
   $("ownedGrid").innerHTML='<div class="status">Connect wallet to load your Stones.</div>';
   $("stakedGrid").innerHTML='<div class="status">Connect wallet to load your stakes.</div>';
-  setStatus("Wallet disconnected.","");
+  setStatus("Wallet disconnected.");
   closeWalletModal();
 }
 
 function setupEIP6963(){
   if(!window.addEventListener)return;
-
-  window.addEventListener("eip6963:announceProvider",(event)=>{
+  window.addEventListener("eip6963:announceProvider",event=>{
     const detail=event.detail;
     if(!detail?.provider)return;
-
-    const exists=walletProviders.some(x=>
-      x.info?.rdns && detail.info?.rdns
-        ? x.info.rdns===detail.info.rdns
-        : x.provider===detail.provider
-    );
-    if(!exists)walletProviders.push(detail);
+    const exists=walletProviders.some(x=>x.provider===detail.provider || (x.info?.rdns&&detail.info?.rdns&&x.info.rdns===detail.info.rdns));
+    if(!exists){walletProviders.push(detail);bindProviderEvents(detail.provider)}
     if(walletModal.classList.contains("open"))renderWalletOptions();
   });
-
   window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-  setTimeout(async ()=>{
-    if(!walletProviders.length && window.ethereum){
-      walletProviders.push({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
-    }
-    if(walletModal.classList.contains("open"))renderWalletOptions();
-    await restoreConnection();
-  },800);
+  if(window.ethereum){
+    const exists=walletProviders.some(x=>x.provider===window.ethereum);
+    if(!exists)walletProviders.unshift({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
+    bindProviderEvents(window.ethereum);
+  }
+  setTimeout(()=>{if(walletModal.classList.contains("open"))renderWalletOptions();restoreConnection()},500);
 }
 
 $("connectBtn").addEventListener("click",connect);
 $("walletClose").addEventListener("click",closeWalletModal);
 $("walletBackdrop").addEventListener("click",closeWalletModal);
-
-window.addEventListener("keydown",e=>{
-  if(e.key==="Escape")closeWalletModal();
-});
-
-setupEIP6963();
+window.addEventListener("keydown",e=>{if(e.key==="Escape")closeWalletModal()});
 
 async function getOwnedTokens(){
 const out=[];
@@ -404,21 +392,6 @@ setStatus(e?.shortMessage||e?.reason||e?.message||"Could not load staking data."
 }
 }
 
-function updateTokenSelect(ids){
- const sel=$("tokenSelect"),btn=$("stakeSelectedBtn");
- sel.innerHTML="";
- if(!wallet){sel.innerHTML='<option value="">CONNECT WALLET TO LOAD YOUR STONES</option>';sel.disabled=true;btn.disabled=true;return}
- if(!ids.length){sel.innerHTML='<option value="">NO STONES FOUND IN THIS WALLET</option>';sel.disabled=true;btn.disabled=true;return}
- sel.disabled=false; ids.forEach(id=>{const o=document.createElement("option");o.value=String(id);o.textContent=`Rhood Stone #${String(id).padStart(3,"0")}`;sel.appendChild(o)}); btn.disabled=false;
-}
-
-async function stakeSelected(){
- if(!wallet){await connect();return}
- const id=Number($("tokenSelect").value);
- if(!Number.isInteger(id)||id<1||id>555){setStatus("No valid Stone selected.","warn");return}
- await action("stake",id);
-}
-
 async function action(type,id){
 try{
 if(!wallet){await connect();return}
@@ -452,7 +425,6 @@ setStatus(e?.shortMessage||e?.reason||e?.message||"Transaction failed.","err")
 }
 
 $("refreshBtn").addEventListener("click",refreshAll);
-$("stakeSelectedBtn").addEventListener("click",stakeSelected);
 
 document.addEventListener("click",e=>{
 const b=e.target.closest("[data-action]");
@@ -460,33 +432,32 @@ if(b)action(b.dataset.action,Number(b.dataset.id))
 });
 
 function bindProviderEvents(p){
-  if(!p?.on)return;
-  if(p.__rhoodStoneBound)return;
+  if(!p?.on || p.__rhoodStoneBound)return;
   p.__rhoodStoneBound=true;
-  p.on("accountsChanged",async a=>{
-    if(!a.length){disconnect();return;}
+  p.on("accountsChanged",async accounts=>{
+    if(p!==selectedProvider)return;
+    if(!accounts?.length){disconnect();return}
+    try{
+      provider=new ethers.BrowserProvider(p);
+      await ensureChain();
+      setConnectedUI();
+      setStatus("Account changed. Refreshing your Stones…","ok");
+      await refreshAll();
+    }catch(e){setStatus(e?.shortMessage||e?.message||"Wallet update failed.","err")}
+  });
+  p.on("chainChanged",async ()=>{
     if(p!==selectedProvider)return;
     try{
       provider=new ethers.BrowserProvider(p);
       await ensureChain();
-      $("walletShort").textContent=short(wallet);
-      $("connectBtn").textContent=short(wallet);
-      try{await refreshAll()}catch(e){console.warn("Staking refresh failed:",e)}
-    }catch(e){setStatus(e?.message||"Wallet update failed.","err")}
-  });
-  p.on("chainChanged",async ()=>{
-    if(!wallet || p!==selectedProvider)return;
-    try{
-      provider=new ethers.BrowserProvider(p);
-      await ensureChain();
-      $("walletShort").textContent=short(wallet);
-      $("connectBtn").textContent=short(wallet);
-      try{await refreshAll()}catch(e){console.warn("Staking refresh failed:",e)}
-    }catch(e){setStatus(e?.message||"Network update failed.","err")}
+      setConnectedUI();
+      setStatus("Network updated. Refreshing staking data…","ok");
+      await refreshAll();
+    }catch(e){setStatus(e?.shortMessage||e?.message||"Network update failed.","err")}
   });
 }
 
-if(window.ethereum)bindProviderEvents(window.ethereum);
+
 </script>
 </body>
 </html>
