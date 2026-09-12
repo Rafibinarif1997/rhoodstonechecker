@@ -26,10 +26,38 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 .how{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.how .nft{min-height:150px}.footer-note{text-align:center;margin-top:34px;color:#68736d;font-size:8px;letter-spacing:2px}
 @media(max-width:800px){.stats{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}.page{padding-top:105px}.topbar{padding:18px 5%}.connect{min-width:132px;height:42px}}
 @media(max-width:480px){.container{width:88%}.how{grid-template-columns:1fr}.panel{padding:22px}.manual{align-items:stretch}.input{min-width:100%}.manual .btn{flex:1}.hero p{font-size:13px}}
+
+.wallet-modal{display:none;position:fixed;inset:0;z-index:1000}
+.wallet-modal.open{display:block}
+.wallet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+.wallet-dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(430px,90%);padding:28px;border:1px solid #4a524c;background:linear-gradient(145deg,#343a36,#090c0a);box-shadow:0 30px 100px rgba(0,0,0,.7),inset 1px 1px 0 rgba(255,255,255,.1);color:#e9eeeb}
+.wallet-close{position:absolute;right:13px;top:9px;border:0;background:none;color:#aeb7b2;font-size:28px;cursor:pointer}
+.wallet-kicker{font-size:8px;letter-spacing:3px;color:var(--green);font-weight:900;margin-bottom:8px}
+.wallet-dialog h3{font:900 28px Georgia,serif;color:#dce2df}
+.wallet-dialog p{margin-top:7px;color:#aeb7b2;font-size:12px}
+.wallet-list{display:grid;gap:9px;margin-top:20px}
+.wallet-option{width:100%;display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid #4a524c;background:linear-gradient(145deg,#252b27,#0b0e0c);color:#edf2ef;cursor:pointer;text-align:left}
+.wallet-option:hover{border-color:rgba(32,255,154,.65);box-shadow:0 0 18px rgba(32,255,154,.08)}
+.wallet-icon{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:#171c19;border:1px solid #414944;font-size:20px;font-weight:900}
+.wallet-name{font:900 12px Georgia,serif;letter-spacing:.7px}
+.wallet-desc{font-size:9px;color:#8f9993;margin-top:3px}
+.wallet-modal-status{margin-top:13px;color:#9dffca;font-size:10px;line-height:1.5}
+.wallet-disconnect{margin-top:8px;width:100%}
 </style>
 </head>
 <body>
 <div class="topbar"><button class="connect" id="connectBtn">CONNECT WALLET</button></div>
+<div id="walletModal" class="wallet-modal" aria-hidden="true">
+  <div class="wallet-backdrop" id="walletBackdrop"></div>
+  <div class="wallet-dialog" role="dialog" aria-modal="true" aria-labelledby="walletTitle">
+    <button class="wallet-close" id="walletClose" aria-label="Close">×</button>
+    <div class="wallet-kicker">RHOOD STONE</div>
+    <h3 id="walletTitle">CONNECT WALLET</h3>
+    <p>Select an EVM-compatible wallet.</p>
+    <div id="walletList" class="wallet-list"></div>
+    <div id="walletModalStatus" class="wallet-modal-status"></div>
+  </div>
+</div>
 <div class="rock r1"></div><div class="rock r2"></div>
 <main class="page"><div class="container">
 <section class="hero">
@@ -70,57 +98,195 @@ const STAKE_ABI=["function stake(uint256)","function requestUnstake(uint256)","f
 let provider=null,signer=null,wallet=null,nft=null,staking=null;
 const $=id=>document.getElementById(id);function short(a){return a?a.slice(0,6)+"…"+a.slice(-4):"—"}function setStatus(t,c=""){$("status").className="status "+c;$("status").textContent=t}
 
+let walletProviders=[];
+let selectedProvider=null;
+let walletSource=null;
+
+const walletModal=$("walletModal");
+const walletList=$("walletList");
+const walletModalStatus=$("walletModalStatus");
+
+function openWalletModal(){
+  if(!window.ethereum && !walletProviders.length){
+    setStatus("No compatible EVM wallet detected. Open this page in a browser with MetaMask, Bitget, Zerion or another EVM wallet.","err");
+    return;
+  }
+  walletModal.classList.add("open");
+  walletModal.setAttribute("aria-hidden","false");
+  walletModalStatus.textContent="";
+  renderWalletOptions();
+}
+
+function closeWalletModal(){
+  walletModal.classList.remove("open");
+  walletModal.setAttribute("aria-hidden","true");
+}
+
+function walletLabel(info){
+  const name=(info?.info?.name||"EVM Wallet").trim();
+  const rdns=(info?.info?.rdns||"").toLowerCase();
+  if(rdns.includes("metamask")||name.toLowerCase().includes("metamask"))return "MetaMask";
+  if(rdns.includes("bitget")||name.toLowerCase().includes("bitget"))return "Bitget";
+  if(rdns.includes("zerion")||name.toLowerCase().includes("zerion"))return "Zerion";
+  if(rdns.includes("rabby")||name.toLowerCase().includes("rabby"))return "Rabby";
+  return name;
+}
+
+function walletIcon(info){
+  const svg=info?.info?.icon;
+  if(svg)return `<img src="${svg}" alt="" style="width:30px;height:30px;border-radius:8px">`;
+  const n=walletLabel(info);
+  return n.slice(0,1).toUpperCase();
+}
+
+function renderWalletOptions(){
+  walletList.innerHTML="";
+  const items=[...walletProviders];
+
+  if(!items.length && window.ethereum){
+    items.push({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
+  }
+
+  const seen=new Set();
+  for(const item of items){
+    const name=walletLabel(item);
+    const key=name.toLowerCase();
+    if(seen.has(key))continue;
+    seen.add(key);
+
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="wallet-option";
+    b.innerHTML=`<div class="wallet-icon">${walletIcon(item)}</div><div><div class="wallet-name">${name}</div><div class="wallet-desc">Connect with ${name}</div></div>`;
+    b.addEventListener("click",()=>connectWithProvider(item.provider,name));
+    walletList.appendChild(b);
+  }
+}
+
 async function ensureChain(){
-let net=await provider.getNetwork();
-if(Number(net.chainId)!==CHAIN_ID){
-try{
-await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
-}catch(e){
-if(e.code===4902){
-await window.ethereum.request({
-method:"wallet_addEthereumChain",
-params:[{
-chainId:CHAIN_HEX,
-chainName:"Robinhood Chain",
-rpcUrls:[RPC_URL],
-nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
-blockExplorerUrls:[EXPLORER]
-}]
-});
-}else throw e
+  let net=await provider.getNetwork();
+  if(Number(net.chainId)!==CHAIN_ID){
+    try{
+      await selectedProvider.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+    }catch(e){
+      if(e.code===4902){
+        await selectedProvider.request({
+          method:"wallet_addEthereumChain",
+          params:[{
+            chainId:CHAIN_HEX,
+            chainName:"Robinhood Chain",
+            rpcUrls:[RPC_URL],
+            nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
+            blockExplorerUrls:[EXPLORER]
+          }]
+        });
+      }else throw e;
+    }
+    provider=new ethers.BrowserProvider(selectedProvider);
+  }
+  signer=await provider.getSigner();
+  wallet=await signer.getAddress();
+  nft=new ethers.Contract(NFT_ADDRESS,NFT_ABI,signer);
+  staking=new ethers.Contract(STAKING_ADDRESS,STAKE_ABI,signer);
 }
-provider=new ethers.BrowserProvider(window.ethereum)
-}
-signer=await provider.getSigner();
-wallet=await signer.getAddress();
-nft=new ethers.Contract(NFT_ADDRESS,NFT_ABI,signer);
-staking=new ethers.Contract(STAKING_ADDRESS,STAKE_ABI,signer)
+
+async function connectWithProvider(p,name){
+  if(!p)return;
+  if(typeof ethers==="undefined"){
+    walletModalStatus.textContent="Wallet library failed to load. Please refresh the page.";
+    return;
+  }
+  try{
+    walletModalStatus.textContent=`Connecting to ${name}…`;
+    selectedProvider=p;
+    await p.request({method:"eth_requestAccounts"});
+    provider=new ethers.BrowserProvider(p);
+    await ensureChain();
+
+    $("walletShort").textContent=short(wallet);
+    $("connectBtn").textContent=short(wallet);
+    $("connectBtn").classList.add("connected");
+    setStatus("Wallet connected. Loading your Stones…","ok");
+
+    closeWalletModal();
+    await refreshAll();
+  }catch(e){
+    console.error(e);
+    walletModalStatus.textContent=e?.shortMessage||e?.reason||e?.message||"Wallet connection failed.";
+    setStatus(walletModalStatus.textContent,"err");
+  }
 }
 
 async function connect(){
-if(!window.ethereum){
-setStatus("No compatible EVM wallet detected. Open this page in a browser with MetaMask or another wallet.","err");
-return
+  if(typeof ethers==="undefined"){
+    setStatus("Wallet library failed to load. Please refresh the page and try again.","err");
+    return;
+  }
+  if(wallet){
+    walletModalStatus.innerHTML=`Connected: <strong>${short(wallet)}</strong><button type="button" class="btn wallet-disconnect" id="disconnectBtn">DISCONNECT WALLET</button>`;
+    walletList.innerHTML="";
+    walletModal.classList.add("open");
+    walletModal.setAttribute("aria-hidden","false");
+    document.getElementById("disconnectBtn").addEventListener("click",disconnect);
+    return;
+  }
+  openWalletModal();
 }
-if(typeof ethers==="undefined"){
-setStatus("Wallet library failed to load. Please refresh the page and try again.","err");
-return
+
+function disconnect(){
+  wallet=null;
+  signer=null;
+  provider=null;
+  nft=null;
+  staking=null;
+  selectedProvider=null;
+  walletSource=null;
+  $("walletShort").textContent="—";
+  $("stakedCount").textContent="—";
+  $("ogStatus").textContent="—";
+  $("connectBtn").textContent="CONNECT WALLET";
+  $("connectBtn").classList.remove("connected");
+  $("ownedGrid").innerHTML='<div class="status">Connect wallet to load your Stones.</div>';
+  $("stakedGrid").innerHTML='<div class="status">Connect wallet to load your stakes.</div>';
+  setStatus("Wallet disconnected.","");
+  closeWalletModal();
 }
-try{
-setStatus("Connecting wallet…","warn");
-await window.ethereum.request({method:"eth_requestAccounts"});
-provider=new ethers.BrowserProvider(window.ethereum);
-await ensureChain();
-$("walletShort").textContent=short(wallet);
-$("connectBtn").textContent=short(wallet);
-$("connectBtn").classList.add("connected");
-setStatus("Wallet connected. Loading your Stones…","ok");
-await refreshAll()
-}catch(e){
-console.error(e);
-setStatus(e?.shortMessage||e?.reason||e?.message||"Wallet connection failed.","err")
+
+function setupEIP6963(){
+  if(!window.addEventListener)return;
+
+  window.addEventListener("eip6963:announceProvider",(event)=>{
+    const detail=event.detail;
+    if(!detail?.provider)return;
+
+    const exists=walletProviders.some(x=>
+      x.info?.rdns && detail.info?.rdns
+        ? x.info.rdns===detail.info.rdns
+        : x.provider===detail.provider
+    );
+    if(!exists)walletProviders.push(detail);
+    if(walletModal.classList.contains("open"))renderWalletOptions();
+  });
+
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+  setTimeout(()=>{
+    if(!walletProviders.length && window.ethereum){
+      walletProviders.push({provider:window.ethereum,info:{name:"Browser Wallet",rdns:"injected"}});
+    }
+    if(walletModal.classList.contains("open"))renderWalletOptions();
+  },500);
 }
-}
+
+$("connectBtn").addEventListener("click",connect);
+$("walletClose").addEventListener("click",closeWalletModal);
+$("walletBackdrop").addEventListener("click",closeWalletModal);
+
+window.addEventListener("keydown",e=>{
+  if(e.key==="Escape")closeWalletModal();
+});
+
+setupEIP6963();
 
 async function getOwnedTokens(){
 const out=[];
@@ -253,7 +419,6 @@ setStatus(e?.shortMessage||e?.reason||e?.message||"Transaction failed.","err")
 }
 }
 
-$("connectBtn").addEventListener("click",connect);
 $("refreshBtn").addEventListener("click",refreshAll);
 $("checkTokenBtn").addEventListener("click",checkOwnership);
 
@@ -264,19 +429,25 @@ if(b)action(b.dataset.action,Number(b.dataset.id))
 
 if(window.ethereum){
 window.ethereum.on?.("accountsChanged",async a=>{
-if(a.length){
-provider=new ethers.BrowserProvider(window.ethereum);
-try{
-await ensureChain();
-$("walletShort").textContent=short(wallet);
-$("connectBtn").textContent=short(wallet);
-await refreshAll()
-}catch(e){
-setStatus(e?.message||"Wallet update failed.","err")
-}
-}else location.reload()
+  if(!a.length){
+    disconnect();
+    return;
+  }
+  try{
+    if(selectedProvider){
+      provider=new ethers.BrowserProvider(selectedProvider);
+      await ensureChain();
+      $("walletShort").textContent=short(wallet);
+      $("connectBtn").textContent=short(wallet);
+      await refreshAll();
+    }
+  }catch(e){
+    setStatus(e?.message||"Wallet update failed.","err");
+  }
 });
-window.ethereum.on?.("chainChanged",()=>location.reload())
+window.ethereum.on?.("chainChanged",()=>{
+  if(wallet) location.reload();
+});
 }
 </script>
 </body>
