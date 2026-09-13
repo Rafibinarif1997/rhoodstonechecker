@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -88,16 +87,35 @@ function sourceSignals(src,abi){
  ];
  return checks.map(([key,title,terms,penalty,desc])=>({key,title,terms,penalty,desc,hit:terms.some(t=>text.includes(t.toLowerCase()))}));
 }
-async function getTopHolders(addr){try{const j=await get('/tokens/'+addr+'/holders?limit=100'); return j?.items||j?.result||[]}catch{return []}}
+async function getAllHolders(addr){
+  const all=[]; let path='/tokens/'+addr+'/holders?limit=100';
+  for(let page=0;page<20 && path;page++){
+    try{
+      const j=await get(path);
+      const items=Array.isArray(j?.items)?j.items:(Array.isArray(j?.result)?j.result:[]);
+      all.push(...items);
+      const np=j?.next_page_params;
+      if(!np) break;
+      const qs=new URLSearchParams(); Object.entries(np).forEach(([k,v])=>qs.set(k,String(v)));
+      path='/tokens/'+addr+'/holders?'+qs.toString();
+    }catch{break}
+  }
+  return all;
+}
 function holderValue(item){const v=item?.value??item?.amount??item?.token_count??item?.balance; try{return BigInt(String(v||0))}catch{return 0n}}
-function holderAddress(item){return item?.address_hash?.hash||item?.address?.hash||item?.address||item?.address_hash||''}
+function holderAddress(item){return (item?.address_hash?.hash||item?.address?.hash||item?.address||item?.address_hash||'').toLowerCase()}
+function aggregateHolders(items){
+  const map=new Map();
+  for(const item of items){const a=holderAddress(item); if(!/^0x[a-f0-9]{40}$/.test(a)) continue; map.set(a,(map.get(a)||0n)+holderValue(item));}
+  return [...map.entries()].sort((a,b)=>b[1]>a[1]?-1:b[1]<a[1]?1:0);
+}
 async function scan(){
  const a=$('address').value.trim();
  if(!addrRe.test(a)){showStatus('Enter a valid 0x contract address.','bad');return}
  $('scan').disabled=true;$('scan').textContent='SCANNING…';showStatus('Reading source, permissions, holders & onchain data…','loading');$('empty').classList.add('hidden');$('results').classList.add('hidden');
  try{
   const [contract,token,counters,reads,legacy,holdersRes]=await Promise.allSettled([
-   get('/smart-contracts/'+a),get('/tokens/'+a),get('/tokens/'+a+'/counters'),standardReads(a),getSourceLegacy(a),getTopHolders(a)
+   get('/smart-contracts/'+a),get('/tokens/'+a),get('/tokens/'+a+'/counters'),standardReads(a),getSourceLegacy(a),getAllHolders(a)
   ]);
   const c=contract.status==='fulfilled'?contract.value:null;
   const t=token.status==='fulfilled'?token.value:null;
@@ -110,12 +128,15 @@ async function scan(){
   const source=!!(c?.is_verified||c?.verified_twin_address||sourceText||lg?.contractName);
   const proxy=!!(c?.is_proxy||c?.proxy_type||c?.implementation_address_hash||c?.implementations||lg?.proxy==='1'||lg?.implementation);
   const tokenType=t?.type||((rd.erc721)?'ERC-721':(rd.erc20?'ERC-20':'Contract'));
-  const holders=co?.token_holders_count??t?.holders_count??'—';
+  const holderItems=holdersRes.status==='fulfilled'?holdersRes.value:[];
+   const holderBalances=aggregateHolders(holderItems);
+   const derivedHolderCount=holderBalances.length;
+   const apiHolderCount=Number(co?.token_holders_count??t?.holders_count);
+   const holders=(tokenType==='ERC-721' && derivedHolderCount>0)?derivedHolderCount:(Number.isFinite(apiHolderCount)&&apiHolderCount>0?apiHolderCount:'—');
   const supply=t?.total_supply??t?.totalSupply??rd.totalSupply??'—';
   const name=t?.name||rd.name||c?.name||lg?.contractName||'Unknown Contract';
   const owner=await readOwner(a);
   const sh=sourceSignals(sourceText,abi);
-  const holderItems=holdersRes.status==='fulfilled'?holdersRes.value:[];
   let score=100;const sig=[];
   if(source){addSignal(sig,'good','Verified source available','Blockscout exposes verified source/ABI information, so the rules can inspect code-level signals.');}else{score-=25;addSignal(sig,'bad','Contract source is not verified','The explorer could not provide verified source code. Treat the bytecode as opaque.');}
   if(proxy){score-=12;addSignal(sig,'warn','Upgradeable / proxy detected','Proxy metadata was detected. An authorized account may be able to change implementation behavior.');}else addSignal(sig,'good','No proxy detected','No proxy implementation metadata was detected.');
@@ -132,7 +153,7 @@ async function scan(){
   // Holder concentration from indexed top holders. Works best for fungible tokens and NFT collections where holder values are indexed.
   let concentration=null;
   if(holderItems.length && supply!=='—'){
-    try{const total=BigInt(String(supply)); if(total>0n){const top=holderItems.slice(0,10).reduce((n,x)=>n+holderValue(x),0n); concentration=Number(top*10000n/total)/100; if(concentration>=60){score-=15;addSignal(sig,'bad','High top-10 concentration','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>=40){score-=8;addSignal(sig,'warn','Elevated top-10 concentration','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>0){addSignal(sig,'good','Holder concentration checked','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}}}catch{}
+    try{const total=BigInt(String(supply)); if(total>0n){const top=holderBalances.slice(0,10).reduce((n,x)=>n+x[1],0n); concentration=Number(top*10000n/total)/100; if(concentration>=60){score-=15;addSignal(sig,'bad','High top-10 concentration','Top 10 unique holder addresses control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>=40){score-=8;addSignal(sig,'warn','Elevated top-10 concentration','Top 10 unique holder addresses control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>0){addSignal(sig,'good','Holder concentration checked','Top 10 unique holder addresses control about '+concentration.toFixed(2)+'% of reported supply.');}}}catch{}
   }
   score=Math.max(0,Math.min(100,score));
   $('name').textContent=name+(rd.symbol?' · '+rd.symbol:'');$('contract').textContent=a;$('score').textContent=score;$('scorebar').style.width=score+'%';$('type').textContent=tokenType;$('verified').textContent=source?'YES':'NO';$('supply').textContent=formatNum(supply);$('holders').textContent=formatNum(holders);$('proxy').textContent=proxy?'YES':'NO';$('creator').textContent=short(c?.creator_address_hash||c?.creator?.hash||c?.creator_address);
