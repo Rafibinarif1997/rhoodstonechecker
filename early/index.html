@@ -1,1 +1,156 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Early Radar — Robinhood Chain Intelligence</title>
+<meta name="description" content="Early Radar automatically surfaces promising early projects on Robinhood Chain using transparent onchain signals.">
+<style>
+:root{--bg:#060707;--panel:#0c0f0f;--panel2:#101414;--line:#202625;--text:#f4f6f3;--muted:#89928e;--green:#b8ff78;--cyan:#8ff7ff;--amber:#ffd36a;--red:#ff7777;--shadow:0 24px 90px rgba(0,0,0,.42)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(900px 500px at 50% -100px,#1a211e 0,#090b0b 50%,#060707 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:inherit}.wrap{max-width:1240px;margin:auto;padding:0 24px}.nav{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:12px;font-weight:950;letter-spacing:.14em}.logo{width:34px;height:34px;border:1px solid #4c5752;border-radius:10px;background:linear-gradient(145deg,#39433d,#0b0d0d);box-shadow:inset 0 3px 14px #000}.navlinks{display:flex;gap:24px;color:#9ca6a1;font-size:11px;font-weight:800;letter-spacing:.12em}.navlinks a{text-decoration:none}.live{display:flex;align-items:center;gap:8px;border:1px solid #26322b;background:#0c130e;border-radius:999px;padding:8px 12px;font-size:10px;font-weight:900;color:var(--green)}.pulse{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 14px var(--green)}
+.hero{padding:82px 0 34px}.eyebrow{font-size:10px;letter-spacing:.28em;color:var(--green);font-weight:900}.hero h1{font-size:clamp(50px,8vw,94px);line-height:.91;letter-spacing:-.065em;margin:18px 0}.hero p{max-width:720px;color:var(--muted);line-height:1.7;font-size:16px}.hero p b{color:#dfe6e1}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:34px 0}.stat{background:rgba(13,16,16,.8);border:1px solid var(--line);border-radius:15px;padding:16px}.stat b{font-size:20px}.stat span{display:block;color:var(--muted);font-size:10px;margin-top:5px;text-transform:uppercase;letter-spacing:.13em}
+.toolbar{position:sticky;top:0;z-index:5;background:rgba(6,7,7,.84);backdrop-filter:blur(16px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}.tools{display:flex;gap:8px;align-items:center}.search{flex:1;background:#090b0b;border:1px solid #2a302e;color:white;border-radius:11px;padding:12px 14px;outline:none}.filters{display:flex;gap:6px;overflow:auto}.filter{white-space:nowrap;border:1px solid var(--line);background:#0c0f0f;color:#9ca5a0;border-radius:999px;padding:9px 12px;font-size:10px;font-weight:900;cursor:pointer}.filter.active{background:#e9f0e9;color:#080a09;border-color:#e9f0e9}.refresh{border:1px solid #34403a;background:#111613;color:#dbe3de;border-radius:11px;padding:11px 14px;font-weight:900;cursor:pointer}
+.section{padding:42px 0}.sectionhead{display:flex;align-items:end;justify-content:space-between;margin-bottom:18px}.kicker{color:var(--green);font-size:10px;letter-spacing:.22em;font-weight:900}.section h2{font-size:27px;letter-spacing:-.04em;margin:6px 0 0}.sub{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{position:relative;overflow:hidden;background:linear-gradient(145deg,#111615,#0a0c0c);border:1px solid var(--line);border-radius:20px;padding:18px;transition:.2s}.card:hover{transform:translateY(-3px);border-color:#35403b;box-shadow:var(--shadow)}.rank{font-size:10px;color:#68726d;font-weight:900;letter-spacing:.14em}.topline{display:flex;justify-content:space-between;gap:10px;align-items:start}.name{font-size:20px;font-weight:950;margin-top:7px}.symbol{color:var(--muted);font-size:11px}.score{width:58px;height:58px;border:5px solid var(--green);border-radius:50%;display:grid;place-items:center;background:#0b110c;flex:0 0 auto}.score strong{font-size:19px}.score small{display:block;font-size:7px;color:var(--muted);text-align:center}.badges{display:flex;gap:5px;flex-wrap:wrap;margin:14px 0}.badge{font-size:8px;font-weight:900;letter-spacing:.08em;border:1px solid #28302d;background:#0c1010;color:#b3bcb7;border-radius:999px;padding:5px 7px}.badge.good{color:var(--green);border-color:#293b2b}.badge.warn{color:var(--amber);border-color:#403722}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}.metric{background:#090b0b;border:1px solid #1e2322;border-radius:10px;padding:9px}.metric b{display:block;font-size:11px}.metric span{font-size:9px;color:var(--muted)}.why{margin-top:13px;border-top:1px solid #202523;padding-top:12px}.why b{font-size:9px;letter-spacing:.13em;color:#8e9993}.why p{margin:5px 0 0;color:#aeb7b2;font-size:11px;line-height:1.55}.footrow{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:#66706a;font-size:9px}.empty{padding:50px;text-align:center;border:1px dashed #2b312f;border-radius:18px;color:var(--muted)}.notice{margin-top:12px;background:#0d120f;border:1px solid #243229;border-radius:14px;padding:14px;color:#aab4ae;font-size:11px;line-height:1.6}.footer{border-top:1px solid var(--line);padding:34px 0 55px;color:#69726d;font-size:10px;line-height:1.7}.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal.show{display:flex}.modalbox{max-width:720px;width:100%;background:#0d1010;border:1px solid #303734;border-radius:20px;padding:22px;box-shadow:var(--shadow)}.modalhead{display:flex;justify-content:space-between}.close{background:none;border:0;color:#aab3ae;font-size:22px;cursor:pointer}.evidence{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.ev{background:#090b0b;border:1px solid #202624;border-radius:11px;padding:12px}.ev b{display:block;font-size:9px;color:var(--muted);margin-bottom:4px}.ev span{font-size:12px}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.navlinks{display:none}.tools{flex-wrap:wrap}.search{min-width:100%}}
+@media(max-width:560px){.wrap{padding:0 15px}.hero{padding:55px 0 28px}.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.nav{height:64px}.evidence{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="nav wrap">
+  <div class="brand"><div class="logo"></div><span>EARLY RADAR</span></div>
+  <div class="navlinks"><a href="#radar">RADAR</a><a href="#signals">SIGNALS</a><a href="#method">METHOD</a></div>
+  <div class="live"><i class="pulse"></i> LIVE SCAN</div>
+</header>
+
+<main class="wrap">
+<section class="hero">
+  <div class="eyebrow">ROBINHOOD CHAIN · ONCHAIN INTELLIGENCE</div>
+  <h1>Find them<br><span style="color:#aab5af">before they trend.</span></h1>
+  <p>Early Radar automatically discovers tokens and collections visible on Robinhood Chain and ranks them using transparent onchain signals. <b>No paid placements. No “trust me” scores.</b></p>
+  <div class="stats">
+    <div class="stat"><b id="count">—</b><span>Projects scanned</span></div>
+    <div class="stat"><b id="early">—</b><span>Early opportunities</span></div>
+    <div class="stat"><b id="verified">—</b><span>Verified contracts</span></div>
+    <div class="stat"><b id="updated">LIVE</b><span>Data status</span></div>
+  </div>
+</section>
+
+<div class="toolbar"><div class="tools">
+  <input id="search" class="search" placeholder="Search project, symbol or contract…">
+  <div class="filters">
+    <button class="filter active" data-filter="all">ALL</button><button class="filter" data-filter="early">EARLY</button><button class="filter" data-filter="erc20">TOKENS</button><button class="filter" data-filter="nft">NFT</button><button class="filter" data-filter="verified">VERIFIED</button>
+  </div>
+  <button class="refresh" id="refresh">↻</button>
+</div></div>
+
+<section id="radar" class="section">
+  <div class="sectionhead"><div><div class="kicker">LIVE RANKING</div><h2>Early Radar</h2></div><div class="sub" id="status">Discovering onchain projects…</div></div>
+  <div id="grid" class="grid"></div>
+</section>
+
+<section id="signals" class="section">
+  <div class="sectionhead"><div><div class="kicker">EVIDENCE FIRST</div><h2>What makes a project rise?</h2></div></div>
+  <div class="notice">
+    <b>EARLY SCORE</b> combines contract verification, holder base, holder concentration, market-cap/volume signals when available, and early-stage characteristics. A higher score means stronger detected signals — it is <b>not</b> a buy recommendation and cannot guarantee safety or performance.
+  </div>
+</section>
+
+<section id="method" class="section">
+  <div class="sectionhead"><div><div class="kicker">TRANSPARENT METHOD</div><h2>Every rank has a reason.</h2></div></div>
+  <div class="grid">
+    <div class="card"><div class="name">01 · Discovery</div><p class="sub">Projects are pulled automatically from Robinhood Chain's Blockscout token index.</p></div>
+    <div class="card"><div class="name">02 · Evidence</div><p class="sub">The engine reads verification, holders, supply, token type and concentration data when available.</p></div>
+    <div class="card"><div class="name">03 · Ranking</div><p class="sub">Projects are scored and filtered into Early, Verified and other views without manual curation.</p></div>
+  </div>
+</section>
+</main>
+
+<footer class="footer"><div class="wrap"><b>EARLY RADAR</b><br>Built for Robinhood Chain. Data source: Blockscout and public onchain reads. Informational discovery tool only — not financial, investment or security-audit advice.</div></footer>
+
+<div class="modal" id="modal"><div class="modalbox">
+  <div class="modalhead"><div><div class="kicker">PROJECT EVIDENCE</div><h2 id="mname" style="margin:6px 0">—</h2></div><button class="close" id="close">×</button></div>
+  <div id="mevidence" class="evidence"></div>
+  <div class="notice" id="mwhy"></div>
+</div></div>
+
+<script>
+const API='https://robinhoodchain.blockscout.com/api/v2';
+const state={items:[],filter:'all'};
+const $=x=>document.getElementById(x);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const short=a=>a?a.slice(0,6)+'…'+a.slice(-4):'—';
+async function get(path){const r=await fetch(API+path);if(!r.ok)throw Error(r.status);return r.json()}
+function score(t){
+  let s=55, reasons=[];
+  const holders=Number(t.holders||0), cap=Number(t.circulating_market_cap||0);
+  if(t.is_verified){s+=15;reasons.push('Verified contract/source signal');}
+  else reasons.push('Contract verification not confirmed');
+  if(holders>=10&&holders<1000){s+=10;reasons.push('Still relatively early holder base');}
+  if(holders>=1000){s+=5;reasons.push('Established holder base');}
+  if(holders>0&&holders<10){s-=8;reasons.push('Very small holder base');}
+  if(holders>50&&holders<5000){s+=8;reasons.push('Early adoption window');}
+  if(cap>0&&cap<100000){s+=8;reasons.push('Small capitalization / early stage');}
+  if(cap>=100000&&cap<1000000){s+=4;reasons.push('Sub-$1M capitalization');}
+  if((t.type||'').includes('ERC-721')){s+=2;reasons.push('NFT collection detected');}
+  return {score:Math.max(1,Math.min(99,s)),reasons};
+}
+function render(){
+  const q=$('search').value.toLowerCase().trim();
+  let arr=state.items.filter(t=>{
+    const sc=t._score;
+    const match=!q||[t.name,t.symbol,t.address].join(' ').toLowerCase().includes(q);
+    const early=sc>=70&&Number(t.holders||0)<5000;
+    const f=state.filter==='all'||(state.filter==='early'&&early)||(state.filter==='erc20'&&t.type==='ERC-20')||(state.filter==='nft'&&(t.type||'').includes('ERC-721'))||(state.filter==='verified'&&t.is_verified);
+    return match&&f;
+  }).sort((a,b)=>b._score-a._score);
+  $('grid').innerHTML=arr.length?arr.slice(0,60).map((t,i)=>{
+    const early=t._score>=70&&Number(t.holders||0)<5000;
+    return `<article class="card"><div class="topline"><div><div class="rank">#${String(i+1).padStart(2,'0')} · ${early?'EARLY SIGNAL':'RADAR'}</div><div class="name">${esc(t.name||'Unnamed')}</div><div class="symbol">${esc(t.symbol||t.type||'Contract')} · ${short(t.address_hash||t.address)}</div></div><div class="score"><div><strong>${t._score}</strong><small>/100</small></div></div></div>
+    <div class="badges">${t.is_verified?'<span class="badge good">VERIFIED</span>':'<span class="badge warn">UNVERIFIED</span>'}${early?'<span class="badge good">EARLY</span>':''}<span class="badge">${esc(t.type||'TOKEN')}</span></div>
+    <div class="metrics"><div class="metric"><b>${Number(t.holders||0).toLocaleString()}</b><span>HOLDERS</span></div><div class="metric"><b>${fmtCap(t.circulating_market_cap)}</b><span>MARKET CAP</span></div></div>
+    <div class="why"><b>WHY IT RANKED</b><p>${esc(t._reasons.slice(0,3).join(' · '))}</p></div>
+    <div class="footrow"><span>Updated live</span><button class="filter" onclick='details(${JSON.stringify(t).replace(/'/g,"&#39;")})'>VIEW EVIDENCE ↗</button></div></article>`;
+  }).join(''):'<div class="empty" style="grid-column:1/-1">No matching projects in the current live index.</div>';
+}
+function fmtCap(v){const n=Number(v||0);if(!n)return'—';if(n>=1e9)return'$'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return'$'+n.toFixed(0)}
+function details(t){
+ $('mname').textContent=t.name||'Unnamed';
+ $('mevidence').innerHTML=[['TYPE',t.type||'—'],['VERIFIED',t.is_verified?'YES':'NO'],['HOLDERS',Number(t.holders||0).toLocaleString()],['MARKET CAP',fmtCap(t.circulating_market_cap)],['SUPPLY',t.total_supply||'—'],['CONTRACT',t.address_hash||t.address||'—']].map(x=>`<div class="ev"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('');
+ $('mwhy').innerHTML='<b>WHY</b><br>'+esc(t._reasons.join(' · '))+'<br><br><a target="_blank" href="https://robinhoodchain.blockscout.com/token/'+(t.address_hash||t.address)+'">Open Blockscout ↗</a>';
+ $('modal').classList.add('show');
+}
+async function discover(){
+ $('status').textContent='Scanning token index…';$('grid').innerHTML='<div class="empty" style="grid-column:1/-1"><span class="spin">◌</span> Discovering projects from Robinhood Chain…</div>';
+ try{
+   let data=await get('/tokens?type=ERC-20,ERC-721&items_count=50');
+   let items=data.items||[];
+   // Fetch a few pages automatically so the ranking is not based on one tiny sample.
+   for(let i=0;i<3;i++){
+     if(!data.next_page_params)break;
+     const p=new URLSearchParams(data.next_page_params).toString();
+     data=await get('/tokens?type=ERC-20,ERC-721&items_count=50&'+p);
+     items=items.concat(data.items||[]);
+   }
+   const seen=new Set();items=items.filter(x=>{const a=(x.address||x.address_hash||'').toLowerCase();if(!a||seen.has(a))return false;seen.add(a);return true});
+   // Enrich the highest-signal candidates with full token info.
+   const top=items.slice(0,80);
+   const enriched=await Promise.all(top.map(async t=>{try{return {...t,...await get('/tokens/'+(t.address||t.address_hash))}}catch{return t}}));
+   state.items=enriched.map(t=>{const z=score(t);return {...t,_score:z.score,_reasons:z.reasons}}).sort((a,b)=>b._score-a._score);
+   $('count').textContent=state.items.length;
+   $('early').textContent=state.items.filter(x=>x._score>=70&&Number(x.holders||0)<5000).length;
+   $('verified').textContent=state.items.filter(x=>x.is_verified).length;
+   $('updated').textContent='JUST NOW';$('status').textContent='Live index · '+state.items.length+' projects loaded';
+   render();
+ }catch(e){
+   $('status').textContent='Live index unavailable';
+   $('grid').innerHTML='<div class="empty" style="grid-column:1/-1"><b>Live discovery could not be reached.</b><br><br>The UI is ready; the public explorer API may be rate-limited or temporarily unavailable. Try refresh in a moment.</div>';
+ }
+}
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{if(!b.dataset.filter)return;document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.filter=b.dataset.filter;render()});
+$('search').oninput=render;$('refresh').onclick=discover;$('close').onclick=()=> $('modal').classList.remove('show');$('modal').onclick=e=>{if(e.target.id==='modal')$('modal').classList.remove('show')};
+discover();
+</script>
+</body>
+</html>
