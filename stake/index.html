@@ -93,7 +93,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 <script>
 const CHAIN_ID=4663,CHAIN_HEX="0x1237",RPC_URL="https://rpc.mainnet.chain.robinhood.com",EXPLORER="https://robinhoodchain.blockscout.com";
 const NFT_ADDRESS="0x6be906e10351B4a970521c386E89D9e4e34c47C9",STAKING_ADDRESS="0xA1Cf1e04c74984F7aF8CCd79Fb17E4fee54302E7";
-const NFT_ABI=["function ownerOf(uint256) view returns(address)","function balanceOf(address) view returns(uint256)","function tokenOfOwnerByIndex(address,uint256) view returns(uint256)","function getApproved(uint256) view returns(address)","function approve(address,uint256)"];
+const NFT_ABI=["function ownerOf(uint256) view returns(address)","function balanceOf(address) view returns(uint256)","function tokenOfOwnerByIndex(address,uint256) view returns(uint256)","function getApproved(uint256) view returns(address)","function approve(address,uint256)","function isApprovedForAll(address,address) view returns(bool)"];
 const STAKE_ABI=["function stake(uint256)","function requestUnstake(uint256)","function completeUnstake(uint256)","function stakedBalance(address) view returns(uint256)","function isOGEligible(address) view returns(bool)","function getStakeInfo(uint256) view returns(address,uint256,uint256,bool)","event Staked(address indexed user,uint256 indexed tokenId,uint256 timestamp)","event Unstaked(address indexed user,uint256 indexed tokenId,uint256 timestamp)"];
 let provider=null,signer=null,wallet=null,nft=null,staking=null;
 const $=id=>document.getElementById(id);function short(a){return a?a.slice(0,6)+"…"+a.slice(-4):"—"}function setStatus(t,c=""){$("status").className="status "+c;$("status").textContent=t}
@@ -424,35 +424,40 @@ async function stakeSelected(){
 }
 
 async function action(type,id){
-try{
-if(!wallet){await connect();return}
-if(type==="stake"){
-const approvedFor=await nft.getApproved(id);
-if(approvedFor.toLowerCase()!==STAKING_ADDRESS.toLowerCase()){
-setStatus(`Approval required for Stone #${id}. Confirm the NFT approval in your wallet…`,"warn");
-const tx=await nft.approve(STAKING_ADDRESS,id);
-await tx.wait();
-}
-setStatus("Confirming stake transaction…","warn");
-const tx=await staking.stake(id);
-await tx.wait();
-setStatus(`Stone #${id} is now staked. You are OG eligible.`,"ok")
-}else if(type==="request"){
-setStatus("Submitting unstake request…","warn");
-const tx=await staking.requestUnstake(id);
-await tx.wait();
-setStatus(`7-day cooldown started for #${id}. OG remains active during cooldown.`,"ok")
-}else{
-setStatus("Completing unstake…","warn");
-const tx=await staking.completeUnstake(id);
-await tx.wait();
-setStatus(`Stone #${id} returned to your wallet.`,"ok")
-}
-await refreshAll()
-}catch(e){
-console.error(e);
-setStatus(e?.shortMessage||e?.reason||e?.message||"Transaction failed.","err")
-}
+ try{
+  if(!wallet){await connect();return}
+  if(type==="stake"){
+   const owner=await nft.ownerOf(id);
+   if(owner.toLowerCase()!==wallet.toLowerCase()) throw new Error(`Stone #${id} is not owned by the connected wallet.`);
+   const already=await staking.isStaked(id);
+   if(already) throw new Error(`Stone #${id} is already staked.`);
+   const approved=await nft.getApproved(id);
+   const approvedForAll=await nft.isApprovedForAll(wallet,STAKING_ADDRESS);
+   if(approved.toLowerCase()!==STAKING_ADDRESS.toLowerCase() && !approvedForAll){
+    setStatus(`Approve Stone #${id} in your wallet…`,"warn");
+    const tx=await nft.approve(STAKING_ADDRESS,id);
+    await tx.wait();
+   }
+   setStatus(`Confirming stake transaction for Stone #${id}…`,"warn");
+   const tx=await staking.stake(id);
+   await tx.wait();
+   setStatus(`Stone #${id} is now staked. You are OG eligible.`,"ok");
+  }else if(type==="request"){
+   setStatus("Submitting unstake request…","warn");
+   const tx=await staking.requestUnstake(id); await tx.wait();
+   setStatus(`7-day cooldown started for #${id}. OG remains active during cooldown.`,"ok");
+  }else{
+   setStatus("Completing unstake…","warn");
+   const tx=await staking.completeUnstake(id); await tx.wait();
+   setStatus(`Stone #${id} returned to your wallet.`,"ok");
+  }
+  await refreshAll();
+ }catch(e){
+  console.error("Rhood Stone action failed:",e);
+  let msg=e?.shortMessage||e?.reason||e?.message||"Transaction failed.";
+  if(e?.data && typeof e.data==="string") msg += ` [revert: ${e.data}]`;
+  setStatus(msg,"err");
+ }
 }
 
 $("refreshBtn").addEventListener("click",refreshAll);
