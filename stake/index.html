@@ -93,7 +93,7 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;back
 <script>
 const CHAIN_ID=4663,CHAIN_HEX="0x1237",RPC_URL="https://rpc.mainnet.chain.robinhood.com",EXPLORER="https://robinhoodchain.blockscout.com";
 const NFT_ADDRESS="0x6be906e10351B4a970521c386E89D9e4e34c47C9",STAKING_ADDRESS="0xA1Cf1e04c74984F7aF8CCd79Fb17E4fee54302E7";
-const NFT_ABI=["function ownerOf(uint256) view returns(address)","function balanceOf(address) view returns(uint256)","function tokenOfOwnerByIndex(address,uint256) view returns(uint256)","function getApproved(uint256) view returns(address)","function approve(address,uint256)","function isApprovedForAll(address,address) view returns(bool)"];
+const NFT_ABI=["function ownerOf(uint256) view returns(address)","function balanceOf(address) view returns(uint256)","function tokenOfOwnerByIndex(address,uint256) view returns(uint256)","function getApproved(uint256) view returns(address)","function approve(address,uint256)","function isApprovedForAll(address,address) view returns(bool)","event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)"];
 const STAKE_ABI=["function stake(uint256)","function requestUnstake(uint256)","function completeUnstake(uint256)","function stakedBalance(address) view returns(uint256)","function isOGEligible(address) view returns(bool)","function isStaked(uint256) view returns(bool)","function getStakeInfo(uint256) view returns(address,uint256,uint256,bool)","function paused() view returns(bool)","error NotNFTOwner()","error AlreadyStaked()","error NotStaked()","error NotStakeOwner()","error StakeLocked(uint256)","error NoUnstakeRequest()","error CooldownActive(uint256)","error InvalidTokenId()","event Staked(address indexed user,uint256 indexed tokenId,uint256 timestamp)","event Unstaked(address indexed user,uint256 indexed tokenId,uint256 timestamp)"];
 let provider=null,signer=null,wallet=null,nft=null,staking=null;
 const $=id=>document.getElementById(id);function short(a){return a?a.slice(0,6)+"…"+a.slice(-4):"—"}function setStatus(t,c=""){$("status").className="status "+c;$("status").textContent=t}
@@ -324,23 +324,63 @@ window.addEventListener("keydown",e=>{
 
 setupEIP6963();
 
+async function withTimeout(promise,ms,label){
+ return await Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label)),ms))]);
+}
+
 async function getOwnedTokens(){
-const out=[];
-try{
-const bal=Number(await nft.balanceOf(wallet));
-for(let i=0;i<bal;i++){
-try{out.push(Number(await nft.tokenOfOwnerByIndex(wallet,i)))}catch{break}
-}
-if(out.length===bal)return [...new Set(out)].sort((a,b)=>a-b)
-}catch{}
-for(let start=1;start<=555;start+=25){
-const ids=Array.from({length:Math.min(25,556-start)},(_,i)=>start+i);
-const rows=await Promise.all(ids.map(async id=>{
-try{return [id,(await nft.ownerOf(id)).toLowerCase()]}catch{return [id,null]}
-}));
-for(const [id,o] of rows)if(o===wallet.toLowerCase())out.push(id)
-}
-return [...new Set(out)].sort((a,b)=>a-b)
+ const out=[];
+ const addr=wallet.toLowerCase();
+
+ // Fast path: use ERC721Enumerable when the collection supports it.
+ try{
+  const bal=Number(await withTimeout(nft.balanceOf(wallet),8000,"balanceOf timed out"));
+  for(let i=0;i<bal;i++){
+   const id=await withTimeout(nft.tokenOfOwnerByIndex(wallet,i),5000,"tokenOfOwnerByIndex timed out");
+   out.push(Number(id));
+  }
+  if(out.length===bal)return [...new Set(out)].sort((a,b)=>a-b);
+ }catch(e){
+  console.warn("Enumerable ownership unavailable:",e);
+ }
+
+ // OpenSea-launched ERC721 collections may not expose ERC721Enumerable.
+ // Reconstruct current ownership from Transfer events instead of making
+ // hundreds of ownerOf RPC calls.
+ try{
+  setStatus("Wallet connected. Reading your Stone ownership…","warn");
+  const incoming=await withTimeout(
+   nft.queryFilter(nft.filters.Transfer(null,wallet),0,"latest"),
+   15000,"NFT transfer history timed out"
+  );
+  const outgoing=await withTimeout(
+   nft.queryFilter(nft.filters.Transfer(wallet,null),0,"latest"),
+   15000,"NFT transfer history timed out"
+  );
+  const active=new Set();
+  const events=[
+   ...incoming.map(x=>({b:x.blockNumber,l:x.index??x.logIndex??0,add:true,id:Number(x.args.tokenId)})),
+   ...outgoing.map(x=>({b:x.blockNumber,l:x.index??x.logIndex??0,add:false,id:Number(x.args.tokenId)}))
+  ].sort((a,b)=>a.b-b.b||a.l-b.l);
+  for(const e of events){ if(e.add) active.add(e.id); else active.delete(e.id); }
+  return [...active].sort((a,b)=>a-b);
+ }catch(e){
+  console.warn("Transfer-history ownership lookup failed:",e);
+ }
+
+ // Last-resort bounded scan.
+ setStatus("Wallet connected. Checking Stone ownership…","warn");
+ for(let start=1;start<=555;start+=20){
+  const ids=Array.from({length:Math.min(20,556-start)},(_,i)=>start+i);
+  const rows=await Promise.all(ids.map(async id=>{
+   try{
+    return [id,(await withTimeout(nft.ownerOf(id),5000,"ownerOf timed out")).toLowerCase()];
+   }catch{return [id,null]}
+  }));
+  for(const [id,o] of rows)if(o===addr)out.push(id);
+  await new Promise(r=>setTimeout(r,0));
+ }
+ return [...new Set(out)].sort((a,b)=>a-b);
 }
 
 async function getStakedTokens(){
