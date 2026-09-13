@@ -432,12 +432,13 @@ async function action(type,id){
    const already=await staking.isStaked(id);
    if(already) throw new Error(`Stone #${id} is already staked.`);
    const approved=await nft.getApproved(id);
-   const approvedForAll=await nft.isApprovedForAll(wallet,STAKING_ADDRESS);
-   if(approved.toLowerCase()!==STAKING_ADDRESS.toLowerCase() && !approvedForAll){
+   if(approved.toLowerCase()!==STAKING_ADDRESS.toLowerCase()){
     setStatus(`Approve Stone #${id} in your wallet…`,"warn");
     const tx=await nft.approve(STAKING_ADDRESS,id);
     await tx.wait();
    }
+   const isPaused=await staking.paused();
+   if(isPaused) throw new Error("Staking contract is currently paused by the contract owner.");
    setStatus(`Confirming stake transaction for Stone #${id}…`,"warn");
    const tx=await staking.stake(id);
    await tx.wait();
