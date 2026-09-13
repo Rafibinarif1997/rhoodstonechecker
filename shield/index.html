@@ -1,1 +1,153 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rhood Shield — Onchain Risk Scanner</title>
+<meta name="description" content="Rhood Shield scans Robinhood Chain contracts and explains onchain risk signals.">
+<style>
+:root{--bg:#080909;--panel:#111313;--panel2:#151817;--line:#292d2c;--text:#f1f2ef;--muted:#8e9692;--green:#9cff6b;--yellow:#ffd36a;--red:#ff7777;--blue:#8db8ff;--shadow:0 18px 60px rgba(0,0,0,.35)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#202522 0,#0b0d0d 38%,#080909 72%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}a{color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 22px}.nav{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center;font-weight:900;letter-spacing:.12em}.mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(145deg,#303633,#111);border:1px solid #454b48;box-shadow:inset 0 2px 10px #000}.nav a{font-size:12px;text-decoration:none;color:#c3c9c5}.hero{padding:74px 0 40px;text-align:center}.eyebrow{font-size:11px;letter-spacing:.25em;color:var(--green);font-weight:800}.hero h1{font-size:clamp(42px,7vw,82px);line-height:.95;margin:16px 0 18px;letter-spacing:-.055em}.hero p{max-width:680px;margin:auto;color:var(--muted);font-size:16px;line-height:1.7}.scanner{margin:36px auto 0;max-width:900px;background:linear-gradient(180deg,#141716,#0e1010);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}.inputrow{display:flex;gap:10px}.inputrow input{flex:1;min-width:0;background:#090b0b;border:1px solid #303533;border-radius:12px;color:white;padding:17px 16px;font:inherit;outline:none}.inputrow input:focus{border-color:#5d6a63}.btn{border:1px solid #667067;background:#dfe7df;color:#0a0c0b;border-radius:12px;padding:0 24px;font-weight:900;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.examples{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.chip{border:1px solid var(--line);background:#101212;color:#aab2ad;padding:7px 10px;border-radius:999px;font-size:11px;cursor:pointer}.status{display:none;margin-top:14px;text-align:left;padding:11px 13px;border-radius:10px;background:#0c0f0e;border:1px solid var(--line);color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin:18px 0 70px}.card{background:rgba(16,18,18,.9);border:1px solid var(--line);border-radius:18px;padding:20px}.scoreCard{display:flex;align-items:center;gap:22px}.score{width:122px;height:122px;border-radius:50%;display:grid;place-items:center;border:9px solid #29302c;background:#0a0c0c;flex:0 0 auto}.score strong{font-size:34px;letter-spacing:-.05em}.score small{display:block;color:var(--muted);font-size:10px;text-align:center}.title{font-size:12px;letter-spacing:.18em;color:var(--muted);font-weight:800}.project{font-size:26px;font-weight:900;margin:7px 0}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#aeb7b2;word-break:break-all}.facts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.fact{background:#0b0d0d;border:1px solid #242827;border-radius:11px;padding:12px}.fact b{display:block;font-size:11px;margin-bottom:4px}.fact span{font-size:12px;color:var(--muted)}.signal{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid #232725}.signal:last-child{border-bottom:0}.dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:0 0 auto}.good{background:var(--green)}.warn{background:var(--yellow)}.bad{background:var(--red)}.info{background:var(--blue)}.signal b{font-size:13px}.signal p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.55}.section{margin:34px 0 12px}.section h2{font-size:18px;margin:0}.empty{padding:45px 20px;text-align:center;color:var(--muted);border:1px dashed #303532;border-radius:18px}.footer{border-top:1px solid var(--line);padding:30px 0 50px;color:#69716d;font-size:11px;line-height:1.6}.hidden{display:none!important}.notice{margin-top:12px;padding:11px 13px;border-left:3px solid var(--yellow);background:#17140b;color:#bcb29b;font-size:11px;line-height:1.55}.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.links a{border:1px solid var(--line);border-radius:9px;padding:8px 10px;text-decoration:none;font-size:11px;color:#b9c0bc}.bar{height:7px;background:#202422;border-radius:9px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:0;background:var(--green);border-radius:9px}.loading{animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.45}}
+@media(max-width:760px){.nav{height:64px}.nav a{display:none}.hero{padding:52px 0 28px}.scanner{padding:14px}.inputrow{flex-direction:column}.btn{height:50px}.grid{grid-template-columns:1fr}.scoreCard{align-items:flex-start}.score{width:100px;height:100px}.facts{grid-template-columns:1fr}.wrap{padding:0 15px}}
+</style>
+</head>
+<body>
+<header class="nav wrap"><div class="brand"><div class="mark"></div><span>RHOOD SHIELD</span></div><a href="https://robinhoodchain.blockscout.com/" target="_blank" rel="noopener">BLOCKSCOUT ↗</a></header>
+<main class="wrap">
+<section class="hero">
+<div class="eyebrow">ROBINHOOD CHAIN · ONCHAIN RISK SCANNER</div>
+<h1>KNOW BEFORE<br>YOU BUY.</h1>
+<p>Paste an ERC-721 / ERC-20 contract and get a transparent risk report built from onchain and explorer data. No “safe” promises — every score is explained.</p>
+<div class="scanner">
+<div class="inputrow"><input id="address" spellcheck="false" placeholder="0x contract address" value="0x6be906e10351B4a970521c386E89D9E4e34c47C9"><button class="btn" id="scan">SCAN CONTRACT</button></div>
+<div class="examples"><button class="chip" data-a="0x6be906e10351B4a970521c386E89D9E4e34c47C9">RHOOD STONE</button><span class="chip">Chain ID 4663</span><span class="chip">Read-only</span></div>
+<div id="status" class="status"></div>
+</div>
+</section>
+<section id="empty" class="empty">Enter a Robinhood Chain contract address to begin.</section>
+<section id="results" class="hidden">
+<div class="grid">
+<div class="card">
+<div class="scoreCard"><div class="score" id="scoreCircle"><div><strong id="score">—</strong><small>/ 100</small></div></div><div><div class="title">SHIELD SCORE</div><div class="project" id="name">Unknown Contract</div><div class="mono" id="contract"></div><div id="verdict" class="notice">Scanning...</div></div></div>
+<div class="bar"><i id="scorebar"></i></div>
+<div class="facts"><div class="fact"><b>TYPE</b><span id="type">—</span></div><div class="fact"><b>VERIFIED</b><span id="verified">—</span></div><div class="fact"><b>SUPPLY</b><span id="supply">—</span></div><div class="fact"><b>HOLDERS</b><span id="holders">—</span></div><div class="fact"><b>PROXY</b><span id="proxy">—</span></div><div class="fact"><b>CREATOR</b><span id="creator">—</span></div></div>
+<div class="links"><a id="explorer" target="_blank" rel="noopener">View on Blockscout ↗</a><a id="tokenLink" class="hidden" target="_blank" rel="noopener">Token page ↗</a></div>
+</div>
+<div class="card"><div class="title">RISK SIGNALS</div><div id="signals" style="margin-top:8px"></div></div>
+</div>
+<div class="card"><div class="title">HOW THIS SCORE WORKS</div><p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:0">Rhood Shield is an automated screening tool, not a security audit. Signals are derived from explorer metadata, contract ABI/source when available, standard token reads and holder concentration. A high score means fewer detected risk signals — it does <b>not</b> guarantee that a project is safe.</p></div>
+</section>
+<div class="footer"><b>RHOOD SHIELD MVP</b><br>Built for Robinhood Chain. Data source: Blockscout / onchain reads. This tool is informational only and should never be treated as financial, investment or security-audit advice.</div>
+</main>
+<script>
+const API='https://robinhoodchain.blockscout.com/api/v2';
+const RPC='https://rpc.mainnet.chain.robinhood.com';
+const CHAIN='4663';
+const $=id=>document.getElementById(id);
+const addrRe=/^0x[a-fA-F0-9]{40}$/;
+function short(a){return a&&a.startsWith('0x')?a.slice(0,6)+'…'+a.slice(-4):a||'—'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function get(path){const r=await fetch(API+path); if(!r.ok) throw new Error('Blockscout API '+r.status); return r.json()}
+async function rpc(method,params=[]){const r=await fetch(RPC,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})}); if(!r.ok) throw new Error('RPC '+r.status); const j=await r.json(); if(j.error) throw new Error(j.error.message||'RPC error'); return j.result}
+function hexPadAddress(a){return '0x'+a.slice(2).toLowerCase().padStart(64,'0')}
+function callData(sig,arg){return sig+arg}
+async function readString(addr,selector){try{const x=await rpc('eth_call',[{to:addr,data:selector},'latest']); if(!x||x==='0x') return null; const bytes=x.slice(2); const off=parseInt(bytes.slice(0,64),16); const len=parseInt(bytes.slice(off*2,off*2+64),16); return decodeURIComponent(bytes.slice(off*2+64,off*2+64+len*2).replace(/(..)/g,'%$1'))}catch(e){return null}}
+async function ethCall(addr,data){return rpc('eth_call',[{to:addr,data},'latest'])}
+async function standardReads(addr){const out={};
+  try{const x=await ethCall(addr,'0x06fdde03'); const b=x.slice(2); const off=parseInt(b.slice(0,64),16),len=parseInt(b.slice(off*2,off*2+64),16); out.name=decodeURIComponent(b.slice(off*2+64,off*2+64+len*2).replace(/(..)/g,'%$1'))}catch{}
+  try{const x=await ethCall(addr,'0x95d89b41'); const b=x.slice(2); const off=parseInt(b.slice(0,64),16),len=parseInt(b.slice(off*2,off*2+64),16); out.symbol=decodeURIComponent(b.slice(off*2+64,off*2+64+len*2).replace(/(..)/g,'%$1'))}catch{}
+  try{const x=await ethCall(addr,'0x18160ddd'); out.totalSupply=BigInt(x).toString()}catch{}
+  try{const x=await ethCall(addr,'0x01ffc9a7'+'0'.repeat(62)+'80'); out.erc721=x.endsWith('1')}catch{}
+  try{const x=await ethCall(addr,'0x01ffc9a7'+'0'.repeat(62)+'d9'); out.erc20=x.endsWith('1')}catch{}
+  return out;
+}
+function parseFunctions(abi){return (abi||[]).filter(x=>x.type==='function').map(x=>x.name).filter(Boolean)}
+function addSignal(arr,type,title,text){arr.push({type,title,text})}
+async function getSourceLegacy(addr){
+  try{
+    const r=await fetch('https://robinhoodchain.blockscout.com/api?module=contract&action=getsourcecode&address='+addr);
+    if(!r.ok)return null; const j=await r.json(); const x=j?.result?.[0];
+    if(!x)return null; let abi=[]; try{abi=JSON.parse(x.ABI||'[]')}catch{}
+    return {source:x.SourceCode||'',abi,contractName:x.ContractName||'',proxy:x.Proxy,implementation:x.Implementation};
+  }catch{return null}
+}
+function decodeAddressResult(x){try{return '0x'+x.slice(-40)}catch{return null}}
+async function readOwner(addr){try{const x=await ethCall(addr,'0x8da5cb5b');return decodeAddressResult(x)}catch{return null}}
+function normalizeSource(src){if(!src)return ''; if(src.trim().startsWith('{')){try{const j=JSON.parse(src);return Object.values(j.sources||{}).map(v=>v.content||'').join('\n')}catch{}} return src}
+function sourceSignals(src,abi){
+ const text=(normalizeSource(src)+'\n'+(abi||[]).map(x=>x.name||'').join('\n')).toLowerCase();
+ const checks=[
+  ['upgrade','upgradeability / implementation control',['upgradeTo','upgradeToAndCall','_authorizeUpgrade','upgradeToAndCall'],-12,'The source/ABI exposes upgrade-related controls.'],
+  ['owner','owner/admin control',['onlyOwner','transferOwnership','renounceOwnership','owner()'],-4,'Owner/admin controls are present; permissions should be reviewed.'],
+  ['mint','additional minting',['mint(','safeMint(','mintBatch(','_mint(','publicmint','publicMint'],-8,'Minting logic appears in the source/ABI; confirm who can call it and supply limits.'],
+  ['metadata','mutable metadata',['setBaseURI','setBaseTokenURI','setTokenURI','setURI','baseURI','_setTokenURI'],-7,'Metadata appears mutable through a setter or configurable URI.'],
+  ['pause','pause controls',['pause(','unpause(','whenNotPaused','whenPaused'],-4,'Pause controls are present; check who can pause and under what conditions.'],
+  ['withdraw','treasury withdrawal',['withdraw(','sweep(','withdrawETH','withdrawERC20','rescueTokens'],-5,'Treasury withdrawal/rescue functions are present; review access control.'],
+  ['blacklist','blacklist / transfer restriction',['blacklist','blocklist','setBlacklist','setBlocklist'],-5,'Blacklist/blocklist controls were detected; transfer restrictions may exist.']
+ ];
+ return checks.map(([key,title,terms,penalty,desc])=>({key,title,terms,penalty,desc,hit:terms.some(t=>text.includes(t.toLowerCase()))}));
+}
+async function getTopHolders(addr){try{const j=await get('/tokens/'+addr+'/holders?limit=100'); return j?.items||j?.result||[]}catch{return []}}
+function holderValue(item){const v=item?.value??item?.amount??item?.token_count??item?.balance; try{return BigInt(String(v||0))}catch{return 0n}}
+function holderAddress(item){return item?.address_hash?.hash||item?.address?.hash||item?.address||item?.address_hash||''}
+async function scan(){
+ const a=$('address').value.trim();
+ if(!addrRe.test(a)){showStatus('Enter a valid 0x contract address.','bad');return}
+ $('scan').disabled=true;$('scan').textContent='SCANNING…';showStatus('Reading source, permissions, holders & onchain data…','loading');$('empty').classList.add('hidden');$('results').classList.add('hidden');
+ try{
+  const [contract,token,counters,reads,legacy,holdersRes]=await Promise.allSettled([
+   get('/smart-contracts/'+a),get('/tokens/'+a),get('/tokens/'+a+'/counters'),standardReads(a),getSourceLegacy(a),getTopHolders(a)
+  ]);
+  const c=contract.status==='fulfilled'?contract.value:null;
+  const t=token.status==='fulfilled'?token.value:null;
+  const co=counters.status==='fulfilled'?counters.value:null;
+  const rd=reads.status==='fulfilled'?reads.value:{};
+  const lg=legacy.status==='fulfilled'?legacy.value:null;
+  let abi=c?.abi||c?.decoded_abi||lg?.abi||[]; if(typeof abi==='string'){try{abi=JSON.parse(abi)}catch{abi=[]}}
+  const sourceText=lg?.source||c?.source_code||c?.sourceCode||c?.files?.map?.(x=>x.content||'').join('\n')||'';
+  const funcs=parseFunctions(abi);
+  const source=!!(c?.is_verified||c?.verified_twin_address||sourceText||lg?.contractName);
+  const proxy=!!(c?.is_proxy||c?.proxy_type||c?.implementation_address_hash||c?.implementations||lg?.proxy==='1'||lg?.implementation);
+  const tokenType=t?.type||((rd.erc721)?'ERC-721':(rd.erc20?'ERC-20':'Contract'));
+  const holders=co?.token_holders_count??t?.holders_count??'—';
+  const supply=t?.total_supply??t?.totalSupply??rd.totalSupply??'—';
+  const name=t?.name||rd.name||c?.name||lg?.contractName||'Unknown Contract';
+  const owner=await readOwner(a);
+  const sh=sourceSignals(sourceText,abi);
+  const holderItems=holdersRes.status==='fulfilled'?holdersRes.value:[];
+  let score=100;const sig=[];
+  if(source){addSignal(sig,'good','Verified source available','Blockscout exposes verified source/ABI information, so the rules can inspect code-level signals.');}else{score-=25;addSignal(sig,'bad','Contract source is not verified','The explorer could not provide verified source code. Treat the bytecode as opaque.');}
+  if(proxy){score-=12;addSignal(sig,'warn','Upgradeable / proxy detected','Proxy metadata was detected. An authorized account may be able to change implementation behavior.');}else addSignal(sig,'good','No proxy detected','No proxy implementation metadata was detected.');
+  if(owner && !/^0x0{40}$/i.test(owner)) addSignal(sig,'warn','Owner/admin address detected','The standard owner() call returned '+short(owner)+'. Ownership powers should be reviewed.');
+  else if(owner) addSignal(sig,'good','No active owner() detected','The standard owner() call returned the zero address. This does not rule out role-based administration.');
+  else addSignal(sig,'info','Owner() not readable','The contract does not expose a readable standard owner() function or the call failed.');
+  let hits=0;
+  sh.forEach(x=>{if(x.hit){hits++;score+=x.penalty;addSignal(sig,x.penalty<=-8?'bad':'warn',x.title,x.desc)} });
+  if(!hits)addSignal(sig,'good','No major source-control patterns detected','No major upgrade/mint/metadata/pause/withdraw/blacklist patterns from the current rule set were detected.');
+  if(tokenType==='ERC-721') addSignal(sig,'good','ERC-721 detected','The contract responds like an ERC-721 token.');
+  else if(tokenType==='ERC-20') addSignal(sig,'info','ERC-20 detected','NFT-specific checks are limited for ERC-20 contracts.');
+  else addSignal(sig,'info','Token standard not confirmed','The standard interface checks did not conclusively identify ERC-20 or ERC-721.');
+  const hc=Number(holders); if(Number.isFinite(hc)&&hc>0){if(hc<10){score-=8;addSignal(sig,'warn','Very small holder base','Fewer than 10 holders are currently reported by Blockscout.');}else if(hc>=100){score+=2;addSignal(sig,'good','Established holder count',String(hc)+' holders are currently reported. This is not a safety guarantee.');}else addSignal(sig,'info','Holder count available',String(hc)+' holders reported by Blockscout.');}
+  // Holder concentration from indexed top holders. Works best for fungible tokens and NFT collections where holder values are indexed.
+  let concentration=null;
+  if(holderItems.length && supply!=='—'){
+    try{const total=BigInt(String(supply)); if(total>0n){const top=holderItems.slice(0,10).reduce((n,x)=>n+holderValue(x),0n); concentration=Number(top*10000n/total)/100; if(concentration>=60){score-=15;addSignal(sig,'bad','High top-10 concentration','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>=40){score-=8;addSignal(sig,'warn','Elevated top-10 concentration','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}else if(concentration>0){addSignal(sig,'good','Holder concentration checked','Top 10 indexed holders control about '+concentration.toFixed(2)+'% of reported supply.');}}}catch{}
+  }
+  score=Math.max(0,Math.min(100,score));
+  $('name').textContent=name+(rd.symbol?' · '+rd.symbol:'');$('contract').textContent=a;$('score').textContent=score;$('scorebar').style.width=score+'%';$('type').textContent=tokenType;$('verified').textContent=source?'YES':'NO';$('supply').textContent=formatNum(supply);$('holders').textContent=formatNum(holders);$('proxy').textContent=proxy?'YES':'NO';$('creator').textContent=short(c?.creator_address_hash||c?.creator?.hash||c?.creator_address);
+  $('scoreCircle').style.borderColor=score>=80?'var(--green)':score>=60?'var(--yellow)':'var(--red)';
+  $('verdict').textContent=score>=80?'LOWER DETECTED RISK — continue your own due diligence.':score>=60?'MEDIUM DETECTED RISK — review the warnings before interacting.':'HIGHER DETECTED RISK — proceed only after deeper investigation.';
+  $('verdict').style.borderLeftColor=score>=80?'var(--green)':score>=60?'var(--yellow)':'var(--red)';
+  $('signals').innerHTML=sig.map(s=>`<div class="signal"><i class="dot ${s.type}"></i><div><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div></div>`).join('');
+  $('explorer').href='https://robinhoodchain.blockscout.com/address/'+a;$('tokenLink').href='https://robinhoodchain.blockscout.com/token/'+a;$('tokenLink').classList.toggle('hidden',!(t||tokenType!=='Contract'));
+  $('results').classList.remove('hidden');showStatus('Scan complete. Source, admin controls, holder data and concentration signals evaluated.','');
+ }catch(e){console.error(e);showStatus('Scan failed: '+e.message+' — some Blockscout endpoints may be unavailable temporarily.','bad');$('empty').classList.remove('hidden')}
+ finally{$('scan').disabled=false;$('scan').textContent='SCAN CONTRACT'}
+}
+function formatNum(v){if(v==='—'||v==null)return '—';try{const n=BigInt(String(v));return n.toLocaleString('en-US')}catch{return String(v)}}
+function showStatus(t,cl){$('status').style.display='block';$('status').className='status '+(cl==='bad'?'bad':'')+(cl==='loading'?' loading':'');$('status').textContent=t}
+$('scan').onclick=scan;$('address').addEventListener('keydown',e=>{if(e.key==='Enter')scan()});document.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>{$('address').value=x.dataset.a;scan()});
+</script>
+</body>
+</html>
