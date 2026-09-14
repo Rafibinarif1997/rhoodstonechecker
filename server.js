@@ -183,3 +183,5 @@ app.get('/api/docs',(_req,res)=>res.json({chain:{chainId:CHAIN_ID,rpc:RPC,explor
 
 app.get('/{*splat}',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
 app.listen(PORT,()=>console.log(`RH//COPILOT running on http://localhost:${PORT}`));
+
+// Static HTML pages are served directly from repository root.

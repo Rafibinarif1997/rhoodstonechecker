@@ -1,43 +1,26 @@
-# RH//COPILOT
+# RH Copilot — Multi-Page Root Build
 
-Single-page independent financial intelligence interface for Robinhood Chain.
+A production-minded independent intelligence interface for Robinhood Chain.
 
-## What works
-- Robinhood Chain RPC health, latest block and gas readout
-- EVM wallet connection + automatic Robinhood Chain network switching
-- Native ETH balance
-- Known ERC-20 balance scanner for Robinhood Stock Tokens, WETH and USDG
-- Official Robinhood Chain Stock Token registry and live bid/ask quotes
-- Stock Token contract links and read-only ERC-20 inspection
-- Address / contract scanner
-- Persistent watchlist
-- Bridge intelligence sourced from documented Robinhood Chain routes
-- Project submission -> pending -> same-page admin approval/rejection
-- Official resource links
-- Responsive single-page UI
+## Pages
+- `/` — Landing page
+- `/dashboard.html`
+- `/stock-token-terminal.html`
+- `/defi-opportunities.html`
+- `/bridge-intelligence.html`
+- `/contract-intelligence.html`
+- `/discover-projects.html`
+- `/watchlist.html`
+- `/developer.html`
+- `/about.html`
+
+All pages share the same wallet session. Connect once; every page sees the same connected account. Clicking the connected wallet opens a disconnect action. The site clears its local session and requests wallet permission revocation where supported.
 
 ## Run
-Node.js 20+ is required.
+Node.js 20+
+`npm install`
+`npm start`
 
-```bash
-npm install
-npm start
-```
+Set `ADMIN_KEY` and optional `ALCHEMY_API_KEY` in `.env`.
 
-Open `http://localhost:3000`.
-
-## Environment
-Copy `.env.example` to `.env`.
-
-- `PORT=3000`
-- `RH_RPC_URL=https://rpc.mainnet.chain.robinhood.com`
-- `ADMIN_KEY=change-me`
-- `WALLET_TOKEN_LIMIT=80`
-
-The public Robinhood Chain RPC is rate-limited. For production, use a managed provider such as Alchemy and set `RH_RPC_URL` accordingly.
-
-## Admin
-Set `ADMIN_KEY`. Open **Admin Review** at the bottom of the same page and enter the key. Pending project submissions can be approved or rejected without another page.
-
-## Important
-This product is independent and is not official or endorsed by Robinhood. It does not fabricate APYs, bridge fees, execution quotes or investment recommendations.
+This is independent software and is not affiliated with or endorsed by Robinhood.

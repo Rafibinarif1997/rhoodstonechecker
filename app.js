@@ -1,89 +1,89 @@
-const $ = (s,root=document)=>root.querySelector(s);
-const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
-const CHAIN_ID=4663, CHAIN_HEX='0x1237';
-const RPC='https://rpc.mainnet.chain.robinhood.com', EXPLORER='https://robinhoodchain.blockscout.com';
-let wallet=null, assets=[], selectedAsset=null, selectedQuote=null, healthData=null;
 
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const short=a=>a?`${a.slice(0,6)}…${a.slice(-4)}`:'—';
-const money=v=>v==null||v===''||Number.isNaN(Number(v))?'—':`$${Number(v).toLocaleString(undefined,{maximumFractionDigits:6})}`;
-const num=v=>Number(v||0).toLocaleString(undefined,{maximumFractionDigits:6});
-function toast(msg,good=true){const t=$('#toast');t.textContent=msg;t.className=`toast show ${good?'':'bad'}`;clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),3500)}
-async function api(url,opt={}){const r=await fetch(url,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||`Request failed (${r.status})`);return d}
-function openExternal(url){if(url)window.open(url,'_blank','noopener,noreferrer')}
-function scrollToId(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});history.replaceState(null,'','#'+id)}
-
-// navigation
-$('#menu').onclick=()=>$('#nav').classList.toggle('open');
-$$('#nav a').forEach(a=>a.onclick=()=>$('#nav').classList.remove('open'));
-$('#enterTerminal').onclick=()=>scrollToId('dashboard');
-$('#heroScan').onclick=()=>{scrollToId('scanner');setTimeout(()=>$('#scanInput').focus(),250)};
-$('#addNetwork').onclick=addNetwork;
-$('#copyRpc').onclick=()=>copy(RPC);
-$('#openExplorer').onclick=()=>openExternal(EXPLORER);
-$('#docsBtn').onclick=()=>scrollToId('resources');
-
-async function copy(text){try{await navigator.clipboard.writeText(text);toast('Copied to clipboard.')}catch{toast('Clipboard access unavailable.',false)}}
-
-// network health
-async function refreshHealth(){
- try{healthData=await api('/api/health');$('#healthDot').textContent='● ONLINE';$('#healthDot').className='good';$('#block').textContent=Number(healthData.block).toLocaleString();$('#gas').textContent=healthData.gasPrice?`${(Number(healthData.gasPrice)/1e9).toFixed(3)} gwei`:'—';$('#lastBlock').textContent=Number(healthData.block).toLocaleString();$('#lastUpdate').textContent=new Date(healthData.time).toLocaleTimeString();}
- catch(e){$('#healthDot').textContent='● OFFLINE';$('#healthDot').className='bad-text';toast('RPC health check failed.',false)}
-}
-$('#refreshHealth').onclick=refreshHealth; refreshHealth(); setInterval(refreshHealth,15000);
-
-// wallet
-async function addNetwork(){if(!window.ethereum)return toast('Install an EVM wallet first.',false);try{await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:CHAIN_HEX,chainName:'Robinhood Chain',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:[RPC],blockExplorerUrls:[EXPLORER+'/']}]});toast('Robinhood Chain added.')}catch(e){toast(e.message||'Could not add network.',false)}}
-async function ensureNetwork(){if(!window.ethereum)throw Error('No EVM wallet detected.');const id=await window.ethereum.request({method:'eth_chainId'});if(id.toLowerCase()!==CHAIN_HEX){try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:CHAIN_HEX}]})}catch(e){if(e.code===4902)await addNetwork();else throw e}}}
-async function connectWallet(){if(!window.ethereum)return toast('No EVM wallet detected. Install MetaMask or another EVM wallet.',false);try{await ensureNetwork();const a=await window.ethereum.request({method:'eth_requestAccounts'});wallet=a[0];renderWalletIdentity();await refreshWallet();toast('Wallet connected.')}catch(e){toast(e.message||'Wallet connection failed.',false)}}
-function renderWalletIdentity(){if(wallet){$('#connect').textContent=short(wallet);$('#walletAddr').textContent=wallet;$('#walletState').textContent='CONNECTED';$('#walletState').className='good'}else{$('#connect').textContent='Connect Wallet';$('#walletAddr').textContent='WALLET NOT CONNECTED';$('#walletState').textContent='READ ONLY';$('#walletState').className='muted'}}
-$('#connect').onclick=connectWallet;$('#refreshWallet').onclick=()=>wallet?refreshWallet():connectWallet();
-if(window.ethereum){window.ethereum.on?.('accountsChanged',a=>{wallet=a[0]||null;renderWalletIdentity();if(wallet)refreshWallet();else clearWallet()});window.ethereum.on?.('chainChanged',()=>wallet&&refreshWallet())}
-function clearWallet(){$('#ethBalance').textContent='—';$('#portfolioValue').textContent='—';$('#tokenCount').textContent='0';$('#assetMini').innerHTML='<div class="empty">Connect a wallet to inspect its token balances.</div>'}
-async function refreshWallet(){if(!wallet)return;$('#refreshWallet').disabled=true;$('#assetMini').innerHTML='<div class="loading">READING WALLET STATE…</div>';try{const d=await api('/api/wallet/'+wallet);$('#ethBalance').textContent=`${num(d.eth)} ETH`;$('#portfolioValue').textContent=`${num(d.eth)} ETH`;$('#tokenCount').textContent=d.tokens.length;$('#scannedCount').textContent=d.tokenScanCount;renderTokenBalances(d.tokens);await updatePortfolioUsd(d.tokens)}catch(e){$('#assetMini').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`;toast(e.message,false)}finally{$('#refreshWallet').disabled=false}}
-function renderTokenBalances(tokens){if(!tokens.length){$('#assetMini').innerHTML='<div class="empty">No non-zero known token balances found.</div>';return}$('#assetMini').innerHTML=`<div class="balance-table">${tokens.map(t=>`<button class="balance-row" data-token="${esc(t.address)}"><span><b>${esc(t.symbol)}</b><small>${esc(t.name||'')}</small></span><strong>${num(t.balance)}</strong></button>`).join('')}</div>`;$$('.balance-row').forEach(b=>b.onclick=()=>scanAddress(b.dataset.token))}
-async function updatePortfolioUsd(tokens){let total=0;for(const t of tokens.filter(x=>x.kind==='STOCK').slice(0,20)){try{const d=await api('/api/stock/prices/'+encodeURIComponent(t.symbol));const q=(d.quotes||[])[0]||d;const px=Number(q.ask||q.bid||0);total+=Number(t.balance)*px*Number(t.multiplier||1)}catch{}}if(total>0)$('#portfolioUsd').textContent=money(total);else $('#portfolioUsd').textContent='—'}
-
-// Stock terminal
-async function loadAssets(){try{const d=await api('/api/stock/assets');assets=(d.assets||[]).filter(a=>(a.deployments||[]).some(x=>Number(x.chainId)===CHAIN_ID));$('#stockCount').textContent=assets.length;renderStockList(filterAssets());renderTicker();if(assets[0])showStock(assets[0]);}catch(e){$('#stockList').innerHTML=`<div class="empty bad-text">Stock Token registry unavailable.<br>${esc(e.message)}</div>`}}
-function filterAssets(){const q=$('#stockSearch').value.trim().toLowerCase();return assets.filter(a=>!q||String(a.tokenSymbol||'').toLowerCase().includes(q)||String(a.tokenName||'').toLowerCase().includes(q)).slice(0,160)}
-function renderTicker(){const list=assets.slice(0,50);$('#ticker').innerHTML=list.concat(list).map(a=>`<span>${esc(a.tokenSymbol||'TOKEN')} <i>◆</i> ${esc(a.tokenName||'')}</span>`).join('')||'NO STOCK TOKENS RETURNED'}
-function renderStockList(list){if(!list.length){$('#stockList').innerHTML='<div class="empty">NO MATCHING STOCK TOKENS.</div>';return}$('#stockList').innerHTML=list.map(a=>`<button class="stock-row ${selectedAsset?.tokenSymbol===a.tokenSymbol?'active':''}" data-symbol="${esc(a.tokenSymbol)}"><span class="coin">${esc((a.tokenSymbol||'??').slice(0,2))}</span><span><b>${esc(a.tokenSymbol)}</b><small>${esc(a.tokenName||'')}</small></span><strong>${a.status==='ASSET_STATUS_ACTIVE'?'ACTIVE':'—'}</strong></button>`).join('');$$('.stock-row').forEach(b=>b.onclick=()=>showStock(assets.find(a=>a.tokenSymbol===b.dataset.symbol)))}
-async function showStock(a){if(!a)return;selectedAsset=a;renderStockList(filterAssets());$('#stockDetail').innerHTML='<div class="loading">FETCHING LIVE QUOTE…</div>';try{const d=await api('/api/stock/prices/'+encodeURIComponent(a.tokenSymbol));const q=(d.quotes||[])[0]||d;selectedQuote=q;const dep=(a.deployments||[]).find(x=>Number(x.chainId)===CHAIN_ID);$('#stockDetail').innerHTML=`<div class="detail-top"><div><div class="eyebrow">STOCK TOKEN // LIVE API</div><h3>${esc(a.tokenSymbol)} <small>${esc(a.tokenName||'')}</small></h3></div><span class="tag ${q.isTradingHalt?'halt':''}">${q.isTradingHalt?'TRADING HALT':'QUOTE LIVE'}</span></div><div class="quote">${money(q.ask||q.bid)}</div><div class="quote-pair"><div><span>BID</span><b>${money(q.bid)}</b></div><div><span>ASK</span><b>${money(q.ask)}</b></div><div><span>DAILY VOLUME</span><b>${q.dailyTradingVolume?Number(q.dailyTradingVolume).toLocaleString():'—'}</b></div></div><div class="detail-grid"><div><span>MULTIPLIER</span><b>${esc(a.currentMultiplier||'—')}</b></div><div><span>STATUS</span><b>${esc(a.status||'—')}</b></div><div><span>CONTRACT</span><b>${dep?.contractAddress?short(dep.contractAddress):'—'}</b></div><div><span>GENERATED</span><b>${q.generatedAt?new Date(q.generatedAt).toLocaleTimeString():'—'}</b></div></div><div class="action-row">${dep?.contractAddress?`<button class="btn" id="stockScan">Inspect Contract</button><button class="btn" id="stockCopy">Copy Contract</button><a class="btn" target="_blank" rel="noopener" href="${EXPLORER}/address/${encodeURIComponent(dep.contractAddress)}">Blockscout ↗</a>`:''}</div>`;$('#stockScan')?.addEventListener('click',()=>scanAddress(dep.contractAddress));$('#stockCopy')?.addEventListener('click',()=>copy(dep.contractAddress))}catch(e){$('#stockDetail').innerHTML=`<div class="empty bad-text">Quote unavailable.<br>${esc(e.message)}</div>`}}
-$('#stockSearch').oninput=()=>renderStockList(filterAssets());$('#clearStock').onclick=()=>{$('#stockSearch').value='';renderStockList(filterAssets())};$('#refreshStocks').onclick=loadAssets;loadAssets();
-
-// scanner + watchlist
-async function scanAddress(address){scrollToId('scanner');$('#scanInput').value=address;setTimeout(scan,100)}
-async function scan(){const address=$('#scanInput').value.trim();if(!address)return toast('Enter an EVM address.',false);$('#scanResult').innerHTML='<div class="loading">SCANNING ROBINHOOD CHAIN…</div>';try{const d=await api('/api/address/'+encodeURIComponent(address));$('#scanResult').innerHTML=`<div class="eyebrow">READ-ONLY TECHNICAL INSPECTION</div><div class="risk ${d.type==='CONTRACT'?'warn':''}">${d.type==='CONTRACT'?'SMART CONTRACT':'EOA / WALLET'}</div><div class="scan-grid">${[['TYPE',d.type],['ETH BALANCE',`${num(d.ethBalance)} ETH`],['NONCE',d.nonce],['BYTECODE',`${d.bytecodeBytes} bytes`],['ADDRESS',short(d.address)],['CHAIN',CHAIN_ID]].map(x=>`<div><span>${x[0]}</span><b>${esc(x[1])}</b></div>`).join('')}</div><div class="action-row"><a class="btn" target="_blank" rel="noopener" href="${d.explorer}">Open Blockscout ↗</a><button class="btn" id="addWatch">＋ Add Watchlist</button>${d.type==='CONTRACT'?'<button class="btn" id="tokenInspect">ERC-20 Read</button>':''}<button class="btn" id="copyScan">Copy Address</button></div><div id="tokenReadout"></div>`;$('#addWatch').onclick=()=>addWatch(address);$('#copyScan').onclick=()=>copy(address);$('#tokenInspect')?.addEventListener('click',()=>inspectToken(address))}catch(e){$('#scanResult').innerHTML=`<div class="empty bad-text">SCAN FAILED<br>${esc(e.message)}</div>`}}
-$('#scan').onclick=scan;$('#scanInput').onkeydown=e=>e.key==='Enter'&&scan();$('#paste').onclick=async()=>{try{$('#scanInput').value=await navigator.clipboard.readText();toast('Address pasted.')}catch{toast('Clipboard permission unavailable.',false)}};
-async function inspectToken(address){$('#tokenReadout').innerHTML='<div class="loading">READING ERC-20 INTERFACE…</div>';try{const d=await api('/api/token/'+address);$('#tokenReadout').innerHTML=`<div class="token-readout"><div><span>NAME</span><b>${esc(d.name||'—')}</b></div><div><span>SYMBOL</span><b>${esc(d.symbol||'—')}</b></div><div><span>DECIMALS</span><b>${esc(d.decimals??'—')}</b></div><div><span>TOTAL SUPPLY</span><b>${esc(d.totalSupply||'—')}</b></div></div>`}catch(e){$('#tokenReadout').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`}}
-async function addWatch(address){try{await api('/api/watchlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({address,label:'Scanner watch'})});toast('Address added to watchlist.');loadWatchlist()}catch(e){toast(e.message,false)}}
-async function loadWatchlist(){try{const rows=await api('/api/watchlist');$('#watchlist').innerHTML=rows.length?rows.map(r=>`<div class="watch-row"><a href="#scanner" data-watch="${r.address}">${short(r.address)}</a><span>${esc(r.label||'')}</span><button class="icon-btn remove-watch" data-address="${r.address}">×</button></div>`).join(''):'<div class="empty">Watchlist is empty.</div>';$$('[data-watch]').forEach(x=>x.onclick=()=>scanAddress(x.dataset.watch));$$('.remove-watch').forEach(x=>x.onclick=async()=>{await api('/api/watchlist/'+x.dataset.address,{method:'DELETE'});loadWatchlist()})}catch(e){$('#watchlist').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`}}
-$('#refreshWatchlist').onclick=loadWatchlist;loadWatchlist();
-
-// bridge
-async function loadBridge(){try{const d=await api('/api/bridge-info');$('#bridgeGrid').innerHTML=d.routes.map(r=>`<article class="card feature"><span class="tag">${esc(r.kind)}</span><h3>${esc(r.name)}</h3><div class="speed">${esc(r.bestFor)}</div><p>${esc(r.details)}</p><button class="btn small" data-doc="${esc(r.docs)}">Read official docs ↗</button></article>`).join('')+`<div class="notice full">${esc(d.note)}</div>`;$$('[data-doc]').forEach(b=>b.onclick=()=>openExternal(b.dataset.doc))}catch(e){$('#bridgeGrid').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`}}
-$('#refreshBridge').onclick=loadBridge;loadBridge();
-
-// projects
-async function loadProjects(){try{const rows=await api('/api/projects');$('#projects').innerHTML=rows.length?rows.map((p,i)=>`<article class="card project"><div class="project-no">${String(i+1).padStart(2,'0')}</div><span class="tag">${esc(p.category)}</span><h3>${esc(p.name)}</h3><p>${esc(p.description)}</p>${p.contract?`<button class="link-btn" data-contract="${esc(p.contract)}">${short(p.contract)} ↗</button>`:''}${p.website?`<button class="btn small" data-site="${esc(p.website)}">Visit project ↗</button>`:''}</article>`).join(''):'<div class="empty">NO APPROVED PROJECTS YET.</div>';$$('[data-contract]').forEach(b=>b.onclick=()=>scanAddress(b.dataset.contract));$$('[data-site]').forEach(b=>b.onclick=()=>openExternal(b.dataset.site))}catch(e){$('#projects').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`}}
-$('#refreshProjects').onclick=loadProjects;loadProjects();
-
-// project modal
-const modal=$('#modal');function openModal(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');$('#projectName').focus()}function closeModal(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}
-$('#submitBtn').onclick=openModal;$('#close').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};document.addEventListener('keydown',e=>e.key==='Escape'&&closeModal());
-$('#projectForm').onsubmit=async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;try{const body=Object.fromEntries(new FormData(e.target));await api('/api/projects',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});e.target.reset();closeModal();toast('Submitted. Your project is pending admin review.')}catch(err){toast(err.message,false)}finally{btn.disabled=false}};
-
-// admin panel in same page
-$('#adminToggle').onclick=()=>{const p=$('#adminPanel');p.classList.toggle('show');if(p.classList.contains('show'))loadAdmin()};
-async function loadAdmin(){const key=$('#adminKey').value.trim();if(!key){$('#adminRows').innerHTML='<div class="empty">Enter ADMIN_KEY to load pending submissions.</div>';return}try{const rows=await api('/api/projects?status=all',{headers:{'x-admin-key':key}});const pending=rows.filter(r=>r.status==='pending');$('#adminRows').innerHTML=pending.length?pending.map(r=>`<div class="admin-row"><div><b>${esc(r.name)}</b><small>${esc(r.category)} · ${esc(r.description)}</small></div><div class="action-row"><button class="btn approve" data-approve="${r.id}">Approve</button><button class="btn reject" data-reject="${r.id}">Reject</button></div></div>`).join(''):'<div class="empty">No pending submissions.</div>';$$('[data-approve]').forEach(b=>b.onclick=()=>adminAction(b.dataset.approve,'approve'));$$('[data-reject]').forEach(b=>b.onclick=()=>adminAction(b.dataset.reject,'reject'))}catch(e){$('#adminRows').innerHTML=`<div class="empty bad-text">${esc(e.message)}</div>`}}
-async function adminAction(id,action){try{await api(`/api/projects/${id}/${action}`,{method:'POST',headers:{'x-admin-key':$('#adminKey').value.trim()}});toast(`Project ${action}d.`);loadAdmin();loadProjects()}catch(e){toast(e.message,false)}}
-$('#adminLoad').onclick=loadAdmin;
-
-// resources
-async function loadResources(){try{const d=await api('/api/docs');$('#resourceLinks').innerHTML=d.links.map(x=>`<button class="resource-link" data-resource="${esc(x.url)}"><span>${esc(x.label)}</span><b>↗</b></button>`).join('')}catch(e){$('#resourceLinks').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-loadResources();
-
-// boot
-$('#boot').innerHTML=['BOOT // Robinhood Chain Copilot','RPC // public mainnet endpoint','CHAIN // 4663 verified','DATA // Stock Token API','WALLET // read-only until connected','MODE // non-custodial intelligence','READY // terminal online'].map(x=>`<p>> ${x}</p>`).join('');
-renderWalletIdentity();
+(() => {
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const API=(p,o={})=>fetch(p,o).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||`Request failed (${r.status})`);return d});
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function toast(msg,ok=true){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.textContent=msg;t.className='toast '+(ok?'ok':'bad');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.remove(),3200)}
+  function nav(path){history.pushState({},'',path); route(); window.scrollTo({top:0,behavior:'smooth'});}
+  const routes={
+    '/dashboard.html': ['Dashboard','Your connected-wallet command center.'],
+    '/stock-token-terminal.html':['Stock Token Terminal','Explore official Robinhood Chain Stock Token data.'],
+    '/defi-opportunities.html':['DeFi Opportunities','Verified on-chain opportunities without fabricated APYs.'],
+    '/bridge-intelligence.html':['Bridge Intelligence','Understand routes into and out of Robinhood Chain.'],
+    '/contract-intelligence.html':['Contract Intelligence','Inspect an address and its technical surface.'],
+    '/discover-projects.html':['Discover Projects','Explore approved ecosystem projects and submit your own.'],
+    '/watchlist.html':['Watchlist','Your saved assets, contracts and projects.'],
+    '/developer.html':['Developer','Network endpoints, APIs and integration references.'],
+    '/about.html':['About','Independent infrastructure and intelligence for Robinhood Chain.']
+  };
+  function shell(title,sub,body){
+    document.title=`${title} — Robinhood Chain Copilot`;
+    return `<div class="sitebar"><a class="brand" href="/">RH<span>COPILOT</span></a><button class="menu-btn" id="menuBtn">☰</button><div class="wallet-slot"><button class="wallet-btn" data-wallet>Connect Wallet</button></div></div>
+    <div class="drawer" id="drawer"><div class="drawer-head">NAVIGATION <button id="closeMenu">×</button></div>${Object.entries(routes).map(([p,v])=>`<a href="${p}" data-nav>${v[0]}</a>`).join('')}<a href="/" data-nav>Home</a></div>
+    <main class="page"><div class="page-head"><div><div class="eyebrow">RH / INTELLIGENCE</div><h1>${title}</h1><p>${sub}</p></div><button class="wallet-btn compact" data-wallet>Connect Wallet</button></div>${body}</main><div id="toast"></div>`;
+  }
+  function home(){
+    document.title='Robinhood Chain Copilot';
+    return `<div class="hero"><nav class="home-nav"><a class="brand" href="/">RH<span>COPILOT</span></a><div class="navlinks"><a href="/dashboard.html">Dashboard</a><a href="/stock-token-terminal.html">Terminal</a><a href="/discover-projects.html">Discover</a></div><button class="wallet-btn home-wallet" data-wallet>Connect Wallet</button></nav>
+    <section class="hero-copy"><div class="eyebrow">INDEPENDENT / ROBINHOOD CHAIN</div><h1>KNOW YOUR<br><span>ONCHAIN OPTIONS.</span></h1><p>One intelligence layer for your Robinhood Chain assets, Stock Tokens, contracts, bridges and ecosystem projects.</p><div class="hero-actions"><button class="primary" data-wallet>Connect Wallet</button><a class="secondary" href="/dashboard.html">Open Dashboard →</a></div></section>
+    <section class="feature-grid">${[['01','PORTFOLIO','See what your wallet holds and where it can go.','/dashboard.html'],['02','STOCK TOKENS','Research official Stock Token data and contracts.','/stock-token-terminal.html'],['03','CONTRACT INTELLIGENCE','Inspect technical signals before interacting.','/contract-intelligence.html'],['04','BRIDGE INTELLIGENCE','Understand supported routes and trade-offs.','/bridge-intelligence.html'],['05','DISCOVER','Find approved projects and submit yours.','/discover-projects.html'],['06','DEVELOPER','Build with Robinhood Chain infrastructure.','/developer.html']].map(x=>`<a class="feature" href="${x[3]}"><b>${x[0]}</b><h3>${x[1]}</h3><p>${x[2]}</p><span>OPEN →</span></a>`).join('')}</section>
+    <footer><span>RH COPILOT</span><span>Independent platform · Not affiliated with Robinhood</span></footer></div>`;
+  }
+  async function dashboard(){
+    let wallet=RHWallet.address;
+    let health={}; try{health=await API('/api/health')}catch(e){}
+    let balance='—'; if(wallet){try{const d=await API('/api/wallet/'+wallet);balance=d.nativeBalance||'0 ETH'}catch(e){balance='Unavailable'}}
+    return shell('Dashboard','Your connected wallet, network state and asset overview.',`<div class="stats"><div><small>WALLET</small><strong data-wallet-status>${wallet?RHWallet.short(wallet):'Not connected'}</strong></div><div><small>NATIVE BALANCE</small><strong>${esc(balance)}</strong></div><div><small>NETWORK</small><strong>${health.ok?'ONLINE':'CHECKING'}</strong></div><div><small>CHAIN</small><strong>4663</strong></div></div><div class="panel"><h2>Wallet Command Center</h2><p>Connect your wallet on Home or here. Once connected, the same wallet session is available throughout every section of Copilot.</p><div class="actions"><button class="primary" data-wallet>${wallet?'Disconnect Wallet':'Connect Wallet'}</button>${wallet?`<button class="secondary" id="switchChain">Switch to Robinhood Chain</button>`:''}</div></div>`);
+  }
+  async function terminal(){
+    let d; try{d=await API('/api/stock/assets')}catch(e){return shell('Stock Token Terminal','Live official registry unavailable right now.',`<div class="panel error">${esc(e.message)}</div>`)}
+    const list=(d.assets||d||[]).slice(0,100);
+    return shell('Stock Token Terminal','Search official Robinhood Chain Stock Token registry and live quotes.',`<div class="toolbar"><input id="tokenSearch" placeholder="Search symbol or name…"><button class="secondary" id="refreshTokens">Refresh</button></div><div class="token-grid" id="tokenGrid">${list.map(a=>`<button class="token-card" data-symbol="${esc(a.symbol||a.ticker||'')}"><strong>${esc(a.symbol||a.ticker||'—')}</strong><span>${esc(a.name||'Stock Token')}</span><small>${esc(a.address||a.contract_address||'Contract unavailable')}</small></button>`).join('')}</div><div class="panel" id="quotePanel"><h2>Select a token</h2><p>Live quote details appear here.</p></div>`);
+  }
+  async function tokenEvents(){
+    $('#tokenSearch')?.addEventListener('input',e=>$$('.token-card').forEach(c=>c.style.display=c.textContent.toLowerCase().includes(e.target.value.toLowerCase())?'':'none'));
+    async function quote(sym){const p=$('#quotePanel');p.innerHTML='<h2>Loading quote…</h2>';try{const d=await API('/api/stock/prices/'+encodeURIComponent(sym));p.innerHTML=`<h2>${esc(sym)}</h2><div class="stats mini"><div><small>BID</small><strong>${esc(d.bid??'—')}</strong></div><div><small>ASK</small><strong>${esc(d.ask??'—')}</strong></div><div><small>PRICE</small><strong>${esc(d.price??d.last??'—')}</strong></div></div>`}catch(e){p.innerHTML=`<div class="error">${esc(e.message)}</div>`}}
+    $$('.token-card').forEach(c=>c.onclick=()=>quote(c.dataset.symbol));
+    $('#refreshTokens')?.addEventListener('click',()=>route());
+  }
+  function simplePage(title,sub,content){return shell(title,sub,content)}
+  async function route(){
+    const path=location.pathname;
+    let out;
+    if(path==='/'||path==='/index.html') out=home();
+    else if(path==='/dashboard.html') out=await dashboard();
+    else if(path==='/stock-token-terminal.html') out=await terminal();
+    else if(path==='/defi-opportunities.html') out=simplePage('DeFi Opportunities','Verified integrations only.',`<div class="panel"><h2>Opportunity Engine</h2><p>Copilot will surface lending, collateral, liquidity and swap opportunities from verified integrations as live adapters are enabled. No fabricated APYs or execution quotes are shown.</p><div class="notice">Research mode active · Execution adapters require verified integrations.</div></div>`);
+    else if(path==='/bridge-intelligence.html') out=simplePage('Bridge Intelligence','Supported bridge paths and what to verify before moving assets.',`<div class="cards"><div class="panel"><h3>Arbitrum Canonical Bridge</h3><p>Canonical L2 bridge route. Check current status, fees and withdrawal timing before use.</p><a href="https://bridge.arbitrum.io" target="_blank" rel="noopener">Open bridge →</a></div><div class="panel"><h3>LayerZero / Stargate</h3><p>Interoperability route. Availability and supported assets can change.</p><a href="https://stargate.finance" target="_blank" rel="noopener">Open Stargate →</a></div><div class="panel"><h3>Chainlink CCIP</h3><p>Cross-chain infrastructure route where supported.</p><a href="https://ccip.chain.link" target="_blank" rel="noopener">Open CCIP →</a></div></div>`);
+    else if(path==='/contract-intelligence.html') out=simplePage('Contract Intelligence','Scan an EVM address for technical information.',`<div class="toolbar"><input id="addressInput" placeholder="0x…"><button class="primary" id="scanAddress">Scan</button></div><div class="panel" id="scanResult"><p>Enter an address to begin.</p></div>`);
+    else if(path==='/discover-projects.html') out=simplePage('Discover Projects','Approved ecosystem projects and project submission.',`<div class="panel"><h2>Project Submission</h2><form id="projectForm"><input name="name" placeholder="Project name" required><input name="url" placeholder="Website URL" required><input name="description" placeholder="Short description" required><button class="primary">Submit for Review</button></form></div><div class="panel"><h2>Directory</h2><div id="projects">Loading approved projects…</div></div>`);
+    else if(path==='/watchlist.html') out=simplePage('Watchlist','Saved items for this browser.',`<div class="panel"><div id="watchlist">Loading…</div></div>`);
+    else if(path==='/developer.html') out=simplePage('Developer','Core network and integration references.',`<div class="stats"><div><small>CHAIN ID</small><strong>4663</strong></div><div><small>NATIVE GAS</small><strong>ETH</strong></div><div><small>RPC</small><strong>MAINNET</strong></div></div><div class="panel"><h2>Robinhood Chain</h2><p>RPC: <code>https://rpc.mainnet.chain.robinhood.com</code></p><p>Explorer: <a href="https://robinhoodchain.blockscout.com" target="_blank">Blockscout</a></p><p>Stock Token APIs are proxied through Copilot server routes.</p></div>`);
+    else if(path==='/about.html') out=simplePage('About','Independent infrastructure and intelligence for Robinhood Chain.',`<div class="panel"><h2>What is Copilot?</h2><p>An independent interface for understanding on-chain assets and opportunities across Robinhood Chain.</p><p class="notice">RH Copilot is not Robinhood, is not endorsed by Robinhood, and does not provide investment advice.</p></div>`);
+    else out=home();
+    document.getElementById('app').innerHTML=out;
+    bindCommon();
+    if(path==='/stock-token-terminal.html') tokenEvents();
+    if(path==='/contract-intelligence.html') bindScanner();
+    if(path==='/discover-projects.html') bindProjects();
+    if(path==='/watchlist.html') bindWatchlist();
+    if(path==='/dashboard.html') $('#switchChain')?.addEventListener('click',()=>RHWallet.switchNetwork().catch(e=>toast(e.message,false)));
+  }
+  function bindCommon(){
+    $$('[data-nav]').forEach(a=>a.onclick=e=>{e.preventDefault();nav(a.getAttribute('href'))});
+    $('#menuBtn')?.addEventListener('click',()=>$('#drawer').classList.add('open'));
+    $('#closeMenu')?.addEventListener('click',()=>$('#drawer').classList.remove('open'));
+    RHWallet.render();
+  }
+  function bindScanner(){
+    $('#scanAddress')?.addEventListener('click',async()=>{const a=$('#addressInput').value.trim(),r=$('#scanResult');if(!/^0x[a-fA-F0-9]{40}$/.test(a)){r.innerHTML='<div class="error">Enter a valid EVM address.</div>';return}r.innerHTML='<p>Scanning…</p>';try{const d=await API('/api/address/'+a);r.innerHTML=`<h2>${esc(a.slice(0,10)+'…'+a.slice(-8))}</h2><pre>${esc(JSON.stringify(d,null,2))}</pre>`}catch(e){r.innerHTML=`<div class="error">${esc(e.message)}</div>`}});
+  }
+  async function bindProjects(){
+    const list=$('#projects');try{const d=await API('/api/projects');const ps=d.projects||d||[];list.innerHTML=ps.length?ps.map(p=>`<div class="list-row"><strong>${esc(p.name)}</strong><span>${esc(p.description||'')}</span><a href="${esc(p.url)}" target="_blank" rel="noopener">Visit →</a></div>`).join(''):'No approved projects yet.'}catch(e){list.textContent=e.message}
+    $('#projectForm')?.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.target);const payload=Object.fromEntries(fd.entries());try{await API('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});toast('Project submitted for review.');e.target.reset()}catch(err){toast(err.message,false)}});
+  }
+  function bindWatchlist(){const k='rh_watchlist';const load=()=>{const a=JSON.parse(localStorage.getItem(k)||'[]');$('#watchlist').innerHTML=a.length?a.map((x,i)=>`<div class="list-row"><span>${esc(x)}</span><button data-del="${i}">Remove</button></div>`).join(''):'Your watchlist is empty.'};load();$('#watchlist').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;let a=JSON.parse(localStorage.getItem(k)||'[]');a.splice(+b.dataset.del,1);localStorage.setItem(k,JSON.stringify(a));load()}}
+  RHWallet.on(()=>{document.querySelectorAll('[data-wallet-status]').forEach(e=>e.textContent=RHWallet.address?RHWallet.short(RHWallet.address):'Not connected')});
+  window.addEventListener('popstate',route);
+  window.addEventListener('load',route);
+})();
