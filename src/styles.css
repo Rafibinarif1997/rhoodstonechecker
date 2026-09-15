@@ -753,3 +753,78 @@ footer p {
     font-size: 32px;
   }
 }
+
+.holder-status-card {
+  position: absolute;
+  top: 82px;
+  right: 36px;
+  width: 270px;
+  padding: 16px;
+  background: rgba(12, 12, 12, 0.96);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  z-index: 20;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.holder-status-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #888;
+}
+
+.holder-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d7ff45;
+  box-shadow: 0 0 10px rgba(215, 255, 69, 0.7);
+}
+
+.holder-wallet {
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  color: #fff;
+}
+
+.holder-status-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.holder-status-result .status-symbol {
+  font-size: 22px;
+  color: #d7ff45;
+}
+
+.holder-status-result strong {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.holder-status-result small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .holder-status-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: auto;
+    margin: 12px 0 0;
+  }
+}
