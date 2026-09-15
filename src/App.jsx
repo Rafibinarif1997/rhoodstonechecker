@@ -152,7 +152,9 @@ function App() {
               className="connect-button mobile-wallet-button"
               onClick={handleMobileWalletClick}
             >
-              {isConnected ? walletLabel() : "Connect Wallet"}
+              {isConnected && address
+  ? `Connected · ${address.slice(0, 6)}...${address.slice(-4)}`
+  : "Connect Wallet"}
             </button>
           </nav>
 
