@@ -1,7 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+
+ const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
+
+useEffect(() => {
+  async function testSupabase() {
+    const { data, error } = await supabase
+      .from("holder_tiers")
+      .select("name")
+      .limit(1);
+
+    if (error) {
+      console.error("Supabase error:", error);
+      setSupabaseStatus("Connection failed");
+      return;
+    }
+
+    console.log("Supabase connected:", data);
+    setSupabaseStatus("Connected");
+  }
+
+  testSupabase();
+}, []);
 
   return (
     <div className="app">
