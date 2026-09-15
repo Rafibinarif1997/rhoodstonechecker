@@ -26,6 +26,22 @@ useEffect(() => {
   testSupabase();
 }, []);
 
+  if (supabaseStatus === "Checking...") {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      display: "grid",
+      placeItems: "center",
+      background: "#090909",
+      color: "#d7ff45",
+      fontFamily: "Arial, sans-serif",
+      fontSize: "18px"
+    }}>
+      Checking Supabase...
+    </div>
+  );
+}
+  
   return (
     <div className="app">
       <header className="navbar">
