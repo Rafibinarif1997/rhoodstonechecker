@@ -5,6 +5,7 @@ import {
   useDisconnect,
 } from "@reown/appkit/react";
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
+import { getHolderTier } from "./lib/holderTier";
 
 function Dashboard() {
   const { open } = useAppKit();
@@ -13,6 +14,7 @@ function Dashboard() {
 
   const [holderStatus, setHolderStatus] = useState("idle");
   const [nftBalance, setNftBalance] = useState(0);
+  const [holderTier, setHolderTier] = useState(null);
 
   useEffect(() => {
     async function verifyHolder() {
@@ -24,6 +26,21 @@ function Dashboard() {
 
       try {
         setHolderStatus("checking");
+
+        useEffect(() => {
+  async function loadHolderTier() {
+    if (!isConnected || !address) {
+      setHolderTier(null);
+      return;
+    }
+
+    const tier = await getHolderTier(0, 0);
+
+    setHolderTier(tier);
+  }
+
+  loadHolderTier();
+}, [isConnected, address]);
 
         const balance = await checkRhoodStoneHolder(address);
 
