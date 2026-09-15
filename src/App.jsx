@@ -3,6 +3,8 @@ import { supabase } from "./lib/supabase";
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+const [walletConnecting, setWalletConnecting] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
   useEffect(() => {
