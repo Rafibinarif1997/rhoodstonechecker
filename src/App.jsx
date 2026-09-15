@@ -133,13 +133,11 @@ const [walletConnecting, setWalletConnecting] = useState(false);
     ? "Disconnect"
     : "Connect Wallet"}
             
-  function disconnectWallet() {
+</button>
+          function disconnectWallet() {
   setWalletAddress("");
 }
-</button>
           
-
-          <button
             className="mobile-menu"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
