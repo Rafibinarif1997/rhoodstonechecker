@@ -1,10 +1,5 @@
-# RhoodStone — Page 1
+RhoodStone Page 1 — Holder Gate
 
-This package contains only the finished landing / holder verification gate.
-
-Structure:
-- index.html
-- assets/styles.css
-- assets/app.js
-
-The page uses Robinhood Chain 4663, the RhoodStone contract, and an EIP-1193 injected-wallet flow. Mobile Chrome without an injected provider should use the Open in Wallet button.
+Upload index.html and the assets/ folder to the repository root.
+Landing page only. It uses Robinhood Chain 4663 and the RhoodStone contract configured in assets/app.js.
+For normal mobile Chrome, use OPEN IN WALLET because Chrome itself does not inject an EVM wallet provider.
