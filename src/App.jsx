@@ -197,7 +197,63 @@ const [nftBalance, setNftBalance] = useState(0);
           >
             {walletLabel()}
           </button>
+{isConnected && (
+  <div className="holder-status-card">
+    <div className="holder-status-top">
+      <span className="holder-status-dot"></span>
+      <span>
+        {holderStatus === "checking"
+          ? "VERIFYING OWNERSHIP"
+          : "WALLET CONNECTED"}
+      </span>
+    </div>
 
+    <div className="holder-wallet">
+      {address
+        ? `${address.slice(0, 6)}...${address.slice(-4)}`
+        : ""}
+    </div>
+
+    <div className="holder-status-result">
+      {holderStatus === "checking" && (
+        <>
+          <span className="status-symbol">◌</span>
+          <span>Checking RhoodStone ownership...</span>
+        </>
+      )}
+
+      {holderStatus === "holder" && (
+        <>
+          <span className="status-symbol">✓</span>
+          <div>
+            <strong>RHOODSTONE HOLDER</strong>
+            <small>{nftBalance} NFT VERIFIED</small>
+          </div>
+        </>
+      )}
+
+      {holderStatus === "not-holder" && (
+        <>
+          <span className="status-symbol">×</span>
+          <div>
+            <strong>NOT A HOLDER</strong>
+            <small>No RhoodStone NFT detected</small>
+          </div>
+        </>
+      )}
+
+      {holderStatus === "error" && (
+        <>
+          <span className="status-symbol">!</span>
+          <div>
+            <strong>VERIFICATION FAILED</strong>
+            <small>Please try again</small>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
           {/* Mobile Menu Button */}
           <button
             className="mobile-menu"
