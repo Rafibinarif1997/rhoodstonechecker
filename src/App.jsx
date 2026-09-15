@@ -133,6 +133,9 @@ const [walletConnecting, setWalletConnecting] = useState(false);
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
     : "Connect Wallet"}
 </button>
+          function disconnectWallet() {
+  setWalletAddress("");
+}
 
           <button
             className="mobile-menu"
