@@ -8,6 +8,10 @@ function App() {
 
 useEffect(() => {
   async function testSupabase() {
+    if (!supabase) {
+  setSupabaseStatus("Supabase variables missing");
+  return;
+}
     const { data, error } = await supabase
       .from("holder_tiers")
       .select("name")
