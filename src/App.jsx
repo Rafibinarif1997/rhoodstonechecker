@@ -39,17 +39,17 @@ function App() {
     testSupabase();
   }, []);
 
-  function handleMobileWalletClick() {
-  if (isConnected) {
-    disconnect();
-  } else {
-    open({ view: "Connect" });
+  function handleWalletClick() {
+    if (isConnected) {
+      disconnect();
+    } else {
+      open({ view: "Connect" });
+    }
   }
-}
 
+  // Mobile menu stays open so the connection status
+  // updates immediately inside the menu.
   function handleMobileWalletClick() {
-    setMenuOpen(false);
-
     if (isConnected) {
       disconnect();
     } else {
@@ -63,6 +63,14 @@ function App() {
     }
 
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
+
+  function mobileWalletLabel() {
+    if (!isConnected || !address) {
+      return "Connect Wallet";
+    }
+
+    return `Connected · ${address.slice(0, 6)}...${address.slice(-4)}`;
   }
 
   if (supabaseStatus === "Checking...") {
@@ -152,9 +160,7 @@ function App() {
               className="connect-button mobile-wallet-button"
               onClick={handleMobileWalletClick}
             >
-              {isConnected && address
-  ? `Connected · ${address.slice(0, 6)}...${address.slice(-4)}`
-  : "Connect Wallet"}
+              {mobileWalletLabel()}
             </button>
           </nav>
 
