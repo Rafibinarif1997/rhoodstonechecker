@@ -45,7 +45,7 @@ const ERC721_ABI = [
 
 export async function checkRhoodStoneHolder(walletAddress) {
   if (!walletAddress) {
-    return false;
+    return 0;
   }
 
   const balance = await rhoodstoneClient.readContract({
@@ -55,5 +55,5 @@ export async function checkRhoodStoneHolder(walletAddress) {
     args: [walletAddress],
   });
 
-  return balance > 0n;
+  return Number(balance);
 }
