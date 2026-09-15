@@ -1,11 +1,12 @@
 import React,{useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {BrowserRouter,useNavigate,useLocation,Routes,Route,Link} from 'react-router-dom';
+import {HashRouter,useNavigate,useLocation,Routes,Route,Link} from 'react-router-dom';
 import {supabase} from './supabase';
-import {connectAndVerify,verifyConnectedWallet,shortAddress,getBalanceOf,CONTRACT} from './chain';
+import {connectAndVerify,verifyConnectedWallet,shortAddress,CONTRACT} from './chain';
+import { OPENSEA_URL as CONFIG_OPENSEA } from './config';
 import './styles.css';
 
-const OPENSEA=import.meta.env.VITE_OPENSEA_URL||'https://opensea.io/';
+const OPENSEA=CONFIG_OPENSEA;
 const ADMIN_EMAIL=import.meta.env.VITE_ADMIN_EMAIL||'';
 
 function Modal({title,text,children,onClose}){return <div className="modal"><div className="modalBox"><h2>{title}</h2><p className="muted">{text}</p>{children||<button className="btn primary" onClick={onClose}>Close</button>}</div></div>}
@@ -90,4 +91,4 @@ function App(){
  const disconnect=()=>{clearWallet();setWallet(null);location.href='/'};
  return <Routes><Route path="/" element={<Home setWallet={setWallet}/>}/><Route path="/dashboard" element={<Protected setWallet={setWallet}><Dashboard wallet={wallet}/></Protected>}/><Route path="/submit" element={<Protected setWallet={setWallet}><SubmitProject wallet={wallet}/></Protected>}/><Route path="/admin" element={<Admin/>}/><Route path="*" element={<Home setWallet={setWallet}/>}/></Routes>
 }
-createRoot(document.getElementById('root')).render(<BrowserRouter><App/></BrowserRouter>);
+createRoot(document.getElementById('root')).render(<HashRouter><App/></HashRouter>);
