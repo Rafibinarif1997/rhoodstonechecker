@@ -1,15 +1,27 @@
-# RhoodStone Holder Portal — Multipage
+# RhoodStone Holder Portal
 
-Clean URL architecture. Each section is a real page using folder-based `index.html`, so URLs contain no `.html`:
-- `/`
+## Structure
+- `/` — wallet verification gate only
+- `/portal/` — private holder dashboard
 - `/benefits/`
-- `/partners/`
-- `/portal/`
 - `/opportunities/`
+- `/partners/`
 - `/points/`
 - `/rewards/`
 - `/passport/`
 - `/tiers/`
 - `/activity/`
 
-Wallet ownership is checked on Robinhood Chain (4663) against the configured RhoodStone contract. Supabase is intentionally not hardcoded with secrets; points, claims, rewards, campaigns and activity must be connected through Supabase Edge Functions/RLS before being treated as live backend data.
+All pages use the single `/assets/styles.css` and `/assets/shared.js` files with root-relative paths, so CSS/JS does not break on nested clean URLs.
+
+## On-chain configuration
+- Robinhood Chain ID: 4663 (`0x1237`)
+- RPC: https://rpc.mainnet.chain.robinhood.com
+- Contract: 0x6be906e10351B4a970521c386E89D9e4e34c47C9
+- Holder check: ERC-721-style `balanceOf(address)`
+
+## Wallet note
+Injected wallets work when the site is opened inside a wallet browser. Normal Android Chrome cannot inject a wallet provider by itself, so the landing page includes an Open in Wallet deep-link fallback.
+
+## Supabase
+Points, campaigns, claims, rewards and activity are intentionally not faked. Connect Supabase before enabling those live features.
