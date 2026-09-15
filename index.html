@@ -1,1 +1,48 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090b0a"><title>RhoodStone — Holder Verification</title><link rel="stylesheet" href="/assets/styles.css"></head><body class="stone-bg"><main class="gate"><div class="stone-logo">RS</div><div class="eyebrow">RHOODSTONE / HOLDER GATE</div><h1>The chain moves forward.<br><span>The stone remembers.</span></h1><p class="lead">A private archive for RhoodStone holders. Connect a wallet to verify ownership on Robinhood Chain and enter the Stone.</p><div class="gate-actions"><button id="connectBtn" class="btn btn-primary">CONNECT &amp; VERIFY</button><button id="openWalletBtn" class="btn">OPEN IN WALLET</button></div><div id="walletStatus" class="status">Wallet not connected</div><div id="walletHelp" class="help"></div><div class="contract">RHOODSTONE CONTRACT<br><code>0x6be906e10351B4a970521c386E89D9e4e34c47C9</code></div></main><script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script><script src="/assets/shared.js"></script><script>Rhood.initGate()</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RhoodStone — The Archive Lives</title>
+<meta name="description" content="RhoodStone holder gate — verify ownership on Robinhood Chain.">
+<link rel="preload" as="image" href="/assets/stone-hero.png">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="stone-bg landing-v2">
+<div class="scene-noise"></div><div class="scene-vignette"></div>
+<header class="landing-nav">
+  <a class="brand-lockup" href="/" aria-label="RhoodStone home"><img src="/assets/rhoodstone-logo.svg" alt=""><span><b>RHOODSTONE</b><small>THE ARCHIVE LIVES</small></span></a>
+  <nav><a href="https://docs.robinhood.com/chain/" target="_blank" rel="noreferrer">DOCS</a><a href="https://x.com/rhoodstone" target="_blank" rel="noreferrer">TWITTER</a><a href="#verify">VERIFY</a></nav>
+</header>
+<main class="hero-v2">
+  <div class="ruin-banner left"><span>HOLD</span><span>EXPLORE</span><span>EARN</span><span>BELONG</span><i>RS</i></div>
+  <div class="hero-stone-wrap"><div class="hero-stone-aura"></div><div class="hero-stone"></div></div>
+  <div class="ruin-banner right"><span>MORE</span><span>THAN</span><span>AN NFT</span><span>A LEGACY</span><i>RS</i></div>
+  <div class="hero-copy">
+    <div class="eyebrow-v2">RHOODSTONE / HOLDER GATE</div>
+    <div class="wordmark-v2">RHOODSTONE</div>
+    <div class="tagline-v2">THE CHAIN MOVES FORWARD. <em>THE STONE REMEMBERS.</em></div>
+    <p>A private archive for RhoodStone holders.<br>Verify ownership on Robinhood Chain and enter the Stone.</p>
+    <section id="verify" class="verify-panel">
+      <button id="connectBtn" class="stone-btn primary"><span class="wallet-icon">▣</span> CONNECT &amp; VERIFY <b>›</b></button>
+      <button id="openWalletBtn" class="stone-btn secondary">OPEN IN WALLET <b>↗</b></button>
+      <div class="wallet-status"><span id="statusDot"></span><span id="walletStatus">Wallet not connected</span></div>
+      <div id="walletHelp" class="wallet-help"></div>
+    </section>
+  </div>
+  <div class="feature-row">
+    <div><div class="feature-gem">◈</div><b>HOLDER ONLY</b><small>Exclusive access</small></div>
+    <div><div class="feature-gem">◇</div><b>REAL UTILITY</b><small>WL, GTD &amp; more</small></div>
+    <div><div class="feature-gem">⬡</div><b>COMMUNITY DRIVEN</b><small>Built together</small></div>
+    <div><div class="feature-gem">⌘</div><b>ROBINHOOD CHAIN</b><small>A growing ecosystem</small></div>
+  </div>
+</main>
+<footer class="landing-footer"><b>RHOODSTONE</b><span>THE ARCHIVE OF WHAT THE WORLD FORGOT.</span><strong>RS ///</strong></footer>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<script src="/assets/shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  Rhood.initGate();
+  document.getElementById('openWalletBtn')?.addEventListener('click',()=>Rhood.openWallet());
+});
+</script>
+</body></html>
