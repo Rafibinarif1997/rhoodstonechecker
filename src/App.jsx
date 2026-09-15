@@ -27,10 +27,10 @@ const [nftBalance, setNftBalance] = useState(0);
     try {
       setHolderStatus("checking");
 
-      const isHolder = await checkRhoodStoneHolder(address);
+      const balance = await checkRhoodStoneHolder(address);
 
-      setNftBalance(isHolder ? 1 : 0);
-      setHolderStatus(isHolder ? "holder" : "not-holder");
+setNftBalance(balance);
+setHolderStatus(balance > 0 ? "holder" : "not-holder");
     } catch (error) {
       console.error("RhoodStone ownership check failed:", error);
       setHolderStatus("error");
