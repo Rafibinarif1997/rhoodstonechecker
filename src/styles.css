@@ -1233,3 +1233,12 @@ footer p {
     padding: 25px 20px;
   }
 }
+
+@media (max-width: 768px) {
+  .dashboard-title-row h1 {
+    font-size: clamp(48px, 14vw, 68px);
+    letter-spacing: -2px;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
