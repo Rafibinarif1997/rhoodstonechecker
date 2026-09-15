@@ -14,7 +14,32 @@ function App() {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
   const { address, isConnected } = useAppKitAccount();
+const [holderStatus, setHolderStatus] = useState("idle");
+const [nftBalance, setNftBalance] = useState(0);
+  useEffect(() => {
+  async function verifyHolder() {
+    if (!isConnected || !address) {
+      setHolderStatus("idle");
+      setNftBalance(0);
+      return;
+    }
 
+    try {
+      setHolderStatus("checking");
+
+      const isHolder = await checkRhoodStoneHolder(address);
+
+      setNftBalance(isHolder ? 1 : 0);
+      setHolderStatus(isHolder ? "holder" : "not-holder");
+    } catch (error) {
+      console.error("RhoodStone ownership check failed:", error);
+      setHolderStatus("error");
+      setNftBalance(0);
+    }
+  }
+
+  verifyHolder();
+}, [isConnected, address]);
   useEffect(() => {
     async function testSupabase() {
       if (!supabase) {
