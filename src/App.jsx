@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
+import Dashboard from "./Dashboard";
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
 import {
   useAppKit,
@@ -8,6 +9,9 @@ import {
 } from "@reown/appkit/react";
 
 function App() {
+  if (window.location.pathname === "/dashboard") {
+  return <Dashboard />;
+}
   const [menuOpen, setMenuOpen] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
