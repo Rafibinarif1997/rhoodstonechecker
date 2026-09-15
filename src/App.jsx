@@ -7,6 +7,31 @@ function App() {
 const [walletConnecting, setWalletConnecting] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
+  async function connectWallet() {
+  if (!window.ethereum) {
+    alert("Please install MetaMask or another EVM wallet.");
+    return;
+  }
+
+  try {
+    setWalletConnecting(true);
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+
+    if (!accounts || accounts.length === 0) {
+      return;
+    }
+
+    setWalletAddress(accounts[0]);
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+  } finally {
+    setWalletConnecting(false);
+  }
+}
+  
   useEffect(() => {
     async function testSupabase() {
       if (!supabase) {
@@ -97,9 +122,17 @@ const [walletConnecting, setWalletConnecting] = useState(false);
             </a>
           </nav>
 
-          <button className="connect-button">
-            Connect Wallet
-          </button>
+          <button
+  className="connect-button"
+  onClick={connectWallet}
+  disabled={walletConnecting}
+>
+  {walletConnecting
+    ? "Connecting..."
+    : walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : "Connect Wallet"}
+</button>
 
           <button
             className="mobile-menu"
