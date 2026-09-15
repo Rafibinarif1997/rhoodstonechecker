@@ -193,6 +193,13 @@ function App() {
               Missions
             </a>
 
+            <a
+  href="/dashboard"
+  onClick={() => setMenuOpen(false)}
+>
+  Dashboard
+</a>
+            
             {/* Mobile Wallet Button */}
             <button
               className="connect-button mobile-wallet-button"
