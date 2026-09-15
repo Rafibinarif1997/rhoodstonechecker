@@ -4,14 +4,13 @@ import App from "./App.jsx";
 import "./styles.css";
 
 import { createAppKit } from "@reown/appkit/react";
-import { WagmiProvider } from "wagmi";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createConfig, http } from "wagmi";
-import { defineChain } from "viem";
+import { WagmiProvider } from "wagmi";
 
 const projectId = import.meta.env.VITE_REOWN_PROJECT_ID;
 
-const robinhood = defineChain({
+const robinhoodChain = {
   id: 4663,
   name: "Robinhood Chain",
   nativeCurrency: {
@@ -30,33 +29,38 @@ const robinhood = defineChain({
       url: "https://robinhoodchain.blockscout.com",
     },
   },
-});
+  chainNamespace: "eip155",
+  caipNetworkId: "eip155:4663",
+};
 
-const wagmiConfig = createConfig({
-  chains: [robinhood],
-  transports: {
-    [robinhood.id]: http(),
-  },
+const networks = [robinhoodChain];
+
+const wagmiAdapter = new WagmiAdapter({
+  networks,
+  projectId,
 });
 
 const queryClient = new QueryClient();
 
 createAppKit({
-  adapters: [],
+  adapters: [wagmiAdapter],
+  networks,
   projectId,
-  networks: [robinhood],
-  defaultNetwork: robinhood,
+  defaultNetwork: robinhoodChain,
   metadata: {
     name: "RhoodStone",
     description: "RhoodStone Ecosystem",
     url: "https://rhoodstone.xyz",
     icons: ["https://rhoodstone.xyz/favicon.ico"],
   },
+  features: {
+    analytics: true,
+  },
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
