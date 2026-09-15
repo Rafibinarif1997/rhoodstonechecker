@@ -124,18 +124,20 @@ const [walletConnecting, setWalletConnecting] = useState(false);
 
           <button
   className="connect-button"
-  onClick={connectWallet}
+  onClick={walletAddress ? disconnectWallet : connectWallet}
   disabled={walletConnecting}
 >
   {walletConnecting
     ? "Connecting..."
     : walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    ? "Disconnect"
     : "Connect Wallet"}
-</button>
-          function disconnectWallet() {
+            
+  function disconnectWallet() {
   setWalletAddress("");
 }
+</button>
+          
 
           <button
             className="mobile-menu"
