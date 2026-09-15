@@ -1,27 +1,10 @@
-# RhoodStone Holder Portal
+# RhoodStone — Page 1
 
-## Structure
-- `/` — wallet verification gate only
-- `/portal/` — private holder dashboard
-- `/benefits/`
-- `/opportunities/`
-- `/partners/`
-- `/points/`
-- `/rewards/`
-- `/passport/`
-- `/tiers/`
-- `/activity/`
+This package contains only the finished landing / holder verification gate.
 
-All pages use the single `/assets/styles.css` and `/assets/shared.js` files with root-relative paths, so CSS/JS does not break on nested clean URLs.
+Structure:
+- index.html
+- assets/styles.css
+- assets/app.js
 
-## On-chain configuration
-- Robinhood Chain ID: 4663 (`0x1237`)
-- RPC: https://rpc.mainnet.chain.robinhood.com
-- Contract: 0x6be906e10351B4a970521c386E89D9e4e34c47C9
-- Holder check: ERC-721-style `balanceOf(address)`
-
-## Wallet note
-Injected wallets work when the site is opened inside a wallet browser. Normal Android Chrome cannot inject a wallet provider by itself, so the landing page includes an Open in Wallet deep-link fallback.
-
-## Supabase
-Points, campaigns, claims, rewards and activity are intentionally not faked. Connect Supabase before enabling those live features.
+The page uses Robinhood Chain 4663, the RhoodStone contract, and an EIP-1193 injected-wallet flow. Mobile Chrome without an injected provider should use the Open in Wallet button.
