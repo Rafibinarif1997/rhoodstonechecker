@@ -14,32 +14,10 @@ function App() {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
   const { address, isConnected } = useAppKitAccount();
-const [holderStatus, setHolderStatus] = useState("idle");
-const [nftBalance, setNftBalance] = useState(0);
-  useEffect(() => {
-  async function verifyHolder() {
-    if (!isConnected || !address) {
-      setHolderStatus("idle");
-      setNftBalance(0);
-      return;
-    }
 
-    try {
-      setHolderStatus("checking");
+  const [holderStatus, setHolderStatus] = useState("idle");
+  const [nftBalance, setNftBalance] = useState(0);
 
-      const balance = await checkRhoodStoneHolder(address);
-
-setNftBalance(balance);
-setHolderStatus(balance > 0 ? "holder" : "not-holder");
-    } catch (error) {
-      console.error("RhoodStone ownership check failed:", error);
-      setHolderStatus("error");
-      setNftBalance(0);
-    }
-  }
-
-  verifyHolder();
-}, [isConnected, address]);
   useEffect(() => {
     async function testSupabase() {
       if (!supabase) {
@@ -65,6 +43,31 @@ setHolderStatus(balance > 0 ? "holder" : "not-holder");
     testSupabase();
   }, []);
 
+  useEffect(() => {
+    async function verifyHolder() {
+      if (!isConnected || !address) {
+        setHolderStatus("idle");
+        setNftBalance(0);
+        return;
+      }
+
+      try {
+        setHolderStatus("checking");
+
+        const balance = await checkRhoodStoneHolder(address);
+
+        setNftBalance(balance);
+        setHolderStatus(balance > 0 ? "holder" : "not-holder");
+      } catch (error) {
+        console.error("RhoodStone ownership check failed:", error);
+        setHolderStatus("error");
+        setNftBalance(0);
+      }
+    }
+
+    verifyHolder();
+  }, [isConnected, address]);
+
   function handleWalletClick() {
     if (isConnected) {
       disconnect();
@@ -73,8 +76,6 @@ setHolderStatus(balance > 0 ? "holder" : "not-holder");
     }
   }
 
-  // Mobile menu stays open so the connection status
-  // updates immediately inside the menu.
   function handleMobileWalletClick() {
     if (isConnected) {
       disconnect();
@@ -188,6 +189,81 @@ setHolderStatus(balance > 0 ? "holder" : "not-holder");
             >
               {mobileWalletLabel()}
             </button>
+
+            {/* Mobile Holder Status */}
+            {isConnected && (
+              <div className="holder-status-card">
+                <div className="holder-status-top">
+                  <span className="holder-status-dot"></span>
+
+                  <span>
+                    {holderStatus === "checking"
+                      ? "VERIFYING OWNERSHIP"
+                      : "WALLET CONNECTED"}
+                  </span>
+                </div>
+
+                <div className="holder-wallet">
+                  {address
+                    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+                    : ""}
+                </div>
+
+                <div className="holder-status-result">
+                  {holderStatus === "checking" && (
+                    <>
+                      <span className="status-symbol">◌</span>
+
+                      <div>
+                        <strong>VERIFYING</strong>
+                        <small>
+                          Checking RhoodStone ownership...
+                        </small>
+                      </div>
+                    </>
+                  )}
+
+                  {holderStatus === "holder" && (
+                    <>
+                      <span className="status-symbol">✓</span>
+
+                      <div>
+                        <strong>RHOODSTONE HOLDER</strong>
+                        <small>
+                          {nftBalance} NFT VERIFIED
+                        </small>
+                      </div>
+                    </>
+                  )}
+
+                  {holderStatus === "not-holder" && (
+                    <>
+                      <span className="status-symbol">×</span>
+
+                      <div>
+                        <strong>NOT A HOLDER</strong>
+                        <small>
+                          No RhoodStone NFT detected
+                        </small>
+                      </div>
+                    </>
+                  )}
+
+                  {holderStatus === "error" && (
+                    <>
+                      <span className="status-symbol">!</span>
+
+                      <div>
+                        <strong>VERIFICATION FAILED</strong>
+                        <small>
+                          Please try again
+                        </small>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </nav>
 
           {/* Desktop Wallet Button */}
@@ -197,63 +273,82 @@ setHolderStatus(balance > 0 ? "holder" : "not-holder");
           >
             {walletLabel()}
           </button>
-{isConnected && (
-  <div className="holder-status-card">
-    <div className="holder-status-top">
-      <span className="holder-status-dot"></span>
-      <span>
-        {holderStatus === "checking"
-          ? "VERIFYING OWNERSHIP"
-          : "WALLET CONNECTED"}
-      </span>
-    </div>
 
-    <div className="holder-wallet">
-      {address
-        ? `${address.slice(0, 6)}...${address.slice(-4)}`
-        : ""}
-    </div>
+          {/* Desktop Holder Status */}
+          {isConnected && (
+            <div className="holder-status-card desktop-holder-card">
+              <div className="holder-status-top">
+                <span className="holder-status-dot"></span>
 
-    <div className="holder-status-result">
-      {holderStatus === "checking" && (
-        <>
-          <span className="status-symbol">◌</span>
-          <span>Checking RhoodStone ownership...</span>
-        </>
-      )}
+                <span>
+                  {holderStatus === "checking"
+                    ? "VERIFYING OWNERSHIP"
+                    : "WALLET CONNECTED"}
+                </span>
+              </div>
 
-      {holderStatus === "holder" && (
-        <>
-          <span className="status-symbol">✓</span>
-          <div>
-            <strong>RHOODSTONE HOLDER</strong>
-            <small>{nftBalance} NFT VERIFIED</small>
-          </div>
-        </>
-      )}
+              <div className="holder-wallet">
+                {address
+                  ? `${address.slice(0, 6)}...${address.slice(-4)}`
+                  : ""}
+              </div>
 
-      {holderStatus === "not-holder" && (
-        <>
-          <span className="status-symbol">×</span>
-          <div>
-            <strong>NOT A HOLDER</strong>
-            <small>No RhoodStone NFT detected</small>
-          </div>
-        </>
-      )}
+              <div className="holder-status-result">
+                {holderStatus === "checking" && (
+                  <>
+                    <span className="status-symbol">◌</span>
 
-      {holderStatus === "error" && (
-        <>
-          <span className="status-symbol">!</span>
-          <div>
-            <strong>VERIFICATION FAILED</strong>
-            <small>Please try again</small>
-          </div>
-        </>
-      )}
-    </div>
-  </div>
-)}
+                    <div>
+                      <strong>VERIFYING</strong>
+                      <small>
+                        Checking RhoodStone ownership...
+                      </small>
+                    </div>
+                  </>
+                )}
+
+                {holderStatus === "holder" && (
+                  <>
+                    <span className="status-symbol">✓</span>
+
+                    <div>
+                      <strong>RHOODSTONE HOLDER</strong>
+                      <small>
+                        {nftBalance} NFT VERIFIED
+                      </small>
+                    </div>
+                  </>
+                )}
+
+                {holderStatus === "not-holder" && (
+                  <>
+                    <span className="status-symbol">×</span>
+
+                    <div>
+                      <strong>NOT A HOLDER</strong>
+                      <small>
+                        No RhoodStone NFT detected
+                      </small>
+                    </div>
+                  </>
+                )}
+
+                {holderStatus === "error" && (
+                  <>
+                    <span className="status-symbol">!</span>
+
+                    <div>
+                      <strong>VERIFICATION FAILED</strong>
+                      <small>
+                        Please try again
+                      </small>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Mobile Menu Button */}
           <button
             className="mobile-menu"
