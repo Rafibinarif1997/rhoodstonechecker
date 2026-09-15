@@ -11,8 +11,6 @@ Production-oriented frontend foundation for the RhoodStone holder-gated website.
 - Wallet-gated holder portal
 - On-chain `balanceOf(address)` verification
 - Automatic Robinhood Chain switching
-- EIP-6963 multi-wallet discovery with injected-wallet fallback
-- Requests wallet account before network switching for better compatibility
 - Holder tiers based on NFT balance
 - WL/GTD, points, rewards, partner and passport UI
 
@@ -27,7 +25,8 @@ Frontend:
 - viem/wagmi for wallet and chain interaction
 
 Backend:
-- Supabase (PostgreSQL + RLS + Edge Functions)
+- Node/Next.js API routes
+- PostgreSQL/Supabase
 - Admin wallet signature authentication
 - Campaign, allocation, points and claim tables
 

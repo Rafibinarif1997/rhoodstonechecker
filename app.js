@@ -6,9 +6,7 @@ const CONFIG = {
   contract: "0x6be906e10351B4a970521c386E89D9e4e34c47C9"
 };
 
-const ERC721_ABI = [
-  "function balanceOf(address owner) view returns (uint256)"
-];
+const ERC721_ABI = ["function balanceOf(address owner) view returns (uint256)"];
 
 const els = {
   connect: document.getElementById("connect"),
@@ -24,222 +22,149 @@ const els = {
   tierBadge: document.getElementById("tierBadge")
 };
 
-let activeProvider = null;
-let browserProvider = null;
-let connectedAddress = null;
+const HEX_CHAIN_ID = "0x" + CONFIG.chainId.toString(16);
 
-function shortAddress(a) {
-  return `${a.slice(0, 6)}…${a.slice(-4)}`;
-}
-
-function tierForBalance(n) {
-  if (n >= 8) return "DIAMOND";
-  if (n >= 4) return "GOLD";
-  if (n >= 2) return "SILVER";
+function shortAddress(a){ return `${a.slice(0,6)}…${a.slice(-4)}`; }
+function tierForBalance(n){
+  if(n >= 8) return "DIAMOND";
+  if(n >= 4) return "GOLD";
+  if(n >= 2) return "SILVER";
   return "STONE";
 }
 
-function setStatus(message, error = false) {
+function setStatus(message, error=false){
+  if(!els.status) return;
   els.status.textContent = message || "";
   els.status.style.color = error ? "#ff7187" : "";
 }
 
-function getInjectedProviders() {
-  const providers = [];
-  if (Array.isArray(window.ethereum?.providers)) {
-    providers.push(...window.ethereum.providers);
-  } else if (window.ethereum) {
-    providers.push(window.ethereum);
-  }
-  return providers;
+function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+function walletDeepLink(){
+  // MetaMask's official dapp deep-link opens this website inside MetaMask Mobile.
+  const host = location.host;
+  const path = location.pathname + location.search + location.hash;
+  return `https://metamask.app.link/dapp/${host}${path}`;
 }
 
-function providerName(p) {
-  if (p?.isMetaMask) return "MetaMask";
-  if (p?.isRabby) return "Rabby";
-  if (p?.isCoinbaseWallet) return "Coinbase Wallet";
-  if (p?.isOKExWallet || p?.isOKXWallet) return "OKX Wallet";
-  if (p?.isTrust) return "Trust Wallet";
-  return "wallet";
+function openWalletBrowser(){
+  setStatus("Opening MetaMask…");
+  const link = walletDeepLink();
+  window.location.href = link;
 }
 
-async function getWalletProvider() {
-  // Prefer EIP-6963 multi-wallet discovery when available.
-  const discovered = [];
-  const handler = (event) => {
-    if (event?.detail?.provider) discovered.push(event.detail);
-  };
+async function getProvider(){
+  if(window.ethereum) return window.ethereum;
 
-  window.addEventListener("eip6963:announceProvider", handler);
-  window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-  await new Promise(resolve => setTimeout(resolve, 150));
-  window.removeEventListener("eip6963:announceProvider", handler);
-
-  if (discovered.length) {
-    const preferred = discovered.find(x =>
-      /metamask|rabby|okx|coinbase|trust/i.test(
-        `${x.info?.name || ""} ${x.info?.rdns || ""}`
-      )
-    );
-    activeProvider = preferred?.provider || discovered[0].provider;
-    return activeProvider;
+  // Some wallet browsers expose the provider slightly after page load.
+  for(let i=0;i<12;i++){
+    await new Promise(r=>setTimeout(r,150));
+    if(window.ethereum) return window.ethereum;
   }
-
-  const injected = getInjectedProviders();
-  if (injected.length) {
-    activeProvider =
-      injected.find(p => p.isMetaMask) ||
-      injected.find(p => p.isRabby) ||
-      injected.find(p => p.isOKXWallet || p.isOKExWallet) ||
-      injected[0];
-    return activeProvider;
-  }
-
   return null;
 }
 
-async function ensureRobinhoodChain(provider) {
-  const chainIdHex = "0x" + CONFIG.chainId.toString(16);
-
-  const current = await provider.request({ method: "eth_chainId" });
-  if (current?.toLowerCase() === chainIdHex.toLowerCase()) return;
-
-  setStatus("Switching to Robinhood Chain…");
+async function ensureRobinhoodChain(provider){
+  try {
+    const current = await provider.request({method:"eth_chainId"});
+    if(String(current).toLowerCase() === HEX_CHAIN_ID.toLowerCase()) return;
+  } catch(_) {}
 
   try {
     await provider.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: chainIdHex }]
+      method:"wallet_switchEthereumChain",
+      params:[{chainId:HEX_CHAIN_ID}]
     });
-  } catch (e) {
-    // 4902 = chain not added to this wallet.
-    if (e?.code !== 4902) {
-      if (e?.code === 4001) throw new Error("Network switch was cancelled in your wallet.");
-      throw e;
+  } catch(e) {
+    if(e && (e.code === 4902 || e.code === -32603)) {
+      await provider.request({
+        method:"wallet_addEthereumChain",
+        params:[{
+          chainId:HEX_CHAIN_ID,
+          chainName:CONFIG.chainName,
+          nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
+          rpcUrls:[CONFIG.rpcUrl],
+          blockExplorerUrls:[CONFIG.explorer]
+        }]
+      });
+      return;
     }
-
-    await provider.request({
-      method: "wallet_addEthereumChain",
-      params: [{
-        chainId: chainIdHex,
-        chainName: CONFIG.chainName,
-        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-        rpcUrls: [CONFIG.rpcUrl],
-        blockExplorerUrls: [CONFIG.explorer]
-      }]
-    });
+    throw e;
   }
 }
 
-async function verifyHolder(address, provider) {
-  const contract = new ethers.Contract(CONFIG.contract, ERC721_ABI, provider);
-
-  try {
-    const raw = await contract.balanceOf(address);
-    return Number(raw);
-  } catch (e) {
-    console.error("balanceOf error:", e);
-    throw new Error(
-      "We couldn't read RhoodStone ownership from the contract. Please try again, and if the problem continues verify the NFT contract/ABI."
-    );
-  }
-}
-
-async function connect() {
+async function connect(){
   setStatus("Connecting wallet…");
+  try{
+    let provider = await getProvider();
 
-  try {
-    if (!window.ethereum && !window.ethereum?.providers) {
-      throw new Error(
-        "No wallet was detected. Open this page in MetaMask, Rabby, OKX Wallet, or another EVM-compatible wallet browser."
-      );
+    // Normal Chrome/mobile browser: hand the dapp to MetaMask Mobile.
+    if(!provider){
+      if(isMobile()) {
+        openWalletBrowser();
+        return;
+      }
+      throw new Error("No wallet detected. Install MetaMask/Rabby/OKX, or open this site in a wallet browser.");
     }
 
-    const provider = await getWalletProvider();
-    if (!provider) {
-      throw new Error("No compatible EVM wallet was detected.");
-    }
-
-    // Request accounts BEFORE switching networks. Some wallet providers
-    // reject network requests until the wallet is connected.
-    const accounts = await provider.request({ method: "eth_requestAccounts" });
-    if (!accounts?.length) throw new Error("No wallet account was returned.");
+    // IMPORTANT: request the account first. Some wallets reject network
+    // switching before the dapp has permission to access the account.
+    let accounts = await provider.request({method:"eth_requestAccounts"});
+    if(!accounts || !accounts.length) throw new Error("No wallet account was selected.");
 
     await ensureRobinhoodChain(provider);
 
-    browserProvider = new ethers.BrowserProvider(provider);
+    // Network switch can recreate the provider state in some mobile wallets.
+    provider = window.ethereum || provider;
+    accounts = await provider.request({method:"eth_accounts"});
+    const address = accounts && accounts[0];
+    if(!address) throw new Error("Wallet connected, but no account was returned.");
 
-    // Refresh the account after the possible network switch.
-    const finalAccounts = await provider.request({ method: "eth_accounts" });
-    connectedAddress = finalAccounts?.[0] || accounts[0];
+    if(typeof ethers === "undefined") throw new Error("Ethers failed to load. Please refresh the page.");
 
-    setStatus("Verifying RhoodStone ownership…");
+    const browserProvider = new ethers.BrowserProvider(provider);
+    const contract = new ethers.Contract(CONFIG.contract, ERC721_ABI, browserProvider);
 
-    const balance = await verifyHolder(connectedAddress, browserProvider);
+    let balance;
+    try {
+      balance = Number(await contract.balanceOf(address));
+    } catch(e) {
+      throw new Error("Wallet connected, but the RhoodStone contract did not respond to balanceOf().");
+    }
 
-    if (balance <= 0) {
-      setStatus("This wallet does not hold a RhoodStone NFT.", true);
+    if(balance <= 0){
+      setStatus("Wallet connected, but this wallet does not hold a RhoodStone NFT.", true);
       return;
     }
 
     const tier = tierForBalance(balance);
-
-    els.address.textContent = shortAddress(connectedAddress);
+    els.address.textContent = shortAddress(address);
     els.balance.textContent = balance;
-    els.passportBalance.textContent = `${balance} NFT${balance === 1 ? "" : "s"}`;
+    els.passportBalance.textContent = `${balance} NFT${balance===1?"":"s"}`;
     els.tier.textContent = tier;
     els.tierBadge.textContent = tier;
-
     els.locked.classList.add("hidden");
     els.dashboard.classList.remove("hidden");
     els.connect.textContent = "Holder Portal";
     setStatus("");
-
-    document.getElementById("portal").scrollIntoView({ behavior: "smooth" });
-  } catch (err) {
-    console.error(err);
-
-    if (err?.code === 4001) {
-      setStatus("Connection was cancelled in your wallet.", true);
-    } else {
-      setStatus(err?.message || "Wallet connection failed. Please try again.", true);
-    }
+    document.getElementById("portal").scrollIntoView({behavior:"smooth"});
+  }catch(err){
+    console.error("RhoodStone wallet connection error:", err);
+    let msg = err && err.message ? err.message : "Wallet connection failed.";
+    if(err && err.code === 4001) msg = "Connection was rejected in your wallet.";
+    if(err && err.code === 4902) msg = "Robinhood Chain could not be added to this wallet.";
+    setStatus(msg, true);
   }
 }
 
-[els.connect, els.heroConnect, els.lockedConnect].forEach(
-  b => b && b.addEventListener("click", connect)
-);
+[els.connect,els.heroConnect,els.lockedConnect].forEach(b => b && b.addEventListener("click",connect));
 
-// React to wallet changes without forcing a full page reload.
-async function handleAccountsChanged(accounts) {
-  if (!accounts?.length) {
-    connectedAddress = null;
-    browserProvider = null;
-    els.locked.classList.remove("hidden");
-    els.dashboard.classList.add("hidden");
-    els.connect.textContent = "Connect Wallet";
-    setStatus("");
-    return;
-  }
-
-  // Re-verify the newly selected account.
-  connect();
+function bindWalletEvents(provider){
+  if(!provider || !provider.on || provider.__rhoodBound) return;
+  provider.__rhoodBound = true;
+  provider.on("accountsChanged", () => window.location.reload());
+  provider.on("chainChanged", () => window.location.reload());
 }
 
-function handleChainChanged() {
-  // The portal requires Robinhood Chain. Re-running connect handles both
-  // network changes and ownership verification.
-  if (connectedAddress) connect();
-}
-
-async function initWalletEvents() {
-  const provider = await getWalletProvider();
-  if (!provider?.on) return;
-
-  provider.on("accountsChanged", handleAccountsChanged);
-  provider.on("chainChanged", handleChainChanged);
-}
-
-initWalletEvents();
+if(window.ethereum) bindWalletEvents(window.ethereum);
+window.addEventListener("ethereum#initialized", () => bindWalletEvents(window.ethereum));
