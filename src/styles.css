@@ -719,8 +719,14 @@ footer p {
 }
 
 @media (max-width: 520px) {
-  .navbar .connect-button {
-    display: none;
+  .desktop-wallet-button {
+    display: none !important;
+  }
+
+  .mobile-wallet-button {
+    display: block !important;
+    width: 100%;
+    margin-top: 12px;
   }
 
   .hero h1 {
