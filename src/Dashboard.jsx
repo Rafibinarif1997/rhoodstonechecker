@@ -219,8 +219,8 @@ function Dashboard() {
                 </div>
 
                 <div className="dashboard-tier">
-                  STONE
-                </div>
+  {holderTier ? holderTier.name : "—"}
+</div>
 
                 <p className="dashboard-card-description">
                   Your current ecosystem level.
