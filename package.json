@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reown/appkit": "^1.8.0",
+    "@reown/appkit-adapter-wagmi": "^1.8.0",
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.468.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "viem": "^2.37.0",
+    "wagmi": "^2.16.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
