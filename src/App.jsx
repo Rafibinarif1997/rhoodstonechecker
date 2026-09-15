@@ -39,13 +39,13 @@ function App() {
     testSupabase();
   }, []);
 
-  function handleWalletClick() {
-    if (isConnected) {
-      disconnect();
-    } else {
-      open({ view: "Connect" });
-    }
+  function handleMobileWalletClick() {
+  if (isConnected) {
+    disconnect();
+  } else {
+    open({ view: "Connect" });
   }
+}
 
   function handleMobileWalletClick() {
     setMenuOpen(false);
