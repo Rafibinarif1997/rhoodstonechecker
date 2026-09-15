@@ -1,40 +1,18 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
+import {
+  useAppKit,
+  useAppKitAccount,
+  useDisconnect,
+} from "@reown/appkit/react";
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
-  const [walletConnecting, setWalletConnecting] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
-  async function connectWallet() {
-    if (!window.ethereum) {
-      alert("Please install MetaMask or another EVM wallet.");
-      return;
-    }
-
-    try {
-      setWalletConnecting(true);
-
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-
-      if (!accounts || accounts.length === 0) {
-        return;
-      }
-
-      setWalletAddress(accounts[0]);
-    } catch (error) {
-      console.error("Wallet connection error:", error);
-    } finally {
-      setWalletConnecting(false);
-    }
-  }
-
-  function disconnectWallet() {
-    setWalletAddress("");
-  }
+  const { open } = useAppKit();
+  const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAppKitAccount();
 
   useEffect(() => {
     async function testSupabase() {
@@ -60,6 +38,32 @@ function App() {
 
     testSupabase();
   }, []);
+
+  function handleWalletClick() {
+    if (isConnected) {
+      disconnect();
+    } else {
+      open({ view: "Connect" });
+    }
+  }
+
+  function handleMobileWalletClick() {
+    setMenuOpen(false);
+
+    if (isConnected) {
+      disconnect();
+    } else {
+      open({ view: "Connect" });
+    }
+  }
+
+  function walletLabel() {
+    if (!isConnected || !address) {
+      return "Connect Wallet";
+    }
+
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }
 
   if (supabaseStatus === "Checking...") {
     return (
@@ -146,28 +150,18 @@ function App() {
             {/* Mobile Wallet Button */}
             <button
               className="connect-button mobile-wallet-button"
-              onClick={walletAddress ? disconnectWallet : connectWallet}
-              disabled={walletConnecting}
+              onClick={handleMobileWalletClick}
             >
-              {walletConnecting
-                ? "Connecting..."
-                : walletAddress
-                ? "Disconnect"
-                : "Connect Wallet"}
+              {isConnected ? walletLabel() : "Connect Wallet"}
             </button>
           </nav>
 
           {/* Desktop Wallet Button */}
           <button
             className="connect-button desktop-wallet-button"
-            onClick={walletAddress ? disconnectWallet : connectWallet}
-            disabled={walletConnecting}
+            onClick={handleWalletClick}
           >
-            {walletConnecting
-              ? "Connecting..."
-              : walletAddress
-              ? "Disconnect"
-              : "Connect Wallet"}
+            {walletLabel()}
           </button>
 
           {/* Mobile Menu Button */}
