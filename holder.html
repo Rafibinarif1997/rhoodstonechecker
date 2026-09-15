@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rhoodstone — Holder Area</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#020402;color:#f4f5ee;font-family:Arial,Helvetica,sans-serif;min-height:100vh}.nav{height:74px;background:rgba(2,4,2,.94);border-bottom:1px solid #273221;display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:5}.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;letter-spacing:2px}.brand img{width:42px;height:42px;border-radius:8px;object-fit:cover}.back{color:#b8beb3;text-decoration:none;font-size:14px}.back:hover{color:#9dff38}.wrap{max-width:1050px;margin:auto;padding:70px 24px}.eyebrow{font-size:11px;letter-spacing:4px;color:#9dff38;font-weight:800}.title{font-family:Georgia,serif;font-size:clamp(42px,7vw,76px);margin:12px 0}.lead{color:#9da69a;line-height:1.8;max-width:650px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:36px}.card{border:1px solid #273221;background:#080c08;border-radius:16px;padding:25px}.label{color:#7f897b;font-size:11px;letter-spacing:2px;text-transform:uppercase}.value{margin-top:10px;font-size:20px;font-weight:800;word-break:break-all}.status{margin-top:26px;padding:18px;border:1px solid #34422e;border-radius:12px;background:#050805}.ok{border-color:#63943d;color:#caff9a}.bad{border-color:#743b3b;color:#ffb1b1}.error{border-color:#7a5c32;color:#ffd28c}.actions{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}.btn{display:inline-block;padding:12px 17px;border-radius:10px;border:1px solid #9dff38;color:#dcffc1;text-decoration:none;font-weight:800;background:#0d180a}.btn.secondary{border-color:#788174;color:#fff;background:#050705}.btn:hover{background:#14250e}.foot{text-align:center;border-top:1px solid #20291d;color:#667060;padding:28px;font-size:11px;letter-spacing:2px;margin-top:40px}@media(max-width:700px){.grid{grid-template-columns:1fr}.nav{padding:0 16px}.wrap{padding:50px 18px}}
+</style>
+</head>
+<body>
+<header class="nav"><a class="brand" href="index.html"><img src="assets/rhoodstone-stone.jpg" alt="Rhoodstone">RHOODSTONE</a><a class="back" href="index.html">← Back Home</a></header>
+<main class="wrap">
+<div class="eyebrow">PRIVATE HOLDER ACCESS</div>
+<h1 class="title">Holder Area</h1>
+<p class="lead">Your wallet was already connected on the homepage. This page uses that same wallet session and checks your Rhoodstone ownership directly on Robinhood Chain.</p>
+<div id="gate" class="status">Checking holder access…</div>
+<div class="grid">
+<div class="card"><div class="label">Connected Wallet</div><div id="wallet" class="value">—</div></div>
+<div class="card"><div class="label">Rhoodstone NFTs</div><div id="balance" class="value">—</div></div>
+</div>
+<div class="actions"><a class="btn secondary" href="index.html">← Back Home</a><button class="btn" id="refresh">Refresh Status</button></div>
+</main>
+<footer class="foot">RHOODSTONE • HOLDER AREA</footer>
+<script type="module">
+import { BrowserProvider, Contract } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+const CONTRACT="0x6be906e10351B4a970521c386E89D9e4e34c47C9";
+const CHAIN_ID=4663n;
+const ABI=["function balanceOf(address owner) view returns (uint256)"];
+const walletEl=document.getElementById('wallet'), balanceEl=document.getElementById('balance'), gate=document.getElementById('gate');
+function short(a){return a.slice(0,6)+'…'+a.slice(-4)}
+function setGate(text,cls){gate.className='status '+cls;gate.innerHTML=text}
+async function provider(){if(!window.ethereum)throw new Error('No Web3 wallet detected. Open the site with a compatible wallet extension/browser.');return new BrowserProvider(window.ethereum)}
+async function check(){
+ try{
+  const account=localStorage.getItem('rhoodstone_account');
+  if(!account){walletEl.textContent='Not connected';balanceEl.textContent='—';setGate('Connect your wallet from the homepage first, then return here.','bad');return}
+  walletEl.textContent=short(account);
+  setGate('Checking Rhoodstone ownership…','');
+  const p=await provider(); const net=await p.getNetwork();
+  if(net.chainId!==CHAIN_ID){balanceEl.textContent='—';setGate('⚠ Wrong network. Switch to Robinhood Chain Mainnet (Chain ID 4663).','error');return}
+  const c=new Contract(CONTRACT,ABI,p); const bal=await c.balanceOf(account); balanceEl.textContent=bal.toString();
+  if(bal>0n)setGate('✓ <b>Holder access verified.</b><br><small>This wallet currently holds '+bal.toString()+' Rhoodstone NFT'+(bal===1n?'':'s')+'.</small>','ok');
+  else setGate('✕ <b>Holder access denied.</b><br><small>This wallet currently holds no Rhoodstone NFT.</small>','bad');
+ }catch(e){setGate('⚠ '+(e.shortMessage||e.message||'Verification failed.'),'error')}
+}
+document.getElementById('refresh').onclick=check;
+if(window.ethereum){window.ethereum.on('accountsChanged',a=>{if(!a.length){localStorage.removeItem('rhoodstone_account');}else localStorage.setItem('rhoodstone_account',a[0]);check()});window.ethereum.on('chainChanged',check)}
+check();
+</script>
+</body>
+</html>
