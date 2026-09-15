@@ -3,11 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn("Supabase environment variables are missing.");
-}
+export const supabaseConfig = {
+  url: supabaseUrl,
+  key: supabaseKey,
+  ready: Boolean(supabaseUrl && supabaseKey),
+};
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseKey
-);
+export const supabase = supabaseConfig.ready
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
