@@ -1,7 +1,0 @@
-node_modules/
-.env
-copilot.db
-copilot.db-shm
-copilot.db-wal
-npm-debug.log*
-.DS_Store
