@@ -7,8 +7,7 @@ const CONFIG = {
 };
 
 const ERC721_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function supportsInterface(bytes4 interfaceId) view returns (bool)"
+  "function balanceOf(address owner) view returns (uint256)"
 ];
 
 const els = {
@@ -25,80 +24,222 @@ const els = {
   tierBadge: document.getElementById("tierBadge")
 };
 
-function shortAddress(a){ return `${a.slice(0,6)}…${a.slice(-4)}`; }
+let activeProvider = null;
+let browserProvider = null;
+let connectedAddress = null;
 
-function tierForBalance(n){
-  if(n >= 8) return "DIAMOND";
-  if(n >= 4) return "GOLD";
-  if(n >= 2) return "SILVER";
+function shortAddress(a) {
+  return `${a.slice(0, 6)}…${a.slice(-4)}`;
+}
+
+function tierForBalance(n) {
+  if (n >= 8) return "DIAMOND";
+  if (n >= 4) return "GOLD";
+  if (n >= 2) return "SILVER";
   return "STONE";
 }
 
-async function ensureRobinhoodChain(){
-  if(!window.ethereum) throw new Error("No EVM wallet detected.");
-  const hex = "0x" + CONFIG.chainId.toString(16);
+function setStatus(message, error = false) {
+  els.status.textContent = message || "";
+  els.status.style.color = error ? "#ff7187" : "";
+}
+
+function getInjectedProviders() {
+  const providers = [];
+  if (Array.isArray(window.ethereum?.providers)) {
+    providers.push(...window.ethereum.providers);
+  } else if (window.ethereum) {
+    providers.push(window.ethereum);
+  }
+  return providers;
+}
+
+function providerName(p) {
+  if (p?.isMetaMask) return "MetaMask";
+  if (p?.isRabby) return "Rabby";
+  if (p?.isCoinbaseWallet) return "Coinbase Wallet";
+  if (p?.isOKExWallet || p?.isOKXWallet) return "OKX Wallet";
+  if (p?.isTrust) return "Trust Wallet";
+  return "wallet";
+}
+
+async function getWalletProvider() {
+  // Prefer EIP-6963 multi-wallet discovery when available.
+  const discovered = [];
+  const handler = (event) => {
+    if (event?.detail?.provider) discovered.push(event.detail);
+  };
+
+  window.addEventListener("eip6963:announceProvider", handler);
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+  await new Promise(resolve => setTimeout(resolve, 150));
+  window.removeEventListener("eip6963:announceProvider", handler);
+
+  if (discovered.length) {
+    const preferred = discovered.find(x =>
+      /metamask|rabby|okx|coinbase|trust/i.test(
+        `${x.info?.name || ""} ${x.info?.rdns || ""}`
+      )
+    );
+    activeProvider = preferred?.provider || discovered[0].provider;
+    return activeProvider;
+  }
+
+  const injected = getInjectedProviders();
+  if (injected.length) {
+    activeProvider =
+      injected.find(p => p.isMetaMask) ||
+      injected.find(p => p.isRabby) ||
+      injected.find(p => p.isOKXWallet || p.isOKExWallet) ||
+      injected[0];
+    return activeProvider;
+  }
+
+  return null;
+}
+
+async function ensureRobinhoodChain(provider) {
+  const chainIdHex = "0x" + CONFIG.chainId.toString(16);
+
+  const current = await provider.request({ method: "eth_chainId" });
+  if (current?.toLowerCase() === chainIdHex.toLowerCase()) return;
+
+  setStatus("Switching to Robinhood Chain…");
+
   try {
-    await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hex}]});
-  } catch(e) {
-    if(e.code !== 4902) throw e;
-    await window.ethereum.request({
-      method:"wallet_addEthereumChain",
-      params:[{
-        chainId:hex,
-        chainName:CONFIG.chainName,
-        nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},
-        rpcUrls:[CONFIG.rpcUrl],
-        blockExplorerUrls:[CONFIG.explorer]
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: chainIdHex }]
+    });
+  } catch (e) {
+    // 4902 = chain not added to this wallet.
+    if (e?.code !== 4902) {
+      if (e?.code === 4001) throw new Error("Network switch was cancelled in your wallet.");
+      throw e;
+    }
+
+    await provider.request({
+      method: "wallet_addEthereumChain",
+      params: [{
+        chainId: chainIdHex,
+        chainName: CONFIG.chainName,
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+        rpcUrls: [CONFIG.rpcUrl],
+        blockExplorerUrls: [CONFIG.explorer]
       }]
     });
   }
 }
 
-async function connect(){
-  els.status.textContent = "Connecting wallet…";
-  try{
-    if(!window.ethereum) throw new Error("Open this site in an EVM-compatible wallet browser or install a wallet extension.");
-    await ensureRobinhoodChain();
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts",[]);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-    const contract = new ethers.Contract(CONFIG.contract, ERC721_ABI, provider);
+async function verifyHolder(address, provider) {
+  const contract = new ethers.Contract(CONFIG.contract, ERC721_ABI, provider);
 
-    let balance;
-    try {
-      balance = Number(await contract.balanceOf(address));
-    } catch(e) {
-      throw new Error("The contract did not respond to ERC-721 balanceOf(). The NFT standard/ABI needs to be verified before production launch.");
+  try {
+    const raw = await contract.balanceOf(address);
+    return Number(raw);
+  } catch (e) {
+    console.error("balanceOf error:", e);
+    throw new Error(
+      "We couldn't read RhoodStone ownership from the contract. Please try again, and if the problem continues verify the NFT contract/ABI."
+    );
+  }
+}
+
+async function connect() {
+  setStatus("Connecting wallet…");
+
+  try {
+    if (!window.ethereum && !window.ethereum?.providers) {
+      throw new Error(
+        "No wallet was detected. Open this page in MetaMask, Rabby, OKX Wallet, or another EVM-compatible wallet browser."
+      );
     }
 
-    if(balance <= 0){
-      els.status.textContent = "This wallet does not hold a RhoodStone NFT.";
-      els.status.style.color = "#ff7187";
+    const provider = await getWalletProvider();
+    if (!provider) {
+      throw new Error("No compatible EVM wallet was detected.");
+    }
+
+    // Request accounts BEFORE switching networks. Some wallet providers
+    // reject network requests until the wallet is connected.
+    const accounts = await provider.request({ method: "eth_requestAccounts" });
+    if (!accounts?.length) throw new Error("No wallet account was returned.");
+
+    await ensureRobinhoodChain(provider);
+
+    browserProvider = new ethers.BrowserProvider(provider);
+
+    // Refresh the account after the possible network switch.
+    const finalAccounts = await provider.request({ method: "eth_accounts" });
+    connectedAddress = finalAccounts?.[0] || accounts[0];
+
+    setStatus("Verifying RhoodStone ownership…");
+
+    const balance = await verifyHolder(connectedAddress, browserProvider);
+
+    if (balance <= 0) {
+      setStatus("This wallet does not hold a RhoodStone NFT.", true);
       return;
     }
 
     const tier = tierForBalance(balance);
-    els.address.textContent = shortAddress(address);
+
+    els.address.textContent = shortAddress(connectedAddress);
     els.balance.textContent = balance;
-    els.passportBalance.textContent = `${balance} NFT${balance===1?"":"s"}`;
+    els.passportBalance.textContent = `${balance} NFT${balance === 1 ? "" : "s"}`;
     els.tier.textContent = tier;
     els.tierBadge.textContent = tier;
+
     els.locked.classList.add("hidden");
     els.dashboard.classList.remove("hidden");
     els.connect.textContent = "Holder Portal";
-    els.status.textContent = "";
-    document.getElementById("portal").scrollIntoView({behavior:"smooth"});
-  }catch(err){
+    setStatus("");
+
+    document.getElementById("portal").scrollIntoView({ behavior: "smooth" });
+  } catch (err) {
     console.error(err);
-    els.status.textContent = err.message || "Wallet connection failed.";
-    els.status.style.color = "#ff7187";
+
+    if (err?.code === 4001) {
+      setStatus("Connection was cancelled in your wallet.", true);
+    } else {
+      setStatus(err?.message || "Wallet connection failed. Please try again.", true);
+    }
   }
 }
 
-[els.connect,els.heroConnect,els.lockedConnect].forEach(b => b && b.addEventListener("click",connect));
+[els.connect, els.heroConnect, els.lockedConnect].forEach(
+  b => b && b.addEventListener("click", connect)
+);
 
-if(window.ethereum){
-  window.ethereum.on("accountsChanged",()=>location.reload());
-  window.ethereum.on("chainChanged",()=>location.reload());
+// React to wallet changes without forcing a full page reload.
+async function handleAccountsChanged(accounts) {
+  if (!accounts?.length) {
+    connectedAddress = null;
+    browserProvider = null;
+    els.locked.classList.remove("hidden");
+    els.dashboard.classList.add("hidden");
+    els.connect.textContent = "Connect Wallet";
+    setStatus("");
+    return;
+  }
+
+  // Re-verify the newly selected account.
+  connect();
 }
+
+function handleChainChanged() {
+  // The portal requires Robinhood Chain. Re-running connect handles both
+  // network changes and ownership verification.
+  if (connectedAddress) connect();
+}
+
+async function initWalletEvents() {
+  const provider = await getWalletProvider();
+  if (!provider?.on) return;
+
+  provider.on("accountsChanged", handleAccountsChanged);
+  provider.on("chainChanged", handleChainChanged);
+}
+
+initWalletEvents();
