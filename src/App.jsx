@@ -4,34 +4,38 @@ import { supabase } from "./lib/supabase";
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
-const [walletConnecting, setWalletConnecting] = useState(false);
+  const [walletConnecting, setWalletConnecting] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
   async function connectWallet() {
-  if (!window.ethereum) {
-    alert("Please install MetaMask or another EVM wallet.");
-    return;
-  }
-
-  try {
-    setWalletConnecting(true);
-
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
-
-    if (!accounts || accounts.length === 0) {
+    if (!window.ethereum) {
+      alert("Please install MetaMask or another EVM wallet.");
       return;
     }
 
-    setWalletAddress(accounts[0]);
-  } catch (error) {
-    console.error("Wallet connection error:", error);
-  } finally {
-    setWalletConnecting(false);
+    try {
+      setWalletConnecting(true);
+
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      if (!accounts || accounts.length === 0) {
+        return;
+      }
+
+      setWalletAddress(accounts[0]);
+    } catch (error) {
+      console.error("Wallet connection error:", error);
+    } finally {
+      setWalletConnecting(false);
+    }
   }
-}
-  
+
+  function disconnectWallet() {
+    setWalletAddress("");
+  }
+
   useEffect(() => {
     async function testSupabase() {
       if (!supabase) {
@@ -77,6 +81,24 @@ const [walletConnecting, setWalletConnecting] = useState(false);
 
   return (
     <>
+      <style>{`
+        .mobile-wallet-button {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          .desktop-wallet-button {
+            display: none !important;
+          }
+
+          .mobile-wallet-button {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+          }
+        }
+      `}</style>
+
       {/* Temporary Supabase Test */}
       <div
         style={{
@@ -120,21 +142,36 @@ const [walletConnecting, setWalletConnecting] = useState(false);
             <a href="#missions" onClick={() => setMenuOpen(false)}>
               Missions
             </a>
+
+            {/* Mobile Wallet Button */}
+            <button
+              className="connect-button mobile-wallet-button"
+              onClick={walletAddress ? disconnectWallet : connectWallet}
+              disabled={walletConnecting}
+            >
+              {walletConnecting
+                ? "Connecting..."
+                : walletAddress
+                ? "Disconnect"
+                : "Connect Wallet"}
+            </button>
           </nav>
 
-          <button>
-  className="connect-button"
-  onClick={walletAddress ? disconnectWallet : connectWallet}
-  disabled={walletConnecting}
->
-  {walletConnecting
-    ? "Connecting..."
-    : walletAddress
-    ? "Disconnect"
-    : "Connect Wallet"}
-            
-</button>
-          
+          {/* Desktop Wallet Button */}
+          <button
+            className="connect-button desktop-wallet-button"
+            onClick={walletAddress ? disconnectWallet : connectWallet}
+            disabled={walletConnecting}
+          >
+            {walletConnecting
+              ? "Connecting..."
+              : walletAddress
+              ? "Disconnect"
+              : "Connect Wallet"}
+          </button>
+
+          {/* Mobile Menu Button */}
+          <button
             className="mobile-menu"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
