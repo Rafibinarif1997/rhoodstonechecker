@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rhoodstone — More Than A Stone</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#020402;color:#f4f5ee;font-family:Arial,Helvetica,sans-serif}
+.nav{position:fixed;top:0;left:0;right:0;height:74px;z-index:99;background:rgba(2,4,2,.88);backdrop-filter:blur(14px);border-bottom:1px solid #273221;display:flex;align-items:center;justify-content:space-between;padding:0 5%}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;letter-spacing:2px}.brand img{width:42px;height:42px;border-radius:8px;object-fit:cover}
+.links{display:flex;gap:30px}.links a{color:#b8beb3;text-decoration:none;font-size:14px}.links a:hover{color:#9dff38}
+.wallet{position:relative}.wallet button,.cta{border:1px solid #9dff38;background:#0d180a;color:#dcffc1;border-radius:10px;padding:11px 17px;font-weight:800;cursor:pointer;box-shadow:0 0 24px #9dff3825}.wallet button:hover,.cta:hover{background:#14250e}.drop{position:absolute;right:0;top:50px;width:250px;background:#0b100b;border:1px solid #34422c;border-radius:12px;padding:8px;box-shadow:0 20px 50px #000;display:none}.drop.open{display:block}.drop p{font-size:11px;color:#7f897b;word-break:break-all;padding:8px;margin:0}.drop button{display:block;width:100%;text-align:left;border:0;background:transparent;box-shadow:none;color:#ddd;padding:10px}.drop button:hover{background:#182018}.drop .danger{color:#ff9a9a}
+.hero{height:min(820px,100vh);min-height:650px;margin-top:74px;background-image:url('assets/hero-banner.jpg');background-size:cover;background-position:center;position:relative;display:flex;align-items:center;justify-content:center;text-align:center}.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.15),rgba(0,0,0,.62)),linear-gradient(0deg,#020402,transparent 30%,rgba(0,0,0,.15))}
+.heroContent{position:relative;max-width:820px;padding:30px 20px}.eyebrow{font-size:11px;letter-spacing:4px;color:#9dff38;font-weight:800}.hero h1{font-family:Georgia,serif;font-size:clamp(54px,9vw,100px);line-height:.82;letter-spacing:3px;margin:18px 0;text-shadow:0 6px 30px #000}.hero h1 span{color:#dedbd0}.hero p{font-size:17px;color:#e3e8de}.actions{margin-top:28px;display:flex;justify-content:center;gap:12px}.secondary{border:1px solid #788174;color:#fff;background:#050705aa;border-radius:10px;padding:11px 18px;text-decoration:none;font-weight:700}
+.status{margin:18px auto 0;padding:12px 15px;max-width:590px;background:#050805df;border:1px solid #34422e;border-radius:10px;font-size:13px}.verified{border-color:#63943d;color:#caff9a}.not{border-color:#743b3b;color:#ffb1b1}.error{color:#ffd28c}
+section{max-width:1080px;margin:auto;padding:90px 24px}.about{display:grid;grid-template-columns:.8fr 1.2fr;gap:70px}.title{font-family:Georgia,serif;font-size:48px;margin:10px 0 20px}.text{color:#9da69a;line-height:1.9}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{padding:25px;border:1px solid #273221;background:#080c08;border-radius:14px}.card b{color:#9dff38}.card h3{font-family:Georgia,serif}.card p{color:#929b90;line-height:1.7;font-size:13px}.road{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}.stone{width:100%;max-width:430px;border-radius:18px;display:block;box-shadow:0 0 80px #9dff3815}.steps{display:grid;gap:10px}.step{padding:14px;border:1px solid #273221;border-radius:10px;color:#ccd1c8}.step span{color:#9dff38;margin-right:12px}details{border-top:1px solid #273221;padding:18px 0}summary{cursor:pointer;font-weight:700}details p{color:#929b90;line-height:1.7}footer{text-align:center;border-top:1px solid #20291d;color:#667060;padding:28px;font-size:11px;letter-spacing:2px}
+@media(max-width:750px){.links{display:none}.about,.road{grid-template-columns:1fr;gap:30px}.cards{grid-template-columns:1fr}.hero{background-position:center}.actions{flex-direction:column}.actions>*{width:100%}.title{font-size:38px}.nav{padding:0 16px}}
+</style>
+</head>
+<body>
+<header class="nav">
+<a class="brand" href="#home"><img src="assets/rhoodstone-stone.jpg" alt="Rhoodstone">RHOODSTONE</a>
+<nav class="links"><a href="#home">Home</a><a href="#about">About</a><a href="#roadmap">Roadmap</a><a href="#faq">FAQ</a></nav>
+<div class="wallet" id="wallet"></div>
+</header>
+
+<main>
+<section class="hero" id="home"><div class="shade"></div><div class="heroContent">
+<div class="eyebrow">MORE THAN A STONE</div>
+<h1>RHOOD<br><span>STONE</span></h1>
+<p>A symbol of belief, community, freedom and a brighter tomorrow.</p>
+<div class="actions"><button class="cta" id="connect">Connect Wallet &amp; Verify</button><a class="secondary" href="#about">Learn More ↓</a></div>
+<div id="status" class="status" style="display:none"></div>
+</div></section>
+
+<section id="about" class="about"><div><div class="eyebrow">THE IDEA</div><h2 class="title">What is Rhoodstone?</h2></div><div><p class="text">Rhoodstone is a community-driven NFT built around a simple idea: holding a stone means holding a place in an ecosystem that grows with its community.</p><p class="text">Phase 1 is intentionally simple. Connect your wallet once and verify your Rhoodstone ownership. Future utilities can be introduced in phases while keeping the holder experience simple.</p></div></section>
+
+<section><div class="cards"><article class="card"><b>01</b><h3>Holder First</h3><p>Access begins with verified ownership. No repeated wallet connection inside the experience.</p></article><article class="card"><b>02</b><h3>Built to Grow</h3><p>Future ecosystem features can be added in phases without changing the core holder flow.</p></article><article class="card"><b>03</b><h3>Community Driven</h3><p>Built around participation, access and long-term community value.</p></article></div></section>
+
+<section id="roadmap" class="road"><div><img class="stone" src="assets/rhoodstone-stone.jpg" alt="Rhoodstone"></div><div><div class="eyebrow">PHASE 01</div><h2 class="title">Verify. Then unlock.</h2><p class="text">One wallet connection powers the entire site. Once connected, the same wallet session is used throughout the experience.</p><div class="steps"><div class="step"><span>01</span>Connect wallet</div><div class="step"><span>02</span>Check Rhoodstone NFT ownership on-chain</div><div class="step"><span>03</span>Verified holder experience</div></div></div></section>
+
+<section id="faq"><div class="eyebrow">FAQ</div><h2 class="title">Simple by design.</h2><details><summary>Do I need to connect on every page?</summary><p>No. The site keeps one wallet session and internal pages do not need another Connect button.</p></details><details><summary>How is holder status checked?</summary><p>The app calls the Rhoodstone NFT contract balanceOf(wallet) on Robinhood Chain.</p></details><details><summary>What if I disconnect?</summary><p>The website clears its local wallet session. Connect again to restore access.</p></details></section>
+</main>
+<footer>RHOODSTONE • MORE THAN A STONE</footer>
+
+<script type="module">
+import { BrowserProvider, Contract } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+const CONTRACT="0x6be906e10351B4a970521c386E89D9e4e34c47C9";
+const CHAIN_ID=4663n;
+const ABI=["function balanceOf(address owner) view returns (uint256)"];
+let account="";
+
+const walletEl=document.getElementById("wallet"), connect=document.getElementById("connect"), status=document.getElementById("status");
+function short(a){return a.slice(0,6)+"…"+a.slice(-4)}
+function show(text,type){status.style.display="block";status.className="status "+type;status.innerHTML=text}
+function render(){if(!account){walletEl.innerHTML='<button id="walletBtn">Connect Wallet</button>';document.getElementById("walletBtn").onclick=connectWallet;connect.textContent="Connect Wallet & Verify"}else{walletEl.innerHTML='<button id="walletBtn">✓ '+short(account)+'⌄</button><div class="drop" id="drop"><p>'+account+'</p><button id="refresh">Refresh Verification</button><button class="danger" id="disconnect">Disconnect</button></div>';let b=document.getElementById("walletBtn"),d=document.getElementById("drop");b.onclick=()=>d.classList.toggle("open");document.getElementById("refresh").onclick=()=>{d.classList.remove("open");verify()};document.getElementById("disconnect").onclick=disconnect;connect.textContent="Verify Holder"}}
+async function provider(){if(!window.ethereum)throw new Error("No Web3 wallet detected. Open this site in a compatible wallet browser or install a wallet extension.");return new BrowserProvider(window.ethereum)}
+async function connectWallet(){try{if(!window.ethereum)throw new Error("No Web3 wallet detected.");let p=await provider();await p.send("eth_requestAccounts",[]);account=await (await p.getSigner()).getAddress();localStorage.setItem("rhoodstone_account",account);render();await verify()}catch(e){show("⚠ "+(e.shortMessage||e.message||"Wallet connection failed."),"error")}}
+async function verify(){try{show("Checking Rhoodstone ownership…","");let p=await provider(),net=await p.getNetwork();if(net.chainId!==CHAIN_ID){show("⚠ Wrong network. Please switch your wallet to Robinhood Chain Mainnet (Chain ID 4663).","error");return}let c=new Contract(CONTRACT,ABI,p);let bal=await c.balanceOf(account);if(bal>0n)show("✓ <b>Rhoodstone Holder Verified</b><br><small>You hold "+bal.toString()+" Rhoodstone NFT"+(bal===1n?"":"s")+".</small>","verified");else show("✕ <b>Not a Rhoodstone Holder</b><br><small>This wallet currently holds no Rhoodstone NFT.</small>","not")}catch(e){show("⚠ "+(e.shortMessage||e.message||"Verification failed."),"error")}}
+function disconnect(){account="";localStorage.removeItem("rhoodstone_account");status.style.display="none";render()}
+async function boot(){render();if(!window.ethereum)return;window.ethereum.on("accountsChanged",a=>{if(!a.length)disconnect();else{account=a[0];localStorage.setItem("rhoodstone_account",account);render();verify()}});window.ethereum.on("chainChanged",()=>{if(account)verify()});let saved=localStorage.getItem("rhoodstone_account");if(saved){account=saved;render();verify()}}
+boot();
+</script>
+</body>
+</html>
