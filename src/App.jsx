@@ -187,7 +187,7 @@ function App() {
             </a>
 
             <a
-  href="/dashboard"
+  href="/?page=dashboard"
   onClick={() => setMenuOpen(false)}
 >
   Dashboard
