@@ -4,6 +4,7 @@ import {
   useAppKitAccount,
   useDisconnect,
 } from "@reown/appkit/react";
+
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
 import { getHolderTier } from "./lib/holderTier";
 import { getRhoodPoints } from "./lib/points";
@@ -24,8 +25,13 @@ function Dashboard() {
   const [missionsLoading, setMissionsLoading] = useState(false);
   const [completingMission, setCompletingMission] = useState(null);
   const [missionMessage, setMissionMessage] = useState("");
+  const [missionMessageType, setMissionMessageType] =
+    useState("");
 
-  // RhoodStone ownership verification
+  // ==========================================
+  // RHOODSTONE OWNERSHIP VERIFICATION
+  // ==========================================
+
   useEffect(() => {
     async function verifyHolder() {
       if (!isConnected || !address) {
@@ -37,11 +43,20 @@ function Dashboard() {
       try {
         setHolderStatus("checking");
 
-        const balance = await checkRhoodStoneHolder(address);
+        const balance =
+          await checkRhoodStoneHolder(address);
+
+        console.log(
+          "Verified RhoodStone balance:",
+          balance
+        );
 
         setNftBalance(balance);
+
         setHolderStatus(
-          balance > 0 ? "holder" : "not-holder"
+          balance > 0
+            ? "holder"
+            : "not-holder"
         );
       } catch (error) {
         console.error(
@@ -57,7 +72,10 @@ function Dashboard() {
     verifyHolder();
   }, [isConnected, address]);
 
-  // Holder tier
+  // ==========================================
+  // HOLDER TIER
+  // ==========================================
+
   useEffect(() => {
     async function loadHolderTier() {
       if (!isConnected || !address) {
@@ -66,7 +84,9 @@ function Dashboard() {
       }
 
       try {
-        const tier = await getHolderTier(0, 0);
+        const tier =
+          await getHolderTier(0, 0);
+
         setHolderTier(tier);
       } catch (error) {
         console.error(
@@ -81,7 +101,10 @@ function Dashboard() {
     loadHolderTier();
   }, [isConnected, address]);
 
-  // Rhood Points
+  // ==========================================
+  // RHOOD POINTS
+  // ==========================================
+
   async function refreshPoints() {
     if (!address) {
       setRhoodPoints(0);
@@ -89,7 +112,14 @@ function Dashboard() {
     }
 
     try {
-      const points = await getRhoodPoints(address);
+      const points =
+        await getRhoodPoints(address);
+
+      console.log(
+        "Rhood Points:",
+        points
+      );
+
       setRhoodPoints(points);
     } catch (error) {
       console.error(
@@ -108,9 +138,16 @@ function Dashboard() {
     refreshPoints();
   }, [isConnected, address]);
 
-  // Load active missions
+  // ==========================================
+  // LOAD ACTIVE MISSIONS
+  // ==========================================
+
   async function loadMissions() {
-    if (!isConnected || !address || !supabase) {
+    if (
+      !isConnected ||
+      !address ||
+      !supabase
+    ) {
       setMissions([]);
       setCompletedMissions([]);
       return;
@@ -119,7 +156,11 @@ function Dashboard() {
     try {
       setMissionsLoading(true);
 
-      const { data, error } = await supabase
+      // Load active missions
+      const {
+        data: missionData,
+        error: missionError,
+      } = await supabase
         .from("missions")
         .select(
           "id, title, description, mission_type, action_url, reward_points, max_completions, start_at, end_at, is_holder_only"
@@ -129,23 +170,27 @@ function Dashboard() {
           ascending: false,
         });
 
-      if (error) {
-        throw error;
+      if (missionError) {
+        throw missionError;
       }
 
-      setMissions(data || []);
+      setMissions(
+        missionData || []
+      );
 
-      // Find missions already completed by this wallet
-      const { data: completions, error: completionError } =
-        await supabase
-          .from("mission_completions")
-          .select(
-            "mission_id, status, points_awarded"
-          )
-          .eq(
-            "wallet_address",
-            address.toLowerCase()
-          );
+      // Load completed missions
+      const {
+        data: completionData,
+        error: completionError,
+      } = await supabase
+        .from("mission_completions")
+        .select(
+          "mission_id, status, points_awarded"
+        )
+        .eq(
+          "wallet_address",
+          address.toLowerCase()
+        );
 
       if (completionError) {
         console.error(
@@ -156,7 +201,7 @@ function Dashboard() {
         setCompletedMissions([]);
       } else {
         setCompletedMissions(
-          completions || []
+          completionData || []
         );
       }
     } catch (error) {
@@ -166,6 +211,7 @@ function Dashboard() {
       );
 
       setMissions([]);
+      setCompletedMissions([]);
     } finally {
       setMissionsLoading(false);
     }
@@ -175,18 +221,29 @@ function Dashboard() {
     loadMissions();
   }, [isConnected, address]);
 
-  // Complete mission
-  async function handleCompleteMission(mission) {
+  // ==========================================
+  // COMPLETE MISSION
+  // ==========================================
+
+  async function handleCompleteMission(
+    mission
+  ) {
     if (!address || !supabase) {
+      setMissionMessage(
+        "Please connect your wallet first."
+      );
+
+      setMissionMessageType("error");
+
       return;
     }
 
     setMissionMessage("");
+    setMissionMessageType("");
     setCompletingMission(mission.id);
 
     try {
-      // If mission has an external action URL,
-      // open it first.
+      // Open mission action URL if available
       if (mission.action_url) {
         window.open(
           mission.action_url,
@@ -195,7 +252,20 @@ function Dashboard() {
         );
       }
 
-      const { data, error } =
+      console.log(
+        "Completing mission:",
+        mission.id
+      );
+
+      console.log(
+        "Wallet:",
+        address
+      );
+
+      const {
+        data,
+        error,
+      } =
         await supabase.functions.invoke(
           "complete-mission",
           {
@@ -206,29 +276,105 @@ function Dashboard() {
           }
         );
 
+      console.log(
+        "Complete mission response:",
+        data
+      );
+
+      console.log(
+        "Complete mission error:",
+        error
+      );
+
+      // ======================================
+      // HANDLE EDGE FUNCTION ERROR
+      // ======================================
+
       if (error) {
-        throw new Error(
+        let message =
           error.message ||
-            "Mission completion failed"
+          "Mission completion failed.";
+
+        try {
+          if (error.context) {
+            const responseText =
+              await error.context.text();
+
+            console.error(
+              "Edge Function raw response:",
+              responseText
+            );
+
+            if (responseText) {
+              try {
+                const parsed =
+                  JSON.parse(
+                    responseText
+                  );
+
+                if (parsed?.error) {
+                  message =
+                    parsed.error;
+                }
+              } catch {
+                message =
+                  responseText;
+              }
+            }
+          }
+        } catch (readError) {
+          console.error(
+            "Could not read Edge Function error:",
+            readError
+          );
+        }
+
+        throw new Error(message);
+      }
+
+      // ======================================
+      // FUNCTION RETURNED AN ERROR
+      // ======================================
+
+      if (data?.error) {
+        throw new Error(
+          data.error
         );
       }
 
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      // ======================================
+      // SUCCESS CHECK
+      // ======================================
 
       if (!data?.success) {
         throw new Error(
-          "Mission could not be completed"
+          "Mission could not be completed."
         );
       }
 
+      // ======================================
+      // SUCCESS
+      // ======================================
+
+      const awardedPoints =
+        Number(
+          data.points_awarded || 0
+        );
+
       setMissionMessage(
-        `Mission completed! +${data.points_awarded} Rhood Points`
+        `Mission completed! +${awardedPoints} Rhood Points`
       );
 
+      setMissionMessageType(
+        "success"
+      );
+
+      // Refresh points
       await refreshPoints();
+
+      // Refresh missions/completions
       await loadMissions();
+
     } catch (error) {
       console.error(
         "Mission completion failed:",
@@ -236,44 +382,84 @@ function Dashboard() {
       );
 
       setMissionMessage(
-        error.message ||
+        error?.message ||
           "Could not complete mission."
+      );
+
+      setMissionMessageType(
+        "error"
       );
     } finally {
       setCompletingMission(null);
     }
   }
 
-  function isMissionCompleted(missionId) {
+  // ==========================================
+  // CHECK COMPLETED MISSION
+  // ==========================================
+
+  function isMissionCompleted(
+    missionId
+  ) {
     return completedMissions.some(
       (completion) =>
-        completion.mission_id === missionId &&
-        completion.status === "completed"
+        completion.mission_id ===
+          missionId &&
+        completion.status ===
+          "completed"
     );
   }
+
+  // ==========================================
+  // WALLET
+  // ==========================================
 
   function handleWallet() {
     if (isConnected) {
       disconnect();
     } else {
-      open({ view: "Connect" });
+      open({
+        view: "Connect",
+      });
     }
   }
 
   const shortAddress = address
-    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    ? `${address.slice(
+        0,
+        6
+      )}...${address.slice(-4)}`
     : "";
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <div className="dashboard-page">
+
+      {/* HEADER */}
       <header className="dashboard-header">
-        <a href="/" className="logo">
-          <span className="logo-mark">◆</span>
-          <span>RHOODSTONE</span>
+
+        <a
+          href="/"
+          className="logo"
+        >
+          <span className="logo-mark">
+            ◆
+          </span>
+
+          <span>
+            RHOODSTONE
+          </span>
         </a>
 
         <div className="dashboard-header-actions">
-          <a href="/" className="dashboard-back">
+
+          <a
+            href="/"
+            className="dashboard-back"
+          >
             ← Home
           </a>
 
@@ -285,54 +471,80 @@ function Dashboard() {
               ? shortAddress
               : "Connect Wallet"}
           </button>
+
         </div>
       </header>
 
+      {/* MAIN */}
       <main className="dashboard-main">
+
+        {/* EYEBROW */}
         <div className="dashboard-eyebrow">
           <span></span>
           RHOODSTONE ECOSYSTEM
         </div>
 
+        {/* TITLE */}
         <div className="dashboard-title-row">
+
           <div>
+
             <h1>
               HOLDER
               <br />
-              <em>DASHBOARD.</em>
+              <em>
+                DASHBOARD.
+              </em>
             </h1>
 
             <p>
-              Your identity, ownership and access inside the
-              RhoodStone ecosystem.
+              Your identity, ownership and access
+              inside the RhoodStone ecosystem.
             </p>
+
           </div>
 
           {isConnected && (
             <div className="dashboard-wallet-status">
+
               <span className="status-dot"></span>
 
               <div>
-                <small>CONNECTED WALLET</small>
-                <strong>{shortAddress}</strong>
+                <small>
+                  CONNECTED WALLET
+                </small>
+
+                <strong>
+                  {shortAddress}
+                </strong>
               </div>
+
             </div>
           )}
+
         </div>
 
+        {/* NOT CONNECTED */}
         {!isConnected ? (
+
           <section className="dashboard-connect-card">
+
             <div className="dashboard-card-icon">
               ◆
             </div>
 
-            <span>MEMBER ACCESS</span>
+            <span>
+              MEMBER ACCESS
+            </span>
 
-            <h2>Connect your wallet</h2>
+            <h2>
+              Connect your wallet
+            </h2>
 
             <p>
-              Connect the wallet holding your RhoodStone NFT
-              to access your holder dashboard.
+              Connect the wallet holding your
+              RhoodStone NFT to access your
+              holder dashboard.
             </p>
 
             <button
@@ -341,91 +553,130 @@ function Dashboard() {
             >
               Connect Wallet
             </button>
+
           </section>
+
         ) : (
+
           <>
+            {/* =================================
+                STATS
+            ================================= */}
+
             <section className="dashboard-grid">
 
+              {/* HOLDER STATUS */}
               <article className="dashboard-card dashboard-card-large">
+
                 <div className="card-label">
                   HOLDER STATUS
                 </div>
 
-                {holderStatus === "checking" && (
+                {holderStatus ===
+                  "checking" && (
+
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       ◌
                     </span>
 
                     <div>
-                      <strong>VERIFYING</strong>
+
+                      <strong>
+                        VERIFYING
+                      </strong>
 
                       <p>
-                        Checking your RhoodStone ownership...
+                        Checking your
+                        RhoodStone ownership...
                       </p>
+
                     </div>
+
                   </div>
                 )}
 
-                {holderStatus === "holder" && (
+                {holderStatus ===
+                  "holder" && (
+
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       ✓
                     </span>
 
                     <div>
+
                       <strong>
                         RHOODSTONE HOLDER
                       </strong>
 
                       <p>
-                        Your ownership has been verified
-                        on-chain.
+                        Your ownership has
+                        been verified on-chain.
                       </p>
+
                     </div>
+
                   </div>
                 )}
 
-                {holderStatus === "not-holder" && (
+                {holderStatus ===
+                  "not-holder" && (
+
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       ×
                     </span>
 
                     <div>
+
                       <strong>
                         NOT A HOLDER
                       </strong>
 
                       <p>
-                        No RhoodStone NFT was detected in
-                        this wallet.
+                        No RhoodStone NFT was
+                        detected in this wallet.
                       </p>
+
                     </div>
+
                   </div>
                 )}
 
-                {holderStatus === "error" && (
+                {holderStatus ===
+                  "error" && (
+
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       !
                     </span>
 
                     <div>
+
                       <strong>
                         VERIFICATION FAILED
                       </strong>
 
                       <p>
-                        We could not verify ownership.
-                        Please try again.
+                        We could not verify
+                        ownership. Please try again.
                       </p>
+
                     </div>
+
                   </div>
                 )}
+
               </article>
 
+              {/* NFT BALANCE */}
               <article className="dashboard-card">
+
                 <div className="card-label">
                   RHOODSTONE HELD
                 </div>
@@ -437,9 +688,12 @@ function Dashboard() {
                 <p className="dashboard-card-description">
                   NFTs currently held by this wallet.
                 </p>
+
               </article>
 
+              {/* TIER */}
               <article className="dashboard-card">
+
                 <div className="card-label">
                   HOLDER TIER
                 </div>
@@ -453,9 +707,12 @@ function Dashboard() {
                 <p className="dashboard-card-description">
                   Your current ecosystem level.
                 </p>
+
               </article>
 
+              {/* POINTS */}
               <article className="dashboard-card">
+
                 <div className="card-label">
                   RHOOD POINTS
                 </div>
@@ -465,229 +722,351 @@ function Dashboard() {
                 </div>
 
                 <p className="dashboard-card-description">
-                  Earn points through missions and
-                  participation.
+                  Earn points through missions
+                  and participation.
                 </p>
+
               </article>
 
             </section>
 
-            {/* MISSIONS */}
+            {/* =================================
+                MISSIONS
+            ================================= */}
+
             <section className="dashboard-section">
+
               <div className="dashboard-section-heading">
-                <span>02 / MISSIONS</span>
+
+                <span>
+                  02 / MISSIONS
+                </span>
 
                 <h2>
                   EARN
                   <br />
-                  <em>RHOOD POINTS.</em>
+                  <em>
+                    RHOOD POINTS.
+                  </em>
                 </h2>
+
               </div>
 
+              {/* MESSAGE */}
               {missionMessage && (
+
                 <div
                   className="dashboard-card"
                   style={{
-                    marginBottom: "20px",
+                    marginBottom:
+                      "20px",
+                    border:
+                      missionMessageType ===
+                      "success"
+                        ? "1px solid rgba(150, 255, 80, 0.35)"
+                        : "1px solid rgba(255, 100, 100, 0.35)",
                   }}
                 >
+
                   <strong>
                     {missionMessage}
                   </strong>
+
                 </div>
+
               )}
 
+              {/* LOADING */}
               {missionsLoading ? (
+
                 <div className="dashboard-card">
+
                   <div className="card-label">
                     MISSIONS
                   </div>
 
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       ◌
                     </span>
 
                     <div>
+
                       <strong>
                         LOADING MISSIONS
                       </strong>
 
                       <p>
-                        Fetching active ecosystem missions...
+                        Fetching active
+                        ecosystem missions...
                       </p>
+
                     </div>
+
                   </div>
+
                 </div>
-              ) : missions.length === 0 ? (
+
+              ) : missions.length ===
+                0 ? (
+
+                /* EMPTY */
                 <div className="dashboard-card">
+
                   <div className="card-label">
                     MISSIONS
                   </div>
 
                   <div className="dashboard-result">
+
                     <span className="result-icon">
                       —
                     </span>
 
                     <div>
+
                       <strong>
                         NO ACTIVE MISSIONS
                       </strong>
 
                       <p>
-                        New missions will appear here when
-                        they become available.
+                        New missions will
+                        appear here when
+                        available.
                       </p>
+
                     </div>
+
                   </div>
+
                 </div>
+
               ) : (
+
+                /* MISSION LIST */
                 <div className="dashboard-access-grid">
-                  {missions.map((mission) => {
-                    const completed =
-                      isMissionCompleted(
-                        mission.id
+
+                  {missions.map(
+                    (mission) => {
+
+                      const completed =
+                        isMissionCompleted(
+                          mission.id
+                        );
+
+                      const completing =
+                        completingMission ===
+                        mission.id;
+
+                      return (
+
+                        <article
+                          key={mission.id}
+                        >
+
+                          <span>
+                            {mission.mission_type
+                              ? mission.mission_type.toUpperCase()
+                              : "MISSION"}
+                          </span>
+
+                          <h3>
+                            {mission.title}
+                          </h3>
+
+                          <p>
+                            {mission.description}
+                          </p>
+
+                          <div
+                            style={{
+                              marginTop:
+                                "18px",
+                              display:
+                                "flex",
+                              alignItems:
+                                "center",
+                              justifyContent:
+                                "space-between",
+                              gap: "12px",
+                              flexWrap:
+                                "wrap",
+                            }}
+                          >
+
+                            <strong>
+                              +
+                              {
+                                mission.reward_points
+                              }{" "}
+                              POINTS
+                            </strong>
+
+                            {mission.is_holder_only && (
+                              <small>
+                                HOLDER ONLY
+                              </small>
+                            )}
+
+                          </div>
+
+                          <button
+                            className="primary-button"
+                            style={{
+                              marginTop:
+                                "18px",
+                              width: "100%",
+                              opacity:
+                                completed ||
+                                completing
+                                  ? 0.6
+                                  : 1,
+                              cursor:
+                                completed ||
+                                completing
+                                  ? "not-allowed"
+                                  : "pointer",
+                            }}
+                            disabled={
+                              completed ||
+                              completing
+                            }
+                            onClick={() =>
+                              handleCompleteMission(
+                                mission
+                              )
+                            }
+                          >
+
+                            {completed
+                              ? "✓ COMPLETED"
+                              : completing
+                              ? "COMPLETING..."
+                              : "COMPLETE MISSION"}
+
+                          </button>
+
+                        </article>
+
                       );
+                    }
+                  )}
 
-                    const completing =
-                      completingMission ===
-                      mission.id;
-
-                    return (
-                      <article key={mission.id}>
-                        <span>
-                          {mission.mission_type
-                            ? mission.mission_type.toUpperCase()
-                            : "MISSION"}
-                        </span>
-
-                        <h3>
-                          {mission.title}
-                        </h3>
-
-                        <p>
-                          {mission.description}
-                        </p>
-
-                        <div
-                          style={{
-                            marginTop: "18px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent:
-                              "space-between",
-                            gap: "12px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <strong>
-                            +{mission.reward_points} POINTS
-                          </strong>
-
-                          {mission.is_holder_only && (
-                            <small>
-                              HOLDER ONLY
-                            </small>
-                          )}
-                        </div>
-
-                        <button
-                          className="primary-button"
-                          style={{
-                            marginTop: "18px",
-                            width: "100%",
-                          }}
-                          disabled={
-                            completed ||
-                            completing
-                          }
-                          onClick={() =>
-                            handleCompleteMission(
-                              mission
-                            )
-                          }
-                        >
-                          {completed
-                            ? "✓ COMPLETED"
-                            : completing
-                            ? "COMPLETING..."
-                            : "COMPLETE MISSION"}
-                        </button>
-                      </article>
-                    );
-                  })}
                 </div>
+
               )}
+
             </section>
 
-            {/* ECOSYSTEM ACCESS */}
+            {/* =================================
+                ECOSYSTEM ACCESS
+            ================================= */}
+
             <section className="dashboard-section">
+
               <div className="dashboard-section-heading">
-                <span>03 / ACCESS</span>
+
+                <span>
+                  03 / ACCESS
+                </span>
 
                 <h2>
                   YOUR
                   <br />
-                  <em>ECOSYSTEM.</em>
+                  <em>
+                    ECOSYSTEM.
+                  </em>
                 </h2>
+
               </div>
 
               <div className="dashboard-access-grid">
 
                 <article>
-                  <span>WL & GTD</span>
+
+                  <span>
+                    WL & GTD
+                  </span>
 
                   <h3>
                     Partner Opportunities
                   </h3>
 
                   <p>
-                    Exclusive whitelist and guaranteed
-                    mint opportunities will appear here.
+                    Exclusive whitelist and
+                    guaranteed mint opportunities
+                    will appear here.
                   </p>
+
                 </article>
 
                 <article>
-                  <span>MISSIONS</span>
+
+                  <span>
+                    MISSIONS
+                  </span>
 
                   <h3>
                     Earn Rhood Points
                   </h3>
 
                   <p>
-                    Complete ecosystem missions and
-                    increase your holder reputation.
+                    Complete ecosystem missions
+                    and increase your holder
+                    reputation.
                   </p>
+
                 </article>
 
                 <article>
-                  <span>REWARDS</span>
+
+                  <span>
+                    REWARDS
+                  </span>
 
                   <h3>
                     Holder Rewards
                   </h3>
 
                   <p>
-                    Future holder-only rewards and drops
-                    will be available here.
+                    Future holder-only rewards
+                    and drops will be available
+                    here.
                   </p>
+
                 </article>
 
               </div>
+
             </section>
+
           </>
         )}
+
       </main>
 
+      {/* FOOTER */}
       <footer className="dashboard-footer">
+
         <div className="logo">
-          <span className="logo-mark">◆</span>
-          <span>RHOODSTONE</span>
+
+          <span className="logo-mark">
+            ◆
+          </span>
+
+          <span>
+            RHOODSTONE
+          </span>
+
         </div>
 
-        <span>© 2026 RhoodStone</span>
+        <span>
+          © 2026 RhoodStone
+        </span>
+
       </footer>
+
     </div>
   );
 }
