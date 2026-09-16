@@ -187,7 +187,7 @@ function Dashboard() {
         .select(
           "mission_id, status, points_awarded"
         )
-        .eq(
+        .ilike(
           "wallet_address",
           address.toLowerCase()
         );
@@ -225,9 +225,7 @@ function Dashboard() {
   // COMPLETE MISSION
   // ==========================================
 
-  async function handleCompleteMission(
-    mission
-  ) {
+  async function handleCompleteMission(mission) {
     if (!address || !supabase) {
       setMissionMessage(
         "Please connect your wallet first."
@@ -243,7 +241,7 @@ function Dashboard() {
     setCompletingMission(mission.id);
 
     try {
-      // Open mission action URL if available
+      // Open external mission action
       if (mission.action_url) {
         window.open(
           mission.action_url,
@@ -262,10 +260,7 @@ function Dashboard() {
         address
       );
 
-      const {
-        data,
-        error,
-      } =
+      const response =
         await supabase.functions.invoke(
           "complete-mission",
           {
@@ -275,6 +270,9 @@ function Dashboard() {
             },
           }
         );
+
+      const data = response?.data;
+      const error = response?.error;
 
       console.log(
         "Complete mission response:",
@@ -287,7 +285,43 @@ function Dashboard() {
       );
 
       // ======================================
-      // HANDLE EDGE FUNCTION ERROR
+      // IMPORTANT:
+      // CHECK SUCCESS FIRST
+      // ======================================
+
+      if (
+        data &&
+        data.success === true
+      ) {
+        const awardedPoints =
+          Number(
+            data.points_awarded || 0
+          );
+
+        console.log(
+          "Mission completed successfully:",
+          awardedPoints
+        );
+
+        setMissionMessage(
+          `Mission completed! +${awardedPoints} Rhood Points`
+        );
+
+        setMissionMessageType(
+          "success"
+        );
+
+        // Update points immediately
+        await refreshPoints();
+
+        // Update mission completion state
+        await loadMissions();
+
+        return;
+      }
+
+      // ======================================
+      // EDGE FUNCTION ERROR
       // ======================================
 
       if (error) {
@@ -333,7 +367,7 @@ function Dashboard() {
       }
 
       // ======================================
-      // FUNCTION RETURNED AN ERROR
+      // SERVER RETURNED ERROR
       // ======================================
 
       if (data?.error) {
@@ -343,37 +377,12 @@ function Dashboard() {
       }
 
       // ======================================
-      // SUCCESS CHECK
+      // UNKNOWN RESPONSE
       // ======================================
 
-      if (!data?.success) {
-        throw new Error(
-          "Mission could not be completed."
-        );
-      }
-
-      // ======================================
-      // SUCCESS
-      // ======================================
-
-      const awardedPoints =
-        Number(
-          data.points_awarded || 0
-        );
-
-      setMissionMessage(
-        `Mission completed! +${awardedPoints} Rhood Points`
+      throw new Error(
+        "Mission could not be completed."
       );
-
-      setMissionMessageType(
-        "success"
-      );
-
-      // Refresh points
-      await refreshPoints();
-
-      // Refresh missions/completions
-      await loadMissions();
 
     } catch (error) {
       console.error(
@@ -389,6 +398,7 @@ function Dashboard() {
       setMissionMessageType(
         "error"
       );
+
     } finally {
       setCompletingMission(null);
     }
@@ -398,9 +408,7 @@ function Dashboard() {
   // CHECK COMPLETED MISSION
   // ==========================================
 
-  function isMissionCompleted(
-    missionId
-  ) {
+  function isMissionCompleted(missionId) {
     return completedMissions.some(
       (completion) =>
         completion.mission_id ===
@@ -478,13 +486,11 @@ function Dashboard() {
       {/* MAIN */}
       <main className="dashboard-main">
 
-        {/* EYEBROW */}
         <div className="dashboard-eyebrow">
           <span></span>
           RHOODSTONE ECOSYSTEM
         </div>
 
-        {/* TITLE */}
         <div className="dashboard-title-row">
 
           <div>
@@ -524,7 +530,6 @@ function Dashboard() {
 
         </div>
 
-        {/* NOT CONNECTED */}
         {!isConnected ? (
 
           <section className="dashboard-connect-card">
@@ -559,13 +564,13 @@ function Dashboard() {
         ) : (
 
           <>
+
             {/* =================================
                 STATS
             ================================= */}
 
             <section className="dashboard-grid">
 
-              {/* HOLDER STATUS */}
               <article className="dashboard-card dashboard-card-large">
 
                 <div className="card-label">
@@ -674,7 +679,6 @@ function Dashboard() {
 
               </article>
 
-              {/* NFT BALANCE */}
               <article className="dashboard-card">
 
                 <div className="card-label">
@@ -691,7 +695,6 @@ function Dashboard() {
 
               </article>
 
-              {/* TIER */}
               <article className="dashboard-card">
 
                 <div className="card-label">
@@ -710,7 +713,6 @@ function Dashboard() {
 
               </article>
 
-              {/* POINTS */}
               <article className="dashboard-card">
 
                 <div className="card-label">
@@ -752,7 +754,6 @@ function Dashboard() {
 
               </div>
 
-              {/* MESSAGE */}
               {missionMessage && (
 
                 <div
@@ -776,7 +777,6 @@ function Dashboard() {
 
               )}
 
-              {/* LOADING */}
               {missionsLoading ? (
 
                 <div className="dashboard-card">
@@ -811,7 +811,6 @@ function Dashboard() {
               ) : missions.length ===
                 0 ? (
 
-                /* EMPTY */
                 <div className="dashboard-card">
 
                   <div className="card-label">
@@ -844,7 +843,6 @@ function Dashboard() {
 
               ) : (
 
-                /* MISSION LIST */
                 <div className="dashboard-access-grid">
 
                   {missions.map(
