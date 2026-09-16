@@ -12,6 +12,9 @@ export async function checkRhoodStoneHolder(walletAddress) {
     throw new Error("Supabase is not configured");
   }
 
+  console.log("Starting RhoodStone verification...");
+  console.log("Wallet:", walletAddress);
+
   const { data, error } = await supabase.functions.invoke(
     "verify-rhoodstone",
     {
@@ -21,13 +24,17 @@ export async function checkRhoodStoneHolder(walletAddress) {
     }
   );
 
+  console.log("Edge Function data:", data);
+  console.log("Edge Function error:", error);
+
   if (error) {
-    console.error("RhoodStone verification error:", error);
-    throw error;
+    throw new Error(
+      `Edge Function error: ${error.message || "Unknown error"}`
+    );
   }
 
   if (!data) {
-    throw new Error("No verification response");
+    throw new Error("No response from verification function");
   }
 
   if (data.error) {
