@@ -16,6 +16,7 @@ function Dashboard() {
   const [nftBalance, setNftBalance] = useState(0);
   const [holderTier, setHolderTier] = useState(null);
 
+  // RhoodStone ownership verification
   useEffect(() => {
     async function verifyHolder() {
       if (!isConnected || !address) {
@@ -27,33 +28,46 @@ function Dashboard() {
       try {
         setHolderStatus("checking");
 
-        useEffect(() => {
-  async function loadHolderTier() {
-    if (!isConnected || !address) {
-      setHolderTier(null);
-      return;
-    }
-
-    const tier = await getHolderTier(0, 0);
-
-    setHolderTier(tier);
-  }
-
-  loadHolderTier();
-}, [isConnected, address]);
-
         const balance = await checkRhoodStoneHolder(address);
 
+        console.log("Verified RhoodStone balance:", balance);
+
         setNftBalance(balance);
-        setHolderStatus(balance > 0 ? "holder" : "not-holder");
+        setHolderStatus(
+          balance > 0 ? "holder" : "not-holder"
+        );
       } catch (error) {
-        console.error("Dashboard ownership check failed:", error);
+        console.error(
+          "Dashboard ownership check failed:",
+          error
+        );
+
         setHolderStatus("error");
         setNftBalance(0);
       }
     }
 
     verifyHolder();
+  }, [isConnected, address]);
+
+  // Holder tier
+  useEffect(() => {
+    async function loadHolderTier() {
+      if (!isConnected || !address) {
+        setHolderTier(null);
+        return;
+      }
+
+      try {
+        const tier = await getHolderTier(0, 0);
+        setHolderTier(tier);
+      } catch (error) {
+        console.error("Holder tier lookup failed:", error);
+        setHolderTier(null);
+      }
+    }
+
+    loadHolderTier();
   }, [isConnected, address]);
 
   function handleWallet() {
@@ -64,10 +78,9 @@ function Dashboard() {
     }
   }
 
-  const shortAddress =
-    address
-      ? `${address.slice(0, 6)}...${address.slice(-4)}`
-      : "";
+  const shortAddress = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    : "";
 
   return (
     <div className="dashboard-page">
@@ -114,6 +127,7 @@ function Dashboard() {
           {isConnected && (
             <div className="dashboard-wallet-status">
               <span className="status-dot"></span>
+
               <div>
                 <small>CONNECTED WALLET</small>
                 <strong>{shortAddress}</strong>
@@ -153,8 +167,10 @@ function Dashboard() {
                 {holderStatus === "checking" && (
                   <div className="dashboard-result">
                     <span className="result-icon">◌</span>
+
                     <div>
                       <strong>VERIFYING</strong>
+
                       <p>
                         Checking your RhoodStone ownership...
                       </p>
@@ -165,8 +181,10 @@ function Dashboard() {
                 {holderStatus === "holder" && (
                   <div className="dashboard-result">
                     <span className="result-icon">✓</span>
+
                     <div>
                       <strong>RHOODSTONE HOLDER</strong>
+
                       <p>
                         Your ownership has been verified on-chain.
                       </p>
@@ -177,8 +195,10 @@ function Dashboard() {
                 {holderStatus === "not-holder" && (
                   <div className="dashboard-result">
                     <span className="result-icon">×</span>
+
                     <div>
                       <strong>NOT A HOLDER</strong>
+
                       <p>
                         No RhoodStone NFT was detected in this wallet.
                       </p>
@@ -189,8 +209,10 @@ function Dashboard() {
                 {holderStatus === "error" && (
                   <div className="dashboard-result">
                     <span className="result-icon">!</span>
+
                     <div>
                       <strong>VERIFICATION FAILED</strong>
+
                       <p>
                         We could not verify ownership. Please try again.
                       </p>
@@ -219,8 +241,8 @@ function Dashboard() {
                 </div>
 
                 <div className="dashboard-tier">
-  {holderTier ? holderTier.name : "—"}
-</div>
+                  {holderTier ? holderTier.name : "—"}
+                </div>
 
                 <p className="dashboard-card-description">
                   Your current ecosystem level.
@@ -256,7 +278,9 @@ function Dashboard() {
               <div className="dashboard-access-grid">
                 <article>
                   <span>WL & GTD</span>
+
                   <h3>Partner Opportunities</h3>
+
                   <p>
                     Exclusive whitelist and guaranteed mint
                     opportunities will appear here.
@@ -265,7 +289,9 @@ function Dashboard() {
 
                 <article>
                   <span>MISSIONS</span>
+
                   <h3>Earn Rhood Points</h3>
+
                   <p>
                     Complete ecosystem missions and increase
                     your holder reputation.
@@ -274,7 +300,9 @@ function Dashboard() {
 
                 <article>
                   <span>REWARDS</span>
+
                   <h3>Holder Rewards</h3>
+
                   <p>
                     Future holder-only rewards and drops will
                     be available here.
