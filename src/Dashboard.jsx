@@ -6,7 +6,7 @@ import {
 } from "@reown/appkit/react";
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
 import { getHolderTier } from "./lib/holderTier";
-
+import { getRhoodPoints } from "./lib/points";
 function Dashboard() {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
