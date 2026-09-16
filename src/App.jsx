@@ -9,16 +9,9 @@ import {
 } from "@reown/appkit/react";
 
 function App() {
-  const savedPath = sessionStorage.getItem("rhoodstone_redirect");
-
-  if (
-    window.location.pathname === "/dashboard" ||
-    savedPath === "/dashboard"
-  ) {
-    sessionStorage.removeItem("rhoodstone_redirect");
+  if (window.location.search === "?page=dashboard") {
     return <Dashboard />;
   }
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState("Checking...");
 
