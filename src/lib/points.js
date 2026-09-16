@@ -7,7 +7,7 @@ export async function getRhoodPoints(walletAddress) {
 
   const { data, error } = await supabase
     .from("point_transactions")
-    .select("points")
+    .select("amount")
     .eq("wallet_address", walletAddress);
 
   if (error) {
@@ -16,7 +16,8 @@ export async function getRhoodPoints(walletAddress) {
   }
 
   return (data || []).reduce(
-    (total, transaction) => total + Number(transaction.points || 0),
+    (total, transaction) =>
+      total + Number(transaction.amount || 0),
     0
   );
 }
