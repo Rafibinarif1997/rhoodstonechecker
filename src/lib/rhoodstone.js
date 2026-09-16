@@ -18,9 +18,13 @@ export const robinhoodChain = {
   },
 };
 
-export const rhoodstoneClient = createPublicClient({
+const client = createPublicClient({
   chain: robinhoodChain,
-  transport: http(),
+  transport: http("https://rpc.mainnet.chain.robinhood.com", {
+    timeout: 15000,
+    retryCount: 3,
+    retryDelay: 1000,
+  }),
 });
 
 const ERC721_ABI = [
@@ -48,7 +52,7 @@ export async function checkRhoodStoneHolder(walletAddress) {
     return 0;
   }
 
-  const balance = await rhoodstoneClient.readContract({
+  const balance = await client.readContract({
     address: RHOODSTONE_CONTRACT,
     abi: ERC721_ABI,
     functionName: "balanceOf",
