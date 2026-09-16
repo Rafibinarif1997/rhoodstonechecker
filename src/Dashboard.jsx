@@ -7,6 +7,7 @@ import {
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
 import { getHolderTier } from "./lib/holderTier";
 import { getRhoodPoints } from "./lib/points";
+import { supabase } from "./lib/supabase";
 
 function Dashboard() {
   const { open } = useAppKit();
@@ -17,6 +18,8 @@ function Dashboard() {
   const [nftBalance, setNftBalance] = useState(0);
   const [holderTier, setHolderTier] = useState(null);
   const [rhoodPoints, setRhoodPoints] = useState(0);
+  const [missions, setMissions] = useState([]);
+  const [missionsLoading, setMissionsLoading] = useState(false);
 
   // RhoodStone ownership verification
   useEffect(() => {
@@ -87,10 +90,7 @@ function Dashboard() {
       try {
         const points = await getRhoodPoints(address);
 
-        console.log(
-          "Rhood Points:",
-          points
-        );
+        console.log("Rhood Points:", points);
 
         setRhoodPoints(points);
       } catch (error) {
@@ -104,6 +104,47 @@ function Dashboard() {
     }
 
     loadRhoodPoints();
+  }, [isConnected, address]);
+
+  // Missions
+  useEffect(() => {
+    async function loadMissions() {
+      if (!isConnected || !address || !supabase) {
+        setMissions([]);
+        return;
+      }
+
+      try {
+        setMissionsLoading(true);
+
+        const { data, error } = await supabase
+          .from("missions")
+          .select(
+            "id, title, description, mission_type, action_url, reward_points, max_completions, start_at, end_at, is_holder_only, is_active"
+          )
+          .eq("is_active", true)
+          .order("created_at", {
+            ascending: false,
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        setMissions(data || []);
+      } catch (error) {
+        console.error(
+          "Missions lookup failed:",
+          error
+        );
+
+        setMissions([]);
+      } finally {
+        setMissionsLoading(false);
+      }
+    }
+
+    loadMissions();
   }, [isConnected, address]);
 
   function handleWallet() {
@@ -326,9 +367,111 @@ function Dashboard() {
 
             </section>
 
+            {/* REAL MISSIONS */}
             <section className="dashboard-section">
               <div className="dashboard-section-heading">
-                <span>01 / ACCESS</span>
+                <span>02 / MISSIONS</span>
+
+                <h2>
+                  EARN
+                  <br />
+                  <em>RHOOD POINTS.</em>
+                </h2>
+              </div>
+
+              {missionsLoading ? (
+                <div className="dashboard-card">
+                  <div className="card-label">
+                    MISSIONS
+                  </div>
+
+                  <div className="dashboard-result">
+                    <span className="result-icon">
+                      ◌
+                    </span>
+
+                    <div>
+                      <strong>
+                        LOADING MISSIONS
+                      </strong>
+
+                      <p>
+                        Fetching active ecosystem missions...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : missions.length === 0 ? (
+                <div className="dashboard-card">
+                  <div className="card-label">
+                    MISSIONS
+                  </div>
+
+                  <div className="dashboard-result">
+                    <span className="result-icon">
+                      —
+                    </span>
+
+                    <div>
+                      <strong>
+                        NO ACTIVE MISSIONS
+                      </strong>
+
+                      <p>
+                        New missions will appear here when
+                        they become available.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="dashboard-access-grid">
+                  {missions.map((mission) => (
+                    <article key={mission.id}>
+                      <span>
+                        {mission.mission_type
+                          ? mission.mission_type.toUpperCase()
+                          : "MISSION"}
+                      </span>
+
+                      <h3>
+                        {mission.title}
+                      </h3>
+
+                      <p>
+                        {mission.description}
+                      </p>
+
+                      <div
+                        style={{
+                          marginTop: "18px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "12px",
+                        }}
+                      >
+                        <strong>
+                          +{mission.reward_points} POINTS
+                        </strong>
+
+                        {mission.is_holder_only && (
+                          <small>
+                            HOLDER ONLY
+                          </small>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+
+            </section>
+
+            {/* ECOSYSTEM ACCESS */}
+            <section className="dashboard-section">
+              <div className="dashboard-section-heading">
+                <span>03 / ACCESS</span>
 
                 <h2>
                   YOUR
