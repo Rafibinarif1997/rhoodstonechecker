@@ -29,10 +29,74 @@ function Dashboard() {
     useState("");
 
   // ==========================================
-  // RHOODSTONE OWNERSHIP VERIFICATION
-  // ==========================================
+// RHOODSTONE OWNERSHIP VERIFICATION
+// ==========================================
 
-  useEffect(() => {
+useEffect(() => {
+  async function verifyOwnership() {
+    if (!isConnected || !address) {
+      setHolderStatus("idle");
+      setNftBalance(0);
+      return;
+    }
+
+    setHolderStatus("checking");
+    setNftBalance(0);
+
+    try {
+      console.log(
+        "Dashboard NFT verification started"
+      );
+
+      console.log(
+        "Wallet:",
+        address
+      );
+
+      const balance =
+        await checkRhoodStoneHolder(address);
+
+      console.log(
+        "Dashboard NFT balance:",
+        balance
+      );
+
+      const numericBalance =
+        Number(balance || 0);
+
+      setNftBalance(
+        numericBalance
+      );
+
+      if (numericBalance > 0) {
+        setHolderStatus("holder");
+      } else {
+        setHolderStatus("not-holder");
+      }
+
+    } catch (error) {
+      console.error(
+        "RhoodStone ownership verification failed:",
+        error
+      );
+
+      setNftBalance(0);
+      setHolderStatus("error");
+    }
+  }
+
+  verifyOwnership();
+}, [
+  isConnected,
+  address,
+]);
+
+
+// ==========================================
+// HOLDER TIER
+// ==========================================
+
+useEffect(() => {
   async function loadHolderTier() {
     if (!isConnected || !address) {
       setHolderTier(null);
@@ -40,12 +104,19 @@ function Dashboard() {
     }
 
     try {
-      const tier = await getHolderTier(
-        rhoodPoints,
-        0
+      const tier =
+        await getHolderTier(
+          rhoodPoints,
+          0
+        );
+
+      console.log(
+        "Holder Tier:",
+        tier
       );
 
       setHolderTier(tier);
+
     } catch (error) {
       console.error(
         "Holder tier lookup failed:",
@@ -63,71 +134,7 @@ function Dashboard() {
   rhoodPoints,
 ]);
 
-  // ==========================================
-  // HOLDER TIER
-  // ==========================================
-
-  useEffect(() => {
-    async function loadHolderTier() {
-      if (!isConnected || !address) {
-        setHolderTier(null);
-        return;
-      }
-
-      try {
-        const tier =
-          await getHolderTier(0, 0);
-
-        setHolderTier(tier);
-      } catch (error) {
-        console.error(
-          "Holder tier lookup failed:",
-          error
-        );
-
-        setHolderTier(null);
-      }
-    }
-
-    loadHolderTier();
-  }, [isConnected, address]);
-
-  // ==========================================
-  // RHOOD POINTS
-  // ==========================================
-
-  async function refreshPoints() {
-    if (!address) {
-      setRhoodPoints(0);
-      return;
-    }
-
-    try {
-      const points =
-        await getRhoodPoints(address);
-
-      console.log(
-        "Rhood Points:",
-        points
-      );
-
-      setRhoodPoints(points);
-    } catch (error) {
-      console.error(
-        "Rhood points lookup failed:",
-        error
-      );
-    }
-  }
-
-  useEffect(() => {
-    if (!isConnected || !address) {
-      setRhoodPoints(0);
-      return;
-    }
-
-    refreshPoints();
-  }, [isConnected, address]);
+  
 
   // ==========================================
   // LOAD ACTIVE MISSIONS
