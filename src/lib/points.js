@@ -5,16 +5,12 @@ export async function getRhoodPoints(walletAddress) {
     return 0;
   }
 
-  const wallet =
-    walletAddress.toLowerCase();
+  const wallet = walletAddress.toLowerCase();
 
   const { data, error } = await supabase
     .from("point_transactions")
-    .select("amount")
-    .ilike(
-      "wallet_address",
-      wallet
-    );
+    .select("amount, wallet_address")
+    .ilike("wallet_address", wallet);
 
   if (error) {
     console.error(
@@ -25,18 +21,23 @@ export async function getRhoodPoints(walletAddress) {
     return 0;
   }
 
-  const total =
-    (data || []).reduce(
-      (sum, transaction) =>
+  console.log(
+    "Point transactions:",
+    data
+  );
+
+  const total = (data || []).reduce(
+    (sum, transaction) => {
+      return (
         sum +
-        Number(
-          transaction.amount || 0
-        ),
-      0
-    );
+        Number(transaction.amount || 0)
+      );
+    },
+    0
+  );
 
   console.log(
-    "Rhood Points:",
+    "Total Rhood Points:",
     total
   );
 
