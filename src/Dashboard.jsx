@@ -18,8 +18,12 @@ function Dashboard() {
   const [nftBalance, setNftBalance] = useState(0);
   const [holderTier, setHolderTier] = useState(null);
   const [rhoodPoints, setRhoodPoints] = useState(0);
+
   const [missions, setMissions] = useState([]);
+  const [completedMissions, setCompletedMissions] = useState([]);
   const [missionsLoading, setMissionsLoading] = useState(false);
+  const [completingMission, setCompletingMission] = useState(null);
+  const [missionMessage, setMissionMessage] = useState("");
 
   // RhoodStone ownership verification
   useEffect(() => {
@@ -34,8 +38,6 @@ function Dashboard() {
         setHolderStatus("checking");
 
         const balance = await checkRhoodStoneHolder(address);
-
-        console.log("Verified RhoodStone balance:", balance);
 
         setNftBalance(balance);
         setHolderStatus(
@@ -80,72 +82,175 @@ function Dashboard() {
   }, [isConnected, address]);
 
   // Rhood Points
-  useEffect(() => {
-    async function loadRhoodPoints() {
-      if (!isConnected || !address) {
-        setRhoodPoints(0);
-        return;
-      }
-
-      try {
-        const points = await getRhoodPoints(address);
-
-        console.log("Rhood Points:", points);
-
-        setRhoodPoints(points);
-      } catch (error) {
-        console.error(
-          "Rhood points lookup failed:",
-          error
-        );
-
-        setRhoodPoints(0);
-      }
+  async function refreshPoints() {
+    if (!address) {
+      setRhoodPoints(0);
+      return;
     }
 
-    loadRhoodPoints();
+    try {
+      const points = await getRhoodPoints(address);
+      setRhoodPoints(points);
+    } catch (error) {
+      console.error(
+        "Rhood points lookup failed:",
+        error
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (!isConnected || !address) {
+      setRhoodPoints(0);
+      return;
+    }
+
+    refreshPoints();
   }, [isConnected, address]);
 
-  // Missions
-  useEffect(() => {
-    async function loadMissions() {
-      if (!isConnected || !address || !supabase) {
-        setMissions([]);
-        return;
-      }
-
-      try {
-        setMissionsLoading(true);
-
-        const { data, error } = await supabase
-          .from("missions")
-          .select(
-            "id, title, description, mission_type, action_url, reward_points, max_completions, start_at, end_at, is_holder_only, is_active"
-          )
-          .eq("is_active", true)
-          .order("created_at", {
-            ascending: false,
-          });
-
-        if (error) {
-          throw error;
-        }
-
-        setMissions(data || []);
-      } catch (error) {
-        console.error(
-          "Missions lookup failed:",
-          error
-        );
-
-        setMissions([]);
-      } finally {
-        setMissionsLoading(false);
-      }
+  // Load active missions
+  async function loadMissions() {
+    if (!isConnected || !address || !supabase) {
+      setMissions([]);
+      setCompletedMissions([]);
+      return;
     }
 
+    try {
+      setMissionsLoading(true);
+
+      const { data, error } = await supabase
+        .from("missions")
+        .select(
+          "id, title, description, mission_type, action_url, reward_points, max_completions, start_at, end_at, is_holder_only"
+        )
+        .eq("is_active", true)
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setMissions(data || []);
+
+      // Find missions already completed by this wallet
+      const { data: completions, error: completionError } =
+        await supabase
+          .from("mission_completions")
+          .select(
+            "mission_id, status, points_awarded"
+          )
+          .eq(
+            "wallet_address",
+            address.toLowerCase()
+          );
+
+      if (completionError) {
+        console.error(
+          "Mission completion lookup failed:",
+          completionError
+        );
+
+        setCompletedMissions([]);
+      } else {
+        setCompletedMissions(
+          completions || []
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Missions lookup failed:",
+        error
+      );
+
+      setMissions([]);
+    } finally {
+      setMissionsLoading(false);
+    }
+  }
+
+  useEffect(() => {
     loadMissions();
   }, [isConnected, address]);
+
+  // Complete mission
+  async function handleCompleteMission(mission) {
+    if (!address || !supabase) {
+      return;
+    }
+
+    setMissionMessage("");
+    setCompletingMission(mission.id);
+
+    try {
+      // If mission has an external action URL,
+      // open it first.
+      if (mission.action_url) {
+        window.open(
+          mission.action_url,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      }
+
+      const { data, error } =
+        await supabase.functions.invoke(
+          "complete-mission",
+          {
+            body: {
+              mission_id: mission.id,
+              wallet: address,
+            },
+          }
+        );
+
+      if (error) {
+        throw new Error(
+          error.message ||
+            "Mission completion failed"
+        );
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data?.success) {
+        throw new Error(
+          "Mission could not be completed"
+        );
+      }
+
+      setMissionMessage(
+        `Mission completed! +${data.points_awarded} Rhood Points`
+      );
+
+      await refreshPoints();
+      await loadMissions();
+    } catch (error) {
+      console.error(
+        "Mission completion failed:",
+        error
+      );
+
+      setMissionMessage(
+        error.message ||
+          "Could not complete mission."
+      );
+    } finally {
+      setCompletingMission(null);
+    }
+  }
+
+  function isMissionCompleted(missionId) {
+    return completedMissions.some(
+      (completion) =>
+        completion.mission_id === missionId &&
+        completion.status === "completed"
+    );
+  }
 
   function handleWallet() {
     if (isConnected) {
@@ -367,7 +472,7 @@ function Dashboard() {
 
             </section>
 
-            {/* REAL MISSIONS */}
+            {/* MISSIONS */}
             <section className="dashboard-section">
               <div className="dashboard-section-heading">
                 <span>02 / MISSIONS</span>
@@ -378,6 +483,19 @@ function Dashboard() {
                   <em>RHOOD POINTS.</em>
                 </h2>
               </div>
+
+              {missionMessage && (
+                <div
+                  className="dashboard-card"
+                  style={{
+                    marginBottom: "20px",
+                  }}
+                >
+                  <strong>
+                    {missionMessage}
+                  </strong>
+                </div>
+              )}
 
               {missionsLoading ? (
                 <div className="dashboard-card">
@@ -426,46 +544,81 @@ function Dashboard() {
                 </div>
               ) : (
                 <div className="dashboard-access-grid">
-                  {missions.map((mission) => (
-                    <article key={mission.id}>
-                      <span>
-                        {mission.mission_type
-                          ? mission.mission_type.toUpperCase()
-                          : "MISSION"}
-                      </span>
+                  {missions.map((mission) => {
+                    const completed =
+                      isMissionCompleted(
+                        mission.id
+                      );
 
-                      <h3>
-                        {mission.title}
-                      </h3>
+                    const completing =
+                      completingMission ===
+                      mission.id;
 
-                      <p>
-                        {mission.description}
-                      </p>
+                    return (
+                      <article key={mission.id}>
+                        <span>
+                          {mission.mission_type
+                            ? mission.mission_type.toUpperCase()
+                            : "MISSION"}
+                        </span>
 
-                      <div
-                        style={{
-                          marginTop: "18px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: "12px",
-                        }}
-                      >
-                        <strong>
-                          +{mission.reward_points} POINTS
-                        </strong>
+                        <h3>
+                          {mission.title}
+                        </h3>
 
-                        {mission.is_holder_only && (
-                          <small>
-                            HOLDER ONLY
-                          </small>
-                        )}
-                      </div>
-                    </article>
-                  ))}
+                        <p>
+                          {mission.description}
+                        </p>
+
+                        <div
+                          style={{
+                            marginTop: "18px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent:
+                              "space-between",
+                            gap: "12px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <strong>
+                            +{mission.reward_points} POINTS
+                          </strong>
+
+                          {mission.is_holder_only && (
+                            <small>
+                              HOLDER ONLY
+                            </small>
+                          )}
+                        </div>
+
+                        <button
+                          className="primary-button"
+                          style={{
+                            marginTop: "18px",
+                            width: "100%",
+                          }}
+                          disabled={
+                            completed ||
+                            completing
+                          }
+                          onClick={() =>
+                            handleCompleteMission(
+                              mission
+                            )
+                          }
+                        >
+                          {completed
+                            ? "✓ COMPLETED"
+                            : completing
+                            ? "COMPLETING..."
+                            : "COMPLETE MISSION"}
+                        </button>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
-
             </section>
 
             {/* ECOSYSTEM ACCESS */}
