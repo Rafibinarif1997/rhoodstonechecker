@@ -59,11 +59,9 @@ createAppKit({
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </WagmiProvider>
-  </React.StrictMode>
+  <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </WagmiProvider>
 );
