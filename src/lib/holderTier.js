@@ -7,7 +7,7 @@ export async function getHolderTier(points = 0, holdingDays = 0) {
 
   const { data, error } = await supabase
     .from("holder_tiers")
-    .select("name, min_points, min_holding_days")
+    .select("name, min_points, min_hold_days")
     .order("min_points", { ascending: false });
 
   if (error) {
@@ -18,7 +18,7 @@ export async function getHolderTier(points = 0, holdingDays = 0) {
   const matchingTier = data.find(
     (tier) =>
       points >= tier.min_points &&
-      holdingDays >= tier.min_holding_days
+      holdingDays >= tier.min_hold_days
   );
 
   return matchingTier || null;
