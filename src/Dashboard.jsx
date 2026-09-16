@@ -7,6 +7,7 @@ import {
 import { checkRhoodStoneHolder } from "./lib/rhoodstone";
 import { getHolderTier } from "./lib/holderTier";
 import { getRhoodPoints } from "./lib/points";
+
 function Dashboard() {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
@@ -15,6 +16,7 @@ function Dashboard() {
   const [holderStatus, setHolderStatus] = useState("idle");
   const [nftBalance, setNftBalance] = useState(0);
   const [holderTier, setHolderTier] = useState(null);
+  const [rhoodPoints, setRhoodPoints] = useState(0);
 
   // RhoodStone ownership verification
   useEffect(() => {
@@ -62,12 +64,46 @@ function Dashboard() {
         const tier = await getHolderTier(0, 0);
         setHolderTier(tier);
       } catch (error) {
-        console.error("Holder tier lookup failed:", error);
+        console.error(
+          "Holder tier lookup failed:",
+          error
+        );
+
         setHolderTier(null);
       }
     }
 
     loadHolderTier();
+  }, [isConnected, address]);
+
+  // Rhood Points
+  useEffect(() => {
+    async function loadRhoodPoints() {
+      if (!isConnected || !address) {
+        setRhoodPoints(0);
+        return;
+      }
+
+      try {
+        const points = await getRhoodPoints(address);
+
+        console.log(
+          "Rhood Points:",
+          points
+        );
+
+        setRhoodPoints(points);
+      } catch (error) {
+        console.error(
+          "Rhood points lookup failed:",
+          error
+        );
+
+        setRhoodPoints(0);
+      }
+    }
+
+    loadRhoodPoints();
   }, [isConnected, address]);
 
   function handleWallet() {
@@ -99,7 +135,9 @@ function Dashboard() {
             className="connect-button"
             onClick={handleWallet}
           >
-            {isConnected ? shortAddress : "Connect Wallet"}
+            {isConnected
+              ? shortAddress
+              : "Connect Wallet"}
           </button>
         </div>
       </header>
@@ -138,7 +176,9 @@ function Dashboard() {
 
         {!isConnected ? (
           <section className="dashboard-connect-card">
-            <div className="dashboard-card-icon">◆</div>
+            <div className="dashboard-card-icon">
+              ◆
+            </div>
 
             <span>MEMBER ACCESS</span>
 
@@ -159,6 +199,7 @@ function Dashboard() {
         ) : (
           <>
             <section className="dashboard-grid">
+
               <article className="dashboard-card dashboard-card-large">
                 <div className="card-label">
                   HOLDER STATUS
@@ -166,7 +207,9 @@ function Dashboard() {
 
                 {holderStatus === "checking" && (
                   <div className="dashboard-result">
-                    <span className="result-icon">◌</span>
+                    <span className="result-icon">
+                      ◌
+                    </span>
 
                     <div>
                       <strong>VERIFYING</strong>
@@ -180,13 +223,18 @@ function Dashboard() {
 
                 {holderStatus === "holder" && (
                   <div className="dashboard-result">
-                    <span className="result-icon">✓</span>
+                    <span className="result-icon">
+                      ✓
+                    </span>
 
                     <div>
-                      <strong>RHOODSTONE HOLDER</strong>
+                      <strong>
+                        RHOODSTONE HOLDER
+                      </strong>
 
                       <p>
-                        Your ownership has been verified on-chain.
+                        Your ownership has been verified
+                        on-chain.
                       </p>
                     </div>
                   </div>
@@ -194,13 +242,18 @@ function Dashboard() {
 
                 {holderStatus === "not-holder" && (
                   <div className="dashboard-result">
-                    <span className="result-icon">×</span>
+                    <span className="result-icon">
+                      ×
+                    </span>
 
                     <div>
-                      <strong>NOT A HOLDER</strong>
+                      <strong>
+                        NOT A HOLDER
+                      </strong>
 
                       <p>
-                        No RhoodStone NFT was detected in this wallet.
+                        No RhoodStone NFT was detected in
+                        this wallet.
                       </p>
                     </div>
                   </div>
@@ -208,13 +261,18 @@ function Dashboard() {
 
                 {holderStatus === "error" && (
                   <div className="dashboard-result">
-                    <span className="result-icon">!</span>
+                    <span className="result-icon">
+                      !
+                    </span>
 
                     <div>
-                      <strong>VERIFICATION FAILED</strong>
+                      <strong>
+                        VERIFICATION FAILED
+                      </strong>
 
                       <p>
-                        We could not verify ownership. Please try again.
+                        We could not verify ownership.
+                        Please try again.
                       </p>
                     </div>
                   </div>
@@ -241,7 +299,9 @@ function Dashboard() {
                 </div>
 
                 <div className="dashboard-tier">
-                  {holderTier ? holderTier.name : "—"}
+                  {holderTier
+                    ? holderTier.name
+                    : "—"}
                 </div>
 
                 <p className="dashboard-card-description">
@@ -255,13 +315,15 @@ function Dashboard() {
                 </div>
 
                 <div className="dashboard-number">
-                  0
+                  {rhoodPoints}
                 </div>
 
                 <p className="dashboard-card-description">
-                  Earn points through missions and participation.
+                  Earn points through missions and
+                  participation.
                 </p>
               </article>
+
             </section>
 
             <section className="dashboard-section">
@@ -276,38 +338,46 @@ function Dashboard() {
               </div>
 
               <div className="dashboard-access-grid">
+
                 <article>
                   <span>WL & GTD</span>
 
-                  <h3>Partner Opportunities</h3>
+                  <h3>
+                    Partner Opportunities
+                  </h3>
 
                   <p>
-                    Exclusive whitelist and guaranteed mint
-                    opportunities will appear here.
+                    Exclusive whitelist and guaranteed
+                    mint opportunities will appear here.
                   </p>
                 </article>
 
                 <article>
                   <span>MISSIONS</span>
 
-                  <h3>Earn Rhood Points</h3>
+                  <h3>
+                    Earn Rhood Points
+                  </h3>
 
                   <p>
-                    Complete ecosystem missions and increase
-                    your holder reputation.
+                    Complete ecosystem missions and
+                    increase your holder reputation.
                   </p>
                 </article>
 
                 <article>
                   <span>REWARDS</span>
 
-                  <h3>Holder Rewards</h3>
+                  <h3>
+                    Holder Rewards
+                  </h3>
 
                   <p>
-                    Future holder-only rewards and drops will
-                    be available here.
+                    Future holder-only rewards and drops
+                    will be available here.
                   </p>
                 </article>
+
               </div>
             </section>
           </>
