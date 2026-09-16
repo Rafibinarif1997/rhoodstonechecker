@@ -2,23 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
   <title>RhoodStone</title>
 
   <script>
-    const path = window.location.pathname;
+    (function () {
+      var l = window.location;
 
-    if (path !== "/" && path !== "/index.html") {
-      sessionStorage.setItem("rhoodstone_redirect", path);
-      window.location.replace("/");
-    }
+      l.replace(
+        l.protocol +
+        "//" +
+        l.hostname +
+        (l.port ? ":" + l.port : "") +
+        "/?/" +
+        l.pathname.slice(1).replace(/&/g, "~and~") +
+        (l.search
+          ? "&" + l.search.slice(1).replace(/&/g, "~and~")
+          : "") +
+        l.hash
+      );
+    })();
   </script>
 </head>
 
-<body>
-  <div id="root"></div>
-</body>
+<body></body>
 </html>
