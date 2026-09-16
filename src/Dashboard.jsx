@@ -33,44 +33,35 @@ function Dashboard() {
   // ==========================================
 
   useEffect(() => {
-    async function verifyHolder() {
-      if (!isConnected || !address) {
-        setHolderStatus("idle");
-        setNftBalance(0);
-        return;
-      }
-
-      try {
-        setHolderStatus("checking");
-
-        const balance =
-          await checkRhoodStoneHolder(address);
-
-        console.log(
-          "Verified RhoodStone balance:",
-          balance
-        );
-
-        setNftBalance(balance);
-
-        setHolderStatus(
-          balance > 0
-            ? "holder"
-            : "not-holder"
-        );
-      } catch (error) {
-        console.error(
-          "Dashboard ownership check failed:",
-          error
-        );
-
-        setHolderStatus("error");
-        setNftBalance(0);
-      }
+  async function loadHolderTier() {
+    if (!isConnected || !address) {
+      setHolderTier(null);
+      return;
     }
 
-    verifyHolder();
-  }, [isConnected, address]);
+    try {
+      const tier = await getHolderTier(
+        rhoodPoints,
+        0
+      );
+
+      setHolderTier(tier);
+    } catch (error) {
+      console.error(
+        "Holder tier lookup failed:",
+        error
+      );
+
+      setHolderTier(null);
+    }
+  }
+
+  loadHolderTier();
+}, [
+  isConnected,
+  address,
+  rhoodPoints,
+]);
 
   // ==========================================
   // HOLDER TIER
